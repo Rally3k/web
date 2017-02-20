@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Rally 3k web</title>
+
+    <!-- Bootstrap -->
+    <link href="files/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="files/font-awesome/css/font-awesome.min.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        .border {
+            border: 0px solid #C0C0C0;
+        }
+
+        .road-sign {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #FFFFFF;
+            border: 0.5rem solid #C0C0C0;
+            border-radius: 50%;
+            text-decoration: none;
+        }
+
+        .speed-limit {
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .item-label {
+            margin: auto;
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 1.3rem;
+            font-weight: bold;
+            line-height: 1.5rem;
+            display: block;
+        }
+
+        .item-value {
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .icon {
+            color: #000000;
+            font-size: 4rem;
+        }
+
+        .rdsIcon {
+            color: #000000;
+            font-size: 2rem;
+        }
+
+        .nopadding {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .square-box{
+            position: relative;
+            overflow: hidden;
+        }
+        .square-box:before{
+            content: "";
+            display: block;
+            padding-top: 100%;
+        }
+        .square-content{
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+        .square-content div {
+            display: table;
+            width: 100%;
+            height: 100%;
+        }
+        .square-content a {
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+            text-decoration: none;
+        }
+
+        .rect-box{
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rect-box:before{
+            content: "";
+            display: block;
+            padding-top: 50%;
+        }
+
+        th {
+            font-size: 1rem;
+        }
+
+        td {
+            font-size: 2rem;
+        }
+
+        .visible-l {
+            display: none !important;
+        }
+
+        @media only screen and (min-aspect-ratio: 7/8) {
+            .col-l-1 {width: 8.33%; float: left;}
+            .col-l-2 {width: 16.66%; float: left;}
+            .col-l-3 {width: 25%; float: left;}
+            .col-l-4 {width: 33.33%; float: left;}
+            .col-l-5 {width: 41.66%; float: left;}
+            .col-l-6 {width: 50%; float: left;}
+            .col-l-7 {width: 58.33%; float: left;}
+            .col-l-8 {width: 66.66%; float: left;}
+            .col-l-9 {width: 75%; float: left;}
+            .col-l-10 {width: 83.33%; float: left;}
+            .col-l-11 {width: 91.66%; float: left;}
+            .col-l-12 {width: 100%; float: left;}
+
+            .col-l-pull-2 {right: 16.66%;}
+            .col-l-push-6 {left: 50%;}
+
+            th.visible-l,
+            td.visible-l {
+                display: table-cell !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="files/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="files/bootstrap.min.js"></script>
+    <script type="text/ecmascript" src="/files/NoSleep.min.js"></script>
+
+    <script type="text/javascript">
+        function increaseFontSize() {
+            var html = document.documentElement;
+            html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) + 1 + 'px';
+        }
+        function decreaseFontSize() {
+            var html = document.documentElement;
+            html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) - 1 + 'px';
+        }
+    </script>
+
+<div class="alert alert-warning alert-dismissable fade in" id="alertSpeed" onclick="$(this).hide();" style="display: none">Скорость должна быть положительной!</div>
+<div class="alert alert-danger alert-dismissable fade in" id="alDanger" onclick="$(this).hide();" style="display: none"></div>
+<div class="grid container-fluid">
+    <div class="row">
+        <div class="col-l-2 col-xs-4 nopadding rect-box">
+            <div class="square-content">
+                <div>
+                    <a href="#" onclick="gpsClick();">
+                        <i class="fa fa-globe icon"></i>
+                    </a>
+                    <a href="javascript:isPause=!isPause;$('.fa-pause').css('color',isPause?'red':'');">
+                        <i class="fa icon fa-pause"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 border nopadding rect-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:showModalTime('Время', getCurrentTime(), true);">
+                        <span class="item-label">Время</snap><br>
+                        <span class="item-value" id="time">23:55:55</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 col-l-push-6 border nopadding rect-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:isReverse=!isReverse;$('.fa-retweet').css('color',isReverse?'red':'');">
+                        <i class="fa fa-retweet icon"></i>
+                    </a>
+                    <a href="javascript:showModalCorrection();">
+                        <i class="fa icon fa-car"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 col-l-pull-2 border nopadding rect-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:showModalNumber('Сектор', sector);">
+                        <span class="item-label">Сектор</snap><br>
+                            <span class="item-value" id="sector">999.999</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 col-l-pull-2 border nopadding rect-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:showModalTime('Норма', norm, false);">
+                        <span class="item-label">Норма</snap><br>
+                            <span class="item-value" id="norm">04:55</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 col-l-pull-2 border nopadding rect-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:showModalTime('Старт', start, true);">
+                        <span class="item-label">Старт</snap><br>
+                            <span class="item-value" id="start">10:00:00</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(10);" class="road-sign">
+                        <span class="speed-limit">10</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(20);" class="road-sign">
+                        <span class="speed-limit">20</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(30);" class="road-sign">
+                        <span class="speed-limit">30</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(40);" class="road-sign">
+                        <span class="speed-limit">40</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(50);" class="road-sign">
+                        <span class="speed-limit">50</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(60);" class="road-sign">
+                        <span class="speed-limit">60</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(70);" class="road-sign">
+                        <span class="speed-limit">70</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(80);" class="road-sign">
+                        <span class="speed-limit">80</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(90);" class="road-sign">
+                        <span class="speed-limit">90</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(100);" class="road-sign">
+                        <span class="speed-limit">100</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(110);" class="road-sign">
+                        <span class="speed-limit">110</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:changeSpeed(130);" class="road-sign">
+                        <span class="speed-limit">130</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-l-2 col-xs-4 border nopadding rect-box">
+            <div class="square-content">
+                <div>
+                    <a href="javascript:showModalNumber('Пройдено', getNumberString(distance, 1000));" oncontextmenu="javascript:resetDistance(); return false;">
+<span class="item-label">Пройдено</snap><br>
+                            <span class="item-value" id="distance">999.999</span>
+</a>
+</div>
+</div>
+</div>
+<div class="col-l-2 col-xs-4 border nopadding rect-box">
+    <div class="square-content">
+        <div>
+            <a href="javascript:showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');" oncontextmenu="javascript:resetInterval(); return false;">
+<span class="item-label">Интервал</snap><br>
+                            <span class="item-value" id="interval">99.999</span><br>
+<span class="item-label" id="intervalDistance">(--.---)</snap>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-2 col-xs-4 border nopadding rect-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:gpsLongClick();">
+                    <span class="item-label">Ср. скорость</snap><br>
+                            <span class="item-value" id="avgSpeed">90.0</span>
+</a>
+</div>
+</div>
+</div>
+<div class="col-l-2 col-xs-4 border nopadding rect-box">
+    <div class="square-content">
+        <div>
+            <a href="javascript:;">
+                <span class="item-label">Льгота</snap><br>
+                            <span class="item-value" id="benefit">00:05</span>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="col-l-2 col-xs-4 border nopadding rect-box">
+    <div class="square-content">
+        <div>
+            <a href="javascript:viewRds();">
+                <span class="item-label">Опоздание</snap><br>
+                            <span class="item-value" id="lateness">-10:00</span>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="col-l-2 col-xs-4 border nopadding rect-box">
+    <div class="square-content">
+        <div>
+            <a href="javascript:showModalSpeed();">
+                <span class="item-label">Скорость</snap><br>
+                <span class="item-value" id="speed">V - 5</span><br>
+                <span class="item-label" id="vpdd">60</snap>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:rdsStart();">
+                    <i class="fa fa-play icon"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:rdsPF();">
+                    <i class="fa icon fa-flag-checkered"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:rdsFinish();">
+                    <i class="fa fa-stop icon"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:increaseFontSize();">
+                    <i class="fa icon fa-plus"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:decreaseFontSize();">
+                    <i class="fa fa-minus icon"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:noSleep.enable();">
+                    <i class="fa fa-lightbulb-o icon"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <table id="rdsTable" class="table">
+        <thead>
+            <tr>
+                <th>Тип</th>
+                <th>Дистанция</th>
+                <th>Скорость</th>
+                <th>Опоздание</th>
+                <th class="visible-l">Норма</th>
+                <th class="visible-l">Время</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Number -->
+<div class="modal fade" id="modalNumber" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <form class="form-horizontal" id="formNumber">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <input type="number" inputmode="numeric" step="any" class="form-control" id="numberValue">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group col-xs-12">
+                        <button type="submit" class="btn btn-success" onclick="isIntervalPosition=false;">Ok</button>
+                        <button type="submit" id="fNumberPosition" class="btn btn-info" onclick="isIntervalPosition=true;">Позиция</button>
+                        <button type="button" id="fNumberReset" class="btn btn-warning" data-dismiss="modal">0..</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Time -->
+<div class="modal fade" id="modalTime" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <form class="form-horizontal" id="formTime">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <input type="text" class="form-control" id="timeValue">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-6">Ok</button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal">Отмена</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal RDS item -->
+<div class="modal fade" id="modalRdsItem" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formRdsItem">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemType">Тип</label>
+                        <div class="col-sm-10">
+                            <label class="radio-inline">
+                                <input type="radio" name="fRdsItemType" value="S"><i class="fa fa-play"></i>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fRdsItemType" value="C"><i class="fa fa-tachometer"></i>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fRdsItemType" value="P"><i class="fa fa-flag-checkered"></i>
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fRdsItemType" value="F"><i class="fa fa-stop"></i>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemDistance">Дистанция</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="fRdsItemDistance" step="any" placeholder="Дистанция">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemSpeed">Скорость</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="fRdsItemSpeed" step="any" placeholder="Скорость">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemTime">Время</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="fRdsItemTime" placeholder="Время отметки">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="btn-group col-xs-12">
+                            <button type="submit" class="btn btn-success col-xs-4">Ok</button>
+                            <button type="button" class="btn btn-danger col-xs-4" data-dismiss="modal" id="fRdsItemDelete">Удалить</button>
+                            <button type="button" class="btn btn-default  col-xs-4" data-dismiss="modal">Отмена</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal correction -->
+<div class="modal fade" id="modalCorrection" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formCorrection">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="fCorrectionType">С колёс</label>
+                        <div class="col-sm-9">
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionType" value="I" checked>Интервал
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionType" value="V">Значение
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="fCorrectionInterval">Пройдено</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="fCorrectionInterval" step="any" disabled placeholder="Пройдено">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="fCorrectionDistance">Дистанция</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="fCorrectionDistance" step="any" placeholder="Дистанция">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="fCorrectionValue">Коэффициент</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="fCorrectionValue" disabled placeholder="Коэффициент">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="btn-group col-xs-12">
+                            <button type="submit" class="btn btn-success col-xs-6">Ok</button>
+                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal">Отмена</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal speed formula -->
+<div class="modal fade" id="modalSpeed" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formFormula">
+                <ul class="list-group">
+                    <a href="#" class="list-group-item">First item</a>
+                </ul>
+                    <div class="modal-footer">
+                        <div class="btn-group col-xs-12">
+                            <button type="submit" class="btn btn-info col-xs-6" id="btnAdd">Добавить</button>
+                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal">Закрыть</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal add speed formula -->
+<div class="modal fade" id="modalAddFormula" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formAddFormula">
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            <input type="checkbox" id="chbVpdd">Vпдд
+                        </label>
+                        <div class="col-xs-3">
+                            <input type="number" class="form-control" id="fVpdd" step="any" disabled placeholder="Vпдд">
+                        </div>
+                        <div class="col-xs-3">
+                            <label>
+                                <input type="checkbox" id="chbUseVpdd" checked>Vдс
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            <input type="checkbox" id="chbVds" checked>Vдс
+                        </label>
+                        <div class="col-xs-3">
+                            <input type="number" class="form-control" id="fVds" step="any" style="display:none;" placeholder="Vдс">
+                            <label id="lVpdd">Vпдд</label>
+                        </div>
+                        <div class="col-xs-3">
+                            <select class="form-control" id="fSign">
+                                <option></option>
+                                <option>-</option>
+                                <option>*</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-3">
+                            <input type="number" class="form-control" id="fOperand" step="any" value="0" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Применить
+                        </label>
+                        <div class="col-xs-3">
+                            <input type="checkbox" id="chbApplySI">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="btn-group col-xs-12">
+                            <button type="submit" class="btn btn-success col-xs-6">Ok</button>
+                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal">Отмена</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var sector;
+    var norm;
+    var start;
+    var distance;
+    var correction;
+    var intervalStart;
+    var intervalDistance;
+    var timeCorrection;
+    var isPause = false;
+    var isReverse = false;
+    var rds = [];
+    var displayRdsItems;
+    var currentPddSpeed;
+    var currentSpeedInstruction;
+    var editRdsItemIndex = 0;
+    var speedIns = [];
+    var noSleep = new NoSleep();
+    var lastLatitude;
+    var lastLongitude;
+    var gpsOptions = {
+        enableHighAccuracy: true,
+        timeout: Infinity,
+        maximumAge: 0
+    };
+
+    var gpsWatch;
+    var wasUpdate = false;
+    var isDemo = false;
+    var isIntervalPosition = false;
+
+    function loadData() {
+        if (typeof(Storage) !== "undefined") {
+            sector = parseFloat(localStorage.getItem("sector"));
+            norm = parseFloat(localStorage.getItem("norm"));
+            start = parseFloat(localStorage.getItem("start"));
+            distance = parseFloat(localStorage.getItem("distance"));
+            correction = parseFloat(localStorage.getItem("correction"));
+            intervalStart = parseFloat(localStorage.getItem("intervalStart"));
+            intervalDistance = parseFloat(localStorage.getItem("intervalDistance"));
+            timeCorrection = parseFloat(localStorage.getItem("timeCorrection"));
+            //isPause = localStorage.getItem("isPause") == "true";
+            //isReverse = localStorage.getItem("isReverse") == "true";
+            var ris = JSON.parse(localStorage.getItem("rds"));
+            if (ris) {
+                for (var i = 0; i < ris.length; ++i) {
+                    rds.push(new RdsItem(ris[i]));
+                }
+            }
+            displayRdsItems = parseInt(localStorage.getItem("displayRdsItems"));
+            currentPddSpeed = parseFloat(localStorage.getItem("currentPddSpeed"));
+            currentSpeedInstruction = new SpeedInstruction(JSON.parse(localStorage.getItem("currentSpeedInstruction")));
+            var sis = JSON.parse(localStorage.getItem("speedIns"));
+            if (sis) {
+                for (var i = 0; i < sis.length; ++i) {
+                    speedIns.push(new SpeedInstruction((sis[i])));
+                }
+            }
+            //lastLatitude = parseFloat(localStorage.getItem("lastLatitude"));
+            //lastLongitude = parseFloat(localStorage.getItem("lastLongitude"));
+            //isDemo = localStorage.getItem("isDemo") == "true";
+        }
+        sector = sector ? sector : 10.0;
+        norm = norm ? norm : 3600.0;
+        start = start ? start : 0.0;
+        distance = distance ? distance : 0.0;
+        correction = correction ? correction : 1.0;
+        intervalStart = intervalStart ? intervalStart : 0.0;
+        intervalDistance = intervalDistance ? intervalDistance : 0.0;
+        timeCorrection = timeCorrection ? timeCorrection : 0.0;
+        displayRdsItems = displayRdsItems ? displayRdsItems : 10;
+        currentPddSpeed = currentPddSpeed ? currentPddSpeed : 60.0;
+        currentSpeedInstruction = currentSpeedInstruction == "undefined" ? new SpeedInstruction(true) : currentSpeedInstruction;
+        speedIns = speedIns.length == 0 ? [new SpeedInstruction(true, 60), new SpeedInstruction(true, null, null, '-', 10.0), new SpeedInstruction(null, 77), new SpeedInstruction(false, null, 66)] : speedIns;
+        // TODO: apply actions if needed
+        //localStorage.setItem("speedIns", null);
+        refreshRdsTable();
+    }
+
+    function gpsClick(e) {
+        if (isDemo) {
+            gpsLongClick();
+            return;
+        }
+        if (gpsWatch) {
+            $(".fa-globe").removeClass("fa-spin");
+            $(".fa-globe").css("color", "");
+            navigator.geolocation.clearWatch(gpsWatch);
+            gpsWatch = null;
+            lastLatitude = null;
+        } else {
+            $(".fa-globe").addClass("fa-spin");
+            if (navigator.geolocation) {
+                gpsWatch = navigator.geolocation.watchPosition(newPosition, gpsError, gpsOptions);
+                $(".fa-globe").css("color", "red");
+            } else {
+                $("#alDanger").text("GPS не поддерживается браузером!");
+                $("#alDanger").show();
+            }
+        }
+    }
+
+    function newPosition(position) {
+        if (lastLatitude) {
+            newMove(getDistance(position.coords.latitude, position.coords.longitude));
+        }
+        if (position.coords.accuracy > 10) {
+            $(".fa-globe").css("color", "orange");
+        } else {
+            $(".fa-globe").css("color", "green");
+        }
+        lastLatitude = position.coords.latitude;
+        lastLongitude = position.coords.longitude;
+    }
+
+    function rad(x) {
+        return x * Math.PI / 180.0;
+    };
+
+    function getDistance(latitude, longitude) {
+        var R = 6378.137; // Earth’s mean radius in km
+        var dLat = rad(latitude - lastLatitude);
+        var dLong = rad(longitude - lastLongitude);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(lastLatitude)) * Math.cos(rad(latitude)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return d; // returns the distance in km
+    };
+
+    function gpsError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                $("#alDanger").text("Пользователь не разрешает использовать GPS.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                $("#alDanger").text("GPS не доступен.");
+                break;
+            case error.TIMEOUT:
+                $("#alDanger").text("Пользователь не подтвердил использование GPS.");
+                break;
+            case error.UNKNOWN_ERROR:
+                $("#alDanger").text("Неизвестная ошибка GPS.");
+                break;
+            default:
+                $("#alDanger").text("Не получается подключится к GPS.");
+
+        }
+        $("#alDanger").show();
+    }
+
+    function gpsLongClick() {
+        if (gpsWatch != null) {
+            return;
+        }
+        isDemo = !isDemo;
+        if (isDemo) {
+            $(".fa-globe").addClass("fa-spin");
+        } else {
+            $(".fa-globe").removeClass("fa-spin");
+        }
+    }
+
+    function SpeedInstruction(isVpdd, vPdd, speed, sign, operand) {
+        if (vPdd === undefined && typeof(isVpdd) === 'object') {
+            for (var prop in isVpdd) {
+                this[prop] = isVpdd[prop];
+            }
+        } else {
+            this.vPdd = vPdd;
+            this.isVpdd = isVpdd;
+            this.speed = speed;
+            this.sign = sign;
+            this.operand = operand;
+        }
+
+        this.getSpeed = function (v) {
+            if (this.isVpdd == null && this.vPdd && this != currentSpeedInstruction) {
+                return currentSpeedInstruction.getSpeed(this.vPdd);
+            }
+            var s = this.isVpdd ? (v ? v : currentPddSpeed) : this.speed;
+            switch (this.sign) {
+                case '-':
+                    s = s - this.operand;
+                    break;
+                case '*':
+                    s = s * this.operand;
+                    break;
+            }
+            return Math.round(100 * s) / 100;
+        }
+
+        this.toString = function (f) {
+            return f ?
+                (this.isVpdd ? "V" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") :
+                (this.vPdd ? "Vпдд = " + this.vPdd + " " : "") + (this.isVpdd != null ? "Vдс = " + (this.isVpdd ? "Vпдд" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") : "");
+        }
+    }
+
+    function RdsItem(distance, type, speed, time) {
+        if (type === undefined && typeof(distance) === 'object') {
+            for (var prop in distance) {
+                this[prop] = distance[prop];
+            }
+        } else {
+            this.type = type;
+            this.distance = distance;
+            this.speed = speed;
+            this.time = time;
+            this.lateness = 0;
+            this.norm = 0;
+        }
+    }
+
+    function rdsStart() {
+        if (!isRds()) {
+            rds = [];
+        }
+        addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime())));
+    }
+
+    function changeSpeed(pddSpeed) {
+        if (currentSpeedInstruction.getSpeed(pddSpeed) <= 0) {
+            $("#alertSpeed").show();
+            return;
+        }
+        currentPddSpeed = pddSpeed;
+        localStorage.setItem("currentPddSpeed", currentPddSpeed);
+        if (isRds()) {
+            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime())));
+        }
+        newMove(0);
+    }
+
+    function rdsPF() {
+        if (isRds()) {
+            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime())));
+        }
+    }
+
+    function rdsFinish() {
+        if (isRds()) {
+            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime())));
+        }
+    }
+
+    function addRdsItem(item) {
+        rds.push(item);
+        rds.sort(compareRdsItems);
+        recalculateRds();
+        refreshRdsTable();
+        localStorage.setItem("rds", JSON.stringify(rds));
+    }
+
+    function isRds() {
+        var result = false;
+        for (var i = 0; i < rds.length; ++i) {
+            switch (rds[i].type) {
+                case 'S':
+                    result = true;
+                    break;
+                case 'F':
+                    return false;
+                    break;
+            }
+        }
+        return result;
+    }
+
+    function calculateRdsItem(index) {
+        if (index < 0 || index >= rds.length) {
+            return;
+        } else if (index == 0) {
+            // first item
+            rds[0].norm = 0.0;
+            rds[0].lateness = 0.0;
+        } else {
+            // other item
+            rds[index].norm = 3600.0 * (rds[index].distance - rds[index - 1].distance) / rds[index - 1].speed;
+            if (rds[index].type != 'S' && rds[index].type != 'P') {
+                rds[index].norm = Math.floor(rds[index].norm);
+            }
+            rds[index].lateness = rds[index].time - rds[index - 1].time - rds[index].norm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].lateness) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
+        }
+    }
+
+    function recalculateRds(startIndex) {
+        for (var i = (startIndex != null) ? startIndex : 0; i < rds.length; ++i) {
+            calculateRdsItem(i);
+        }
+    }
+
+    function refreshRdsTable() {
+        $("#rdsTable > tbody tr").remove();
+        for (i = rds.length > displayRdsItems ? rds.length - displayRdsItems : 0; i < rds.length; ++i) {
+            var t = '';
+            switch (rds[i].type) {
+                case 'S':
+                    t = '<i class="fa fa-play rdsIcon"></i>';
+                    break;
+                case 'C':
+                    t = '<i class="fa fa-tachometer rdsIcon"></i>';
+                    break;
+                case 'P':
+                    t = '<i class="fa fa-flag-checkered rdsIcon"></i>';
+                    break;
+                case 'F':
+                    t = '<i class="fa fa-stop rdsIcon"></i>';
+                    break;
+            }
+            $("#rdsTable > tbody").prepend($('<tr onclick="showModalRdsItem(' + i + ');">')
+                .append($('<td>').html(t))
+                .append($('<td>').text(getNumberString(rds[i].distance, 1000)))
+                .append($('<td>').text(getNumberString(rds[i].speed, 100)))
+                .append($('<td>').text(getNumberString(rds[i].lateness, 10)))
+                .append($('<td class="visible-l">').text(getTimeString(rds[i].norm, true)))
+                .append($('<td class="visible-l">').text(getTimeString(rds[i].time, true)))
+            );
+        }
+    }
+
+    function newMove(d) {
+        wasUpdate = true;
+        if (!isPause) {
+            distance = distance + correction * (isReverse ? -d : d);
+            localStorage.setItem("distance", distance);
+        }
+        // Removing "future" RDS positions
+        if (isRds()) {
+            var needRdsRefresh = false;
+            for (var i = rds.length - 1; i >= 0; --i) {
+                if (rds[i].distance > distance) {
+                    rds.splice(i, 1);
+                    needRdsRefresh = true;
+                } else {
+                    break;
+                }
+            }
+            if (needRdsRefresh) {
+                refreshRdsTable();
+                localStorage.setItem("rds", JSON.stringify(rds));
+            }
+        }
+        $("#time").html(getTimeString(getCurrentTime(), true));
+        $("#sector").html(sector);
+        $("#distance").html(getNumberString(distance, 1000));
+        $("#norm").html(getTimeString(norm, false));
+        $("#start").html(getTimeString(start, true));
+        if (intervalDistance > 0 && distance > intervalStart + intervalDistance) {
+            intervalStart = intervalStart + intervalDistance;
+            localStorage.setItem("intervalStart", intervalStart);
+            intervalDistance = 0;
+            localStorage.setItem("intervalDistance", 0);
+        }
+        $("#interval").html(getNumberString(intervalDistance > 0 ? intervalStart + intervalDistance - distance : distance - intervalStart, 1000));
+        $("#intervalDistance").html(intervalDistance > 0 ? getNumberString(intervalDistance, 1000) : "");
+        var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
+        $("#benefit").html(getTimeString(benefit, false));
+        var lateness;
+        if (sector > 0) {
+            lateness = getKvTime() - distance / sector * norm;
+            $("#benefit").css("color", (benefit + lateness + 60 < 0) ? "red" : "black");
+        } else {
+            $("#benefit").css("color", "black");
+        }
+        if (isRds()) {
+            $("#avgSpeed").html(getNumberString(getCurrentRdsSpeed(), 100));
+            $("#lateness").html(getTimeString(getRdsLateness(), true));
+        } else {
+            $("#avgSpeed").html(norm > 0 ? getNumberString(3600 * sector / norm, 100) : "--.--");
+            $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
+        }
+        $("#speed").html(currentSpeedInstruction.toString(true));
+        $("#vpdd").html(getNumberString(currentPddSpeed, 100));
+
+        if ($('#modalCorrection').is(':visible') && $('input[name=fCorrectionType][value=I]').prop('checked'))
+        {
+            var i = distance - intervalStart;
+            $('#fCorrectionInterval').val(getNumberString(i, 1000));
+            refreshCorrection(i);
+        }
+    }
+
+    $(document).ready(function () {
+        window.onbeforeunload = function() {
+            return "Data will be lost if you leave the page, are you sure?";
+        };
+
+        loadData();
+
+        setInterval(function () {
+            if (isDemo) {
+                newMove(1/60.0);
+            } else if (!wasUpdate) {
+                newMove(0);
+                if (gpsWatch) {
+                    $(".fa-globe").css("color", "red");
+                }
+            }
+            wasUpdate = false;
+        }, 1000);
+    });
+
+    function getCurrentRdsSpeed() {
+        for (var i = rds.length - 1; i >= 0; --i) {
+            if (distance >= rds[i].distance) {
+                return rds[i].speed;
+            }
+        }
+        return null;
+    }
+
+    function getRdsLateness() {
+        if (rds.length < 1) {
+            return null;
+        }
+        var i = rds.length;
+        while (i-- > 0) {
+            if (distance >= rds[i].distance) {
+                break;
+            }
+        }
+        if (i < 0) {
+            return null;
+        }
+        var ri = rds[i];
+        var t = getCurrentTime();
+        return t - ri.time - 3600 * (distance - ri.distance) / ri.speed + (ri.type == 'S' ? 0 : ri.lateness) + (t < ri.time ? 24 * 60 * 60 : 0);
+    }
+
+    function getCurrentTime() {
+        return (Date.now() / 1000 - 60 * (new Date()).getTimezoneOffset() + timeCorrection) % (24 * 60 * 60);
+    }
+
+    function getKvTime() {
+        var t = getCurrentTime();
+        return t - start + (t < start ? 24 * 60 * 60 : 0);
+    }
+
+    function showModalNumber(title, value) {
+        $('#numberValue').val(value);
+        $('.modal-title').html(title);
+        switch (title) {
+            case 'Интервал':
+                $('#fNumberPosition').show();
+                $('#modalNumber .btn-group > .btn').removeClass("col-xs-4");
+                $('#modalNumber .btn-group > .btn').addClass("col-xs-3");
+                break;
+            default:
+                $('#fNumberPosition').hide();
+                $('#modalNumber .btn-group > .btn').removeClass("col-xs-3");
+                $('#modalNumber .btn-group > .btn').addClass("col-xs-4");
+                break;
+        }
+        $('#modalNumber').modal('show');
+        setTimeout(function() {
+            $('#numberValue').focus().select();
+            $('#numberValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        }, 300);
+    }
+
+    $('#fNumberReset').on('click', function (e) {
+        switch ($('.modal-title').html()) {
+            case 'Сектор':
+                sector = 0;
+                localStorage.setItem("sector", sector);
+                break;
+            case 'Пройдено':
+                resetDistance();
+                break;
+            case 'Интервал':
+                resetInterval();
+                break;
+        }
+        newMove(0);
+    })
+
+    function resetDistance() {
+        distance = 0;
+        intervalStart = 0;
+        intervalDistance = 0;
+        localStorage.setItem('distance', 0);
+        localStorage.setItem('intervalStart', 0);
+        localStorage.setItem('intervalDistance', 0);
+    }
+
+    function resetInterval() {
+        intervalStart = distance;
+        intervalDistance = 0;
+        localStorage.setItem('intervalStart', intervalStart);
+        localStorage.setItem('intervalDistance', 0);
+    }
+
+    $('#modalNumber').on('submit', function (e) {
+        alert(e.target);
+        var numberValue = parseFloat($('#numberValue').val());
+        if (isNaN(numberValue)) {
+            $('#numberValue').closest('.form-group').removeClass('has-success').addClass('has-error');
+            return false;
+        } else {
+            $('#numberValue').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#modalNumber').modal('hide');
+            switch ($('.modal-title').html()) {
+                case 'Сектор':
+                    sector = numberValue;
+                    localStorage.setItem("sector", sector);
+                    break;
+                case 'Пройдено':
+                    distance = numberValue;
+                    localStorage.setItem("distance", distance);
+                    break;
+                case 'Интервал':
+                    intervalDistance = isIntervalPosition ? numberValue : -(distance + numberValue);
+                    localStorage.setItem("intervalDistance", intervalDistance);
+                    break;
+            }
+            newMove(0);
+            return false;
+        }
+    });
+
+    function showModalTime(title, value, seconds) {
+        $('#timeValue').val(getTimeString(value, seconds));
+        $('.modal-title').html(title);
+        $('#modalTime').modal('show');
+        setTimeout(function() {
+            $('#timeValue').focus().select();
+            $('#timeValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        }, 300);
+    }
+
+    $('#modalTime').on('submit', function (e) {
+        var timeValue = $('#timeValue');
+        var result = -1;
+        if (timeValue.val()) {
+            var t = timeValue.val().split(/[\D]/);
+            if (t.length == 2) {
+                result = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]);
+            } else if (t.length == 3) {
+                result = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]) + parseInt(t[2]);
+            }
+        }
+
+        if (!result || result < 0) {
+            timeValue.closest('.form-group').removeClass('has-success').addClass('has-error');
+            return false;
+        } else {
+            timeValue.closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#modalTime').modal('hide');
+            result = result % (24 * 60 * 60);
+            switch ($('.modal-title').html()) {
+                case 'Норма':
+                    norm = result;
+                    localStorage.setItem("norm", norm);
+                    break;
+                case 'Старт':
+                    start = result;
+                    localStorage.setItem("start", start);
+                    break;
+                case 'Время':
+                    timeCorrection = 0;
+                    timeCorrection = result - getCurrentTime();
+                    localStorage.setItem("timeCorrection", timeCorrection);
+                    break;
+            }
+            newMove(0);
+            return false;
+        }
+    });
+
+    function showModalRdsItem(index) {
+        if (index < 0 || index >= rds.length) {
+            return;
+        }
+        editRdsItemIndex = index;
+        var ri = rds[index];
+        $('.modal-title').html("РДС строка");
+        $('input[name=fRdsItemType][value=' + ri.type + ']').prop('checked', true);
+        $('#fRdsItemDistance').val(ri.distance);
+        $('#fRdsItemSpeed').val(ri.speed);
+        $('#fRdsItemTime').val(getTimeString(ri.time, true));
+        $('#modalRdsItem').modal('show');
+
+        $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fRdsItemTime').closest('.form-group').removeClass('has-error').removeClass('has-success');
+    }
+
+    $('#modalRdsItem').on('submit', function (e) {
+        var isGood = true;
+        var riDistance = parseFloat($('#fRdsItemDistance').val());
+        if (riDistance == null) {
+            $('#fRdsItemDistance').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        }
+        var riSpeed = parseFloat($('#fRdsItemSpeed').val());
+        if (!riSpeed) {
+            $('#fRdsItemSpeed').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        }
+        var riTime = $('#fRdsItemTime').val();
+        var nTime = -1;
+        if (riTime) {
+            var t = riTime.split(/[\D]/);
+            if (t.length == 2) {
+                nTime = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]);
+            } else if (t.length == 3) {
+                nTime = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]) + parseInt(t[2]);
+            }
+        }
+        if (!nTime || nTime < 0) {
+            $('#fRdsItemTime').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        }
+
+        if (!isGood) {
+            return false;
+        } else {
+            $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#fRdsItemTime').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#modalRdsItem').modal('hide');
+            if (editRdsItemIndex >= 0 && editRdsItemIndex < rds.length) {
+                rds[editRdsItemIndex].type = $('input[name=fRdsItemType]:checked').val();
+                rds[editRdsItemIndex].distance = riDistance;
+                rds[editRdsItemIndex].speed = riSpeed;
+                rds[editRdsItemIndex].time = nTime;
+                rds.sort(compareRdsItems);
+                recalculateRds();
+                refreshRdsTable();
+                localStorage.setItem("rds", JSON.stringify(rds));
+                newMove(0);
+            }
+            return false;
+        }
+    });
+
+    $('#fRdsItemDelete').on('click', function () {
+        if (editRdsItemIndex < 0 || editRdsItemIndex >= rds.length) {
+            return;
+        }
+        rds.splice(editRdsItemIndex, 1);
+        recalculateRds(editRdsItemIndex);
+        refreshRdsTable();
+        localStorage.setItem("rds", JSON.stringify(rds));
+        newMove(0);
+    });
+
+    function compareRdsItems(a, b) {
+        if (a.distance < b.distance) {
+            return -1;
+        } else if (a.distance > b.distance) {
+            return 1;
+        } else if (a.time < b.time) {
+            return -1;
+        } else if (a.time > b.time) {
+            return 1;
+        }
+        return 0;
+    }
+
+    function showModalCorrection() {
+        $('.modal-title').html("Тарировка");
+        $('#modalCorrection').modal('show');
+        $('#fCorrectionValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
+    }
+
+    $('#modalCorrection').on('submit', function (e) {
+        var c = parseFloat($('#fCorrectionValue').val());
+        if (!c) {
+            $('#fCorrectionValue').closest('.form-group').removeClass('has-success').addClass('has-error');
+        } else {
+            $('#modalCorrection').modal('hide');
+            correction = c;
+            localStorage.setItem("correction", correction);
+        }
+        return false;
+    });
+
+    $('input[name=fCorrectionType][value=I]').on('click', function () {
+        $('#fCorrectionInterval').prop('disabled', true);
+        $('#fCorrectionValue').prop('disabled', true);
+    });
+
+    $('input[name=fCorrectionType][value=V]').on('click', function () {
+        $('#fCorrectionInterval').prop('disabled', false);
+        $('#fCorrectionValue').prop('disabled', false);
+        $('#fCorrectionValue').val(correction);
+    });
+
+    $('#fCorrectionInterval').on('change', function() { refreshCorrection(); });
+    $('#fCorrectionDistance').on('change', function() { refreshCorrection(); });
+
+    function refreshCorrection(i) {
+        i = i != null ? i : parseFloat($('#fCorrectionInterval').val());
+        var d = parseFloat($('#fCorrectionDistance').val());
+        if (i && d) {
+            var k = correction * d / i;
+            $('#fCorrectionValue').val(k);
+        } else {
+            $('#fCorrectionValue').val(null);
+        }
+    }
+
+    function showModalSpeed() {
+        $('.modal-title').html("Формула скорости");
+        $('#modalSpeed').modal('show');
+
+        $('#modalSpeed ul a').remove();
+        for (var i = 0; i < speedIns.length; ++i) {
+            $('#modalSpeed ul').append('<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item">' + speedIns[i].toString() + '<button type="button" class="close" onclick="deleteSpeedInstruction(' + i + ');return false;">&times;</button></a>');
+        }
+    }
+
+    function applySpeedInstruction(index) {
+        if (index < 0 || index >= speedIns.length) {
+            return;
+        }
+        var si = speedIns[index];
+        if ((si.vPdd && !si.getSpeed(si.vPdd)) || !si.getSpeed()) {
+            $("#alertSpeed").show();
+            return;
+        }
+        if (si.isVpdd != null) {
+            currentSpeedInstruction = si;
+            localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
+        }
+        changeSpeed(si.vPdd || currentPddSpeed);
+    }
+
+    $('#modalSpeed').on('submit', function (e) {
+        $('#modalSpeed').modal('hide');
+        newMove(0);
+        return false;
+    });
+
+    function deleteSpeedInstruction(index) {
+        $('#modalSpeed ul a').eq(index).remove();
+        speedIns.splice(index, 1);
+        localStorage.setItem("speedIns", JSON.stringify(speedIns));
+        for (var i = index; i < speedIns.length; ++i) {
+            $('#modalSpeed ul a').eq(i).replaceWith('<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item">' + speedIns[i].toString() + '<button type="button" class="close" onclick="deleteSpeedInstruction(' + i + ');return false;">&times;</button></a>');
+        }
+    }
+
+    $('#btnAdd').on('click', function (e) {
+        $('.modal-title').html("Добавить формулу");
+        $('#modalAddFormula').modal('show');
+        $('#modalAddFormula #fVpdd').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#modalAddFormula #fVds').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').removeClass('has-success');
+    });
+
+    $('#modalAddFormula').on('submit', function (e) {
+        var isGood = true;
+        var si = new SpeedInstruction();
+        if ($('#modalAddFormula #chbVpdd').prop('checked')) {
+            var vPdd = parseFloat($('#modalAddFormula #fVpdd').val());
+            if (vPdd) {
+                $('#modalAddFormula #fVpdd').closest('.form-group').removeClass('has-error').addClass('has-success');
+                si.vPdd = vPdd;
+            } else {
+                $('#modalAddFormula #fVpdd').closest('.form-group').removeClass('has-success').addClass('has-error');
+                isGood = false;
+            }
+        }
+        if ($('#modalAddFormula #chbVds').prop('checked')) {
+            si.sign = $('#modalAddFormula #fSign').val();
+            if (si.sign) {
+                si.operand = parseFloat($('#modalAddFormula #fOperand').val());
+                if (si.operand) {
+                    $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').addClass('has-success');
+                } else {
+                    $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-success').addClass('has-error');
+                    isGood = false;
+                }
+            }
+            si.isVpdd = $('#modalAddFormula #chbUseVpdd').prop('checked');
+            if (!si.isVpdd) {
+                si.speed = parseFloat($('#modalAddFormula #fVds').val());
+                if (si.speed) {
+                    $('#modalAddFormula #fVds').closest('.form-group').removeClass('has-error').addClass('has-success');
+                } else {
+                    $('#modalAddFormula #fVds').closest('.form-group').removeClass('has-success').addClass('has-error');
+                    isGood = false;
+                }
+            }
+        }
+        if (isGood && (si.isVpdd != null || si.vPdd)) {
+            $('#modalAddFormula').modal('hide');
+            speedIns.push(new SpeedInstruction(si.isVpdd, si.vPdd, si.speed, si.sign, si.operand));
+            localStorage.setItem("speedIns", JSON.stringify(speedIns));
+            if ($('#modalAddFormula #chbApplySI').prop('checked')) {
+                applySpeedInstruction(speedIns.length - 1);
+            } else {
+                showModalSpeed();
+            }
+        }
+        return false;
+    });
+
+    $('#modalAddFormula #chbVpdd').on('click', function (e) {
+        $('#modalAddFormula #fVpdd').prop('disabled', !this.checked);
+    });
+
+    $('#modalAddFormula #chbUseVpdd').on('click', function (e) {
+        if (this.checked) {
+            $('#modalAddFormula #fVds').hide();
+            $('#modalAddFormula #lVpdd').show();
+        } else {
+            $('#modalAddFormula #fVds').show();
+            $('#modalAddFormula #lVpdd').hide();
+        }
+    });
+
+    $('#modalAddFormula #chbVds').on('click', function (e) {
+        $('#modalAddFormula #fVds').prop('disabled', !this.checked);
+        $('#modalAddFormula #fSign').prop('disabled', !this.checked);
+        if (this.checked) {
+            $('#modalAddFormula #fSign').change();
+        } else {
+            $('#modalAddFormula #fOperand').prop('disabled', !this.checked);
+        }
+    });
+
+    $('#modalAddFormula #fSign').on('change', function (e) {
+        $('#modalAddFormula #fOperand').prop('disabled', !this.value);
+    });
+
+    function viewRds() {
+        if (rds.length == 0) {
+            return;
+        }
+        var message = '<html><body><table><thead><tr><th>Тип</th><th>Дистанция</th><th>Скорость</th><th>Опоздание</th><th>Норма</th><th>Время</th></tr></thead><tbody>';
+        for (var i = 0; i < rds.length; ++i) {
+            message = message + '<tr>'
+                + '<td>' + rds[i].type + '</td>'
+                + '<td>' + getNumberString(rds[i].distance, 1000) + '</td>'
+                + '<td>' + getNumberString(rds[i].speed, 100) + '</td>'
+                + '<td>' + getNumberString(rds[i].lateness, 10) + '</td>'
+                + '<td>' + getTimeString(rds[i].norm) + '</td>'
+                + '<td>' + getTimeString(rds[i].time, true) + '</td>'
+                + '</tr>';
+        }
+        message = message + '</tbody></table></body><html>';
+        nw = window.open("");
+        nw.blur();
+        window.focus();
+        nw.document.write(message);
+        nw.document.close();
+    }
+
+    function getTimeString(value, seconds) {
+        if (value == null) {
+            return "--:--:--";
+        }
+        var n = value < 0;
+        value = Math.abs(value);
+        var h = Math.floor(value / 3600);
+        var m = Math.floor((value - 3600 * h) / 60);
+        if (seconds) {
+            var s = Math.floor(value - 60 * m - 3600 * h);
+            return (n ? "-" : "") + h + (m < 10 ? ":0" : ":") + m + (s < 10 ? ":0" : ":") + s;
+        } else {
+            return (n ? "-" : "") + h + (m < 10 ? ":0" : ":") + m;
+        }
+    }
+
+    function getNumberString(value, size) {
+        if (value == null) {
+            return "--.--"
+        }
+        var n = value < 0;
+        value = Math.abs(value);
+        if (size < 1) {
+            return (n ? "-" : "") + Math.floor(value * size) / size;
+        }
+        var s = Math.round(value * size) / size + '';
+        var dp = 1.1 + '';
+        dp = dp.toLocaleString().substring(1, 2);
+        var d = s.indexOf(dp);
+        if (d == -1) {
+            d = size;
+            s = s + dp;
+        } else {
+            d = size / Math.pow(10, s.length - d - 1);
+        }
+        for (; d > 1; d = d / 10) {
+            s = s + '0';
+        }
+        return (n ? "-" : "") + s;
+    }
+</script>
+
+</div>
+</body>
+
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" style="height:100%; padding:0; margin:0;">
+<head>
+    <script type="text/ecmascript" src="/files/jquery.min.js"></script>
+    <script type="text/ecmascript" src="/files/NoSleep.min.js"></script>
+    <script type="text/javascript" src="https://api-maps.yandex.ru/2.1/?lang=ru_RU"></script>
+    <link rel="stylesheet" href="files/font-awesome/css/font-awesome.min.css">
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        .road-sign {
+            display: block;
+            width: 5vw;
+            height: 5vw;
+            background-color: #FFFFFF;
+            box-shadow: 0.5vw 0.5vw 0.25vw #888888;
+            border: 0.9vw solid #C0C0C0;
+            border-radius: 50%;
+            margin-right: 1vw;
+            text-decoration: none;
+        }
+
+        .speed-limit {
+            text-align: center;
+            padding-top: 0.8vw;
+            margin: auto;
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 2.7vw;
+            font-weight: bold;
+        }
+
+        .item {
+            display: block;
+            width: 15vw;
+            height: 7vw;
+            border: 1px solid #000000;
+            text-decoration: none;
+        }
+
+        .item-label {
+            text-align: center;
+            padding-top: 0.5vw;
+            width: 100%;
+            margin: auto;
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 1.8vw;
+            font-weight: bold;
+        }
+
+        .item-value {
+            text-align: center;
+            width: 100%;
+            margin: auto;
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 3.5vw;
+            font-weight: bold;
+        }
+
+        .icon {
+            display: block;
+            text-align: center;
+            width: 7.45vw;
+            height: 7vw;
+            border: 1px solid #000000;
+            text-decoration: none;
+            color: #000000;
+            font-size: 7vw;
+        }
+
+    </style>
+</head>
+<body>
+    <div style="width:100%;">
+        <div style="width:100%; height:8.33vw">
+            <a href="javascript:alert('GPS')" class="fa icon fa-globe fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('Pause')" class="fa icon fa-pause fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Time</div>
+                <div class="item-value" id="time">23:55:55</div>
+            </a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Total distance</div>
+                <div class="item-value" id="d">999.999</div>
+            </a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Total distance</div>
+                <div class="item-value">999.999</div>
+            </a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Total distance</div>
+                <div class="item-value">999.999</div>
+            </a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Total distance</div>
+                <div class="item-value">999.999</div>
+            </a>
+        </div>
+        <div style="width:100%; height:8.33vw">
+            <a href="javascript:alert('10')" class="road-sign" style="float: left;">
+                <div class="speed-limit">10</div>
+            </a>
+            <a href="javascript:alert('20')" class="road-sign" style="float: left;">
+                <div class="speed-limit">20</div>
+            </a>
+            <a href="javascript:alert('30')" class="road-sign" style="float: left;">
+                <div class="speed-limit">30</div>
+            </a>
+            <a href="javascript:alert('40')" class="road-sign" style="float: left;">
+                <div class="speed-limit">40</div>
+            </a>
+            <a href="javascript:alert('50')" class="road-sign" style="float: left;">
+                <div class="speed-limit">50</div>
+            </a>
+            <a href="javascript:alert('60')" class="road-sign" style="float: left;">
+                <div class="speed-limit">60</div>
+            </a>
+            <a href="javascript:alert('70')" class="road-sign" style="float: left;">
+                <div class="speed-limit">70</div>
+            </a>
+            <a href="javascript:alert('80')" class="road-sign" style="float: left;">
+                <div class="speed-limit">80</div>
+            </a>
+            <a href="javascript:alert('90')" class="road-sign" style="float: left;">
+                <div class="speed-limit">90</div>
+            </a>
+            <a href="javascript:alert('100')" class="road-sign" style="float: left;">
+                <div class="speed-limit">100</div>
+            </a>
+            <a href="javascript:alert('110')" class="road-sign" style="float: left;">
+                <div class="speed-limit">110</div>
+            </a>
+            <a href="javascript:alert('130')" class="road-sign" style="float: left;">
+                <div class="speed-limit">130</div>
+            </a>
+        </div>
+        <div style="width:100%; height:8.33vw">
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Time</div>
+                <div class="item-value" id="time">23:55:55</div>
+            </a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Total distance</div>
+                <div class="item-value" id="d">999.999</div>
+            </a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Total distance</div>
+                <div class="item-value">999.999</div>
+            </a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Total distance</div>
+                <div class="item-value">999.999</div>
+            </a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Total distance</div>
+                <div class="item-value">999.999</div>
+            </a>
+            <a href="javascript:alert('Total distance')" class="item" style="float: left;">
+                <div class="item-label">Total distance</div>
+                <div class="item-value">999.999</div>
+            </a>
+        </div>
+        <div style="width:100%; height:8.33vw">
+            <a href="javascript:alert('GPS')" class="fa icon fa-globe fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('Pause')" class="fa icon fa-pause fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('GPS')" class="fa icon fa-globe fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('Pause')" class="fa icon fa-pause fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('GPS')" class="fa icon fa-globe fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('Pause')" class="fa icon fa-pause fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('GPS')" class="fa icon fa-globe fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('Pause')" class="fa icon fa-pause fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('GPS')" class="fa icon fa-globe fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('Pause')" class="fa icon fa-pause fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('GPS')" class="fa icon fa-globe fa-text-height" style="float: left;"></a>
+            <a href="javascript:alert('Pause')" class="fa icon fa-pause fa-text-height" style="float: left;"></a>
+        </div>
+    </div>
+<label><input type="checkbox" id="toggleGps" onchange="toggleGps(this)">GPS</label>
+<label><input type="checkbox" id="toggleTimer" onchange="toggleTimer(this)">Timer</label>
+<input type="number" id="timerInterval" value=1050>
+<input type="button" id="toggle" value="Wake Lock Disabled" />
+<p id="demo"></p>
+<label id="distance"></label>
+<input type="button" id="btnClear" value="Clear">
+<div id="map" style="width: 400px; height: 400px"></div>
+<!--table id="dataTable" border="1">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Accuracy</th>
+            <th>Altitude</th>
+            <th>Altitude accuracy</th>
+            <th>Heading</th>
+            <th>Speed</th>
+            <th>Delta</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table-->
+<script type="text/javascript">
+var timer, watch;
+var lastLatitude, lastLongitude, distance = 0;
+var positionOptions = {
+    enableHighAccuracy: true,
+    timeout: 1000,
+    maximumAge: 0
+};
+var noSleep = new NoSleep();
+var wakeLockEnabled = false;
+var toggleEl = document.querySelector("#toggle");
+
+toggleEl.addEventListener('click', function() {
+    if (!wakeLockEnabled) {
+        noSleep.enable(); // keep the screen on!
+        wakeLockEnabled = true;
+        toggleEl.value = "Wake Lock Enabled";
+    } else {
+        noSleep.disable(); // let the screen turn off.
+        wakeLockEnabled = false;
+        toggleEl.value = "Wake Lock Disabled";
+    }
+}, false);
+
+var myMap;
+ymaps.ready(init);
+
+function init() { 
+}
+
+$(document).ready(function () {
+    //alert(JSON.stringify(localStorage));
+    if (localStorage.getItem("Distance")) {
+        distance = parseFloat(localStorage.getItem("Distance"));
+    }
+
+    $("#btnClear").click(function () {
+        distance = 0;
+        localStorage.setItem("Distance", "0");
+        $("#distance").html("Total distance: 0 m Delta: 0 m Size: " + JSON.stringify(localStorage).length);
+    });
+});
+
+function toggleTimer(element) {
+    if ($("#toggleGps").prop("checked")) {
+        if (element.checked) {
+            if (watch) {
+                navigator.geolocation.clearWatch(watch);
+                watch = null;
+            }
+            timer = setInterval(function () {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition, showError, positionOptions);
+                } else {
+                    $("#demo").html("Geolocation is not supported by this browser.");
+                }
+            }, $("#timerInterval").val());
+        } else {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+            if (navigator.geolocation) {
+                watch = navigator.geolocation.watchPosition(showPosition, showError, positionOptions);
+            } else {
+                ("#demo").html("Geolocation is not supported by this browser.");
+            }
+        }
+    }
+}
+
+function toggleGps(element) {
+    if (element.checked) {
+        if (navigator.geolocation) {
+            if ($("#toggleTimer").prop("checked")) {
+                timer = setInterval(function () {
+                    navigator.geolocation.getCurrentPosition(showPosition, showError, positionOptions);
+                }, $("#timerInterval").val());
+            } else {
+                watch = navigator.geolocation.watchPosition(showPosition, showError, positionOptions);
+            }
+        } else {
+            ("#demo").html("Geolocation is not supported by this browser.");
+        }
+    } else {
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+        if (watch) {
+            navigator.geolocation.clearWatch(watch);
+            watch = null;
+        }
+        lastLatitude = null;
+        myMap.geoObjects.remove(myMap.geoObjects.get(0));
+    }
+}
+
+function showPosition(position) {
+    var dt = new Date(position.timestamp);
+    var time = dt.toTimeString();
+    var delta = 0;
+    time = time.split(' ')[0];
+    if (lastLatitude) {
+        delta = getDistance(position.coords.latitude, position.coords.longitude);
+        /*$("#dataTable > tbody > tr:first").before($('<tr>')
+            .append($('<td>').text(time))
+            .append($('<td>').text(position.coords.latitude))
+            .append($('<td>').text(position.coords.longitude))
+            .append($('<td>').text(position.coords.accuracy))
+            .append($('<td>').text(position.coords.altitude))
+            .append($('<td>').text(position.coords.altitudeAccuracy))
+            .append($('<td>').text(position.coords.heading))
+            .append($('<td>').text(position.coords.speed))
+            .append($("<td>").text(delta))
+        );*/
+        distance = distance + delta;
+        localStorage.setItem("Distance", distance);
+
+        myMap.geoObjects.set(0, new ymaps.Placemark([position.coords.latitude, position.coords.longitude]));
+        var polyline = new ymaps.Polyline([[lastLatitude, lastLongitude], [position.coords.latitude, position.coords.longitude]]);
+        // Добавляем линию на карту.
+        myMap.geoObjects.add(polyline);
+    } else {
+        /*
+        $("#dataTable > tbody").append($('<tr>')
+            .append($('<td>').text(time))
+            .append($('<td>').text(position.coords.latitude))
+            .append($('<td>').text(position.coords.longitude))
+            .append($('<td>').text(position.coords.accuracy))
+            .append($('<td>').text(position.coords.altitude))
+            .append($('<td>').text(position.coords.altitudeAccuracy))
+            .append($('<td>').text(position.coords.heading))
+            .append($('<td>').text(position.coords.speed))
+            .append($("<td>").text("0"))
+        );*/
+        if (!myMap) {
+            myMap = new ymaps.Map("map", {
+                center: [position.coords.latitude, position.coords.longitude],
+                zoom: 16
+            });
+        }
+        myMap.geoObjects.add(new ymaps.Placemark([position.coords.latitude, position.coords.longitude]), 0);
+    }
+    myMap.setCenter([position.coords.latitude, position.coords.longitude]);
+    $("#demo").html("Time: " + time + " Latitude: " + Math.round(position.coords.latitude * 10000000) / 10000000 + " Longitude: " + Math.round(position.coords.longitude * 10000000) / 10000000);
+    $("#distance").html("Total distance: " + Math.round(distance * 1000) / 1000 + " m Delta: " + Math.round(delta * 1000) / 1000 + " m Size: " + JSON.stringify(localStorage).length);
+    lastLatitude = position.coords.latitude;
+    lastLongitude = position.coords.longitude;
+}
+
+function showError(error) {
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            $("#demo").html("User denied the request for Geolocation.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            $("#demo").html("Location information is unavailable.");
+            break;
+        case error.TIMEOUT:
+            $("#demo").html("The request to get user location timed out.");
+            break;
+        case error.UNKNOWN_ERROR:
+            $("#demo").html("An unknown error occurred.");
+            break;
+    }
+}
+
+var rad = function(x) {
+  return x * Math.PI / 180;
+};
+
+var getDistance = function(latitude, longitude) {
+  var R = 6378137; // Earth’s mean radius in meter
+  var dLat = rad(latitude - lastLatitude);
+  var dLong = rad(longitude - lastLongitude);
+  var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(lastLatitude)) * Math.cos(rad(latitude)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c;
+  return d; // returns the distance in meter
+};
+
+</script>
+</body>
+</html>
