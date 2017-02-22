@@ -805,8 +805,7 @@
         timeCorrection = timeCorrection ? timeCorrection : 0.0;
         displayRdsItems = displayRdsItems ? displayRdsItems : 10;
         currentPddSpeed = currentPddSpeed ? currentPddSpeed : 60.0;
-        alert(currentSpeedInstruction);
-        currentSpeedInstruction = currentSpeedInstruction == "undefined" ? new SpeedInstruction(true) : currentSpeedInstruction;
+        currentSpeedInstruction = currentSpeedInstruction == "undefined" || currentSpeedInstruction == "" ? new SpeedInstruction(true) : currentSpeedInstruction;
         speedIns = speedIns.length == 0 ? [new SpeedInstruction(true, 60), new SpeedInstruction(true, null, null, '-', 10.0), new SpeedInstruction(null, 77), new SpeedInstruction(false, null, 66)] : speedIns;
         // TODO: apply actions if needed
         //localStorage.setItem("speedIns", null);
