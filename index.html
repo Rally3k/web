@@ -805,6 +805,7 @@
         timeCorrection = timeCorrection ? timeCorrection : 0.0;
         displayRdsItems = displayRdsItems ? displayRdsItems : 10;
         currentPddSpeed = currentPddSpeed ? currentPddSpeed : 60.0;
+        alert(currentSpeedInstruction);
         currentSpeedInstruction = currentSpeedInstruction == "undefined" ? new SpeedInstruction(true) : currentSpeedInstruction;
         speedIns = speedIns.length == 0 ? [new SpeedInstruction(true, 60), new SpeedInstruction(true, null, null, '-', 10.0), new SpeedInstruction(null, 77), new SpeedInstruction(false, null, 66)] : speedIns;
         // TODO: apply actions if needed
@@ -1226,7 +1227,6 @@
     }
 
     $('#modalNumber').on('submit', function (e) {
-        alert(e.target);
         var numberValue = parseFloat($('#numberValue').val());
         if (isNaN(numberValue)) {
             $('#numberValue').closest('.form-group').removeClass('has-success').addClass('has-error');
@@ -1244,7 +1244,7 @@
                     localStorage.setItem("distance", distance);
                     break;
                 case 'Интервал':
-                    intervalDistance = isIntervalPosition ? numberValue : -(distance + numberValue);
+                    intervalDistance = isIntervalPosition ? numberValue : distance + numberValue;
                     localStorage.setItem("intervalDistance", intervalDistance);
                     break;
             }
