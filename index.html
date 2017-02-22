@@ -1243,7 +1243,7 @@
                     localStorage.setItem("distance", distance);
                     break;
                 case 'Интервал':
-                    intervalDistance = isIntervalPosition ? numberValue - intervalStart : distance + numberValue;
+                    intervalDistance = isIntervalPosition ? numberValue - intervalStart : numberValue;
                     localStorage.setItem("intervalDistance", intervalDistance);
                     break;
             }
