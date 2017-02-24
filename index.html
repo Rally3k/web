@@ -111,11 +111,11 @@
             padding-top: 50%;
         }
 
-        th {
+        .rds-item-header {
             font-size: 1rem;
         }
 
-        td {
+        .rds-item-data {
             font-size: 2rem;
         }
 
@@ -360,10 +360,10 @@
     <div class="square-content">
         <div>
             <a href="javascript:showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');" oncontextmenu="javascript:resetInterval(); return false;">
-<span class="item-label">Интервал</snap><br>
-                            <span class="item-value" id="interval">99.999</span><br>
-<span class="item-label" id="intervalDistance">(--.---)</snap>
-                </a>
+                <span class="item-label">Интервал</snap><br>
+                <span class="item-value" id="interval">99.999</span><br>
+                <span class="item-label" id="intervalDistance">(--.---)</snap>
+            </a>
             </div>
         </div>
     </div>
@@ -393,6 +393,7 @@
             <a href="javascript:viewRds();">
                 <span class="item-label">Опоздание</snap><br>
                             <span class="item-value" id="lateness">-10:00</span>
+                <span class="item-label" id="latenessPdd">10:00</snap>
             </a>
         </div>
     </div>
@@ -466,7 +467,7 @@
     </div>
     <table id="rdsTable" class="table">
         <thead>
-            <tr>
+            <tr class="rds-item-header">
                 <th>Тип</th>
                 <th>Дистанция</th>
                 <th>Скорость</th>
@@ -498,11 +499,11 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="btn-group col-xs-12">
-                        <button type="submit" class="btn btn-success" onclick="isIntervalPosition=false;">Ok</button>
-                        <button type="submit" id="fNumberPosition" class="btn btn-info" onclick="isIntervalPosition=true;">Позиция</button>
-                        <button type="button" id="fNumberReset" class="btn btn-warning" data-dismiss="modal">0..</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success" onclick="isIntervalPosition=false;"><i class="fa fa-check-circle"></i></button>
+                        <button type="submit" id="fNumberPosition" class="btn btn-info" onclick="isIntervalPosition=true;"><i class="fa fa-map-marker"></i></button>
+                        <button type="button" id="fNumberReset" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-circle-o"></i></button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
                 </div>
             </form>
@@ -527,9 +528,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="btn-group col-xs-12">
-                        <button type="submit" class="btn btn-success col-xs-6">Ok</button>
-                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal">Отмена</button>
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
                 </div>
             </form>
@@ -583,10 +584,10 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <div class="btn-group col-xs-12">
-                            <button type="submit" class="btn btn-success col-xs-4">Ok</button>
-                            <button type="button" class="btn btn-danger col-xs-4" data-dismiss="modal" id="fRdsItemDelete">Удалить</button>
-                            <button type="button" class="btn btn-default  col-xs-4" data-dismiss="modal">Отмена</button>
+                        <div class="btn-group btn-group-lg col-xs-12">
+                            <button type="submit" class="btn btn-success col-xs-4"><i class="fa fa-check-circle"></i></button>
+                            <button type="button" class="btn btn-danger col-xs-4" data-dismiss="modal" id="fRdsItemDelete"><i class="fa fa-trash"></i></button>
+                            <button type="button" class="btn btn-default  col-xs-4" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                         </div>
                     </div>
                 </form>
@@ -635,9 +636,9 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <div class="btn-group col-xs-12">
-                            <button type="submit" class="btn btn-success col-xs-6">Ok</button>
-                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal">Отмена</button>
+                        <div class="btn-group btn-group-lg col-xs-12">
+                            <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
+                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                         </div>
                     </div>
                 </form>
@@ -660,9 +661,9 @@
                         <a href="#" class="list-group-item">First item</a>
                     </ul>
                     <div class="modal-footer">
-                        <div class="btn-group col-xs-12">
-                            <button type="button" class="btn btn-info col-xs-6" id="btnAdd">Добавить</button>
-                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal">Закрыть</button>
+                        <div class="btn-group btn-group-lg col-xs-12">
+                            <button type="button" class="btn btn-info col-xs-6" id="btnAdd"><i class="fa fa-plus-circle"></i></button>
+                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                         </div>
                     </div>
                 </form>
@@ -723,9 +724,9 @@
                     </div>
 
                     <div class="modal-footer">
-                        <div class="btn-group col-xs-12">
-                            <button type="submit" class="btn btn-success col-xs-6">Ok</button>
-                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal">Отмена</button>
+                        <div class="btn-group btn-group-lg col-xs-12">
+                            <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
+                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                         </div>
                     </div>
                 </form>
@@ -747,20 +748,20 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>КВ</th>
+                                <th>#</th>
                                 <th>Старт</th>
                                 <th>Сектор</th>
                                 <th>Норма</th>
-                                <th>Нейтрализация</th>
+                                <th>Пауза</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
                     </table>
                     <div class="modal-footer">
-                        <div class="btn-group col-xs-12">
-                            <button type="button" class="btn btn-info col-xs-6" id="btnAddKv">Добавить</button>
-                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal">Закрыть</button>
+                        <div class="btn-group btn-group-lg col-xs-12">
+                            <button type="button" class="btn btn-info col-xs-6" id="btnAddKv"><i class="fa fa-plus-circle"></i></button>
+                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                         </div>
                     </div>
                 </form>
@@ -798,9 +799,9 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="fKvPause">Нейтрализация</label>
+                        <label class="control-label col-sm-3" for="fKvPause">Пауза</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="fKvPause" placeholder="Нейтрализация">
+                            <input type="text" class="form-control" id="fKvPause" placeholder="Пауза">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -1054,6 +1055,9 @@
             this.distance = distance;
             this.speed = speed;
             this.time = time;
+            this.vPdd = currentPddSpeed;
+            this.vPddLateness = 0;
+            this.vPddNorm = 0;
             this.lateness = 0;
             this.norm = 0;
         }
@@ -1121,13 +1125,18 @@
             // first item
             rds[0].norm = 0.0;
             rds[0].lateness = 0.0;
+            rds[0].vPddNorm = 0.0;
+            rds[0].vPddLateness = 0.0;
         } else {
             // other item
             rds[index].norm = 3600.0 * (rds[index].distance - rds[index - 1].distance) / rds[index - 1].speed;
+            rds[index].vPddNorm = 3600.0 * (rds[index].distance - rds[index - 1].distance) / rds[index - 1].vPdd;
             if (rds[index].type != 'S' && rds[index].type != 'P') {
                 rds[index].norm = Math.floor(rds[index].norm);
+                rds[index].vPddNorm = Math.floor(rds[index].vPddNorm);
             }
             rds[index].lateness = rds[index].time - rds[index - 1].time - rds[index].norm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].lateness) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
+            rds[index].vPddLateness = rds[index].time - rds[index - 1].time - rds[index].vPddNorm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].vPddLateness) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
         }
     }
 
@@ -1155,7 +1164,7 @@
                     t = '<i class="fa fa-stop rdsIcon"></i>';
                     break;
             }
-            $("#rdsTable > tbody").prepend($('<tr onclick="showModalRdsItem(' + i + ');">')
+            $("#rdsTable > tbody").prepend($('<tr class="rds-item-data" onclick="showModalRdsItem(' + i + ');">')
                 .append($('<td>').html(t))
                 .append($('<td>').text(getNumberString(rds[i].distance, 1000)))
                 .append($('<td>').text(getNumberString(rds[i].speed, 100)))
@@ -1213,9 +1222,11 @@
         if (isRds()) {
             $("#avgSpeed").html(getNumberString(getCurrentRdsSpeed(), 100));
             $("#lateness").html(getTimeString(getRdsLateness(), true));
+            $("#latenessPdd").html(getTimeString(getPddLateness(), true));
         } else {
             $("#avgSpeed").html(norm > 0 ? getNumberString(3600 * sector / norm, 100) : "--.--");
             $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
+            $("#latenessPdd").html("");
         }
         $("#speed").html(currentSpeedInstruction.toString(true));
         $("#vpdd").html(getNumberString(currentPddSpeed, 100));
@@ -1273,6 +1284,24 @@
         var ri = rds[i];
         var t = getCurrentTime();
         return t - ri.time - 3600 * (distance - ri.distance) / ri.speed + (ri.type == 'S' ? 0 : ri.lateness) + (t < ri.time ? 24 * 60 * 60 : 0);
+    }
+
+    function getPddLateness() {
+        if (rds.length < 1) {
+            return null;
+        }
+        var i = rds.length;
+        while (i-- > 0) {
+            if (distance >= rds[i].distance) {
+                break;
+            }
+        }
+        if (i < 0) {
+            return null;
+        }
+        var ri = rds[i];
+        var t = getCurrentTime();
+        return t - ri.time - 3600 * (distance - ri.distance) / ri.vPdd + (ri.type == 'S' ? 0 : ri.vPddLateness) + (t < ri.time ? 24 * 60 * 60 : 0);
     }
 
     function getCurrentTime() {
