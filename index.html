@@ -119,6 +119,14 @@
             font-size: 2rem;
         }
 
+        .rds-item {
+            font-size: 2rem;
+        }
+
+        .kv-item {
+            font-size: 1.5rem;
+        }
+
         .visible-l {
             display: none !important;
         }
@@ -1572,7 +1580,7 @@
 
         $('#modalSpeed ul a').remove();
         for (var i = 0; i < speedIns.length; ++i) {
-            $('#modalSpeed ul').append('<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item">' + speedIns[i].toString() + '<button type="button" class="close" onclick="deleteSpeedInstruction(' + i + ');return false;">&times;</button></a>');
+            $('#modalSpeed ul').append('<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item rds-item">' + speedIns[i].toString() + '<button type="button" class="close" onclick="deleteSpeedInstruction(' + i + ');return false;">&times;</button></a>');
         }
     }
 
@@ -1722,7 +1730,7 @@
         $('#modalKvList tbody tr').remove();
         var nextStart = start;
         for (var i = 0; i < kvs.length; ++i) {
-            $('#modalKvList tbody').append($('<tr onclick="showModalKv(' + i + ');">')
+            $('#modalKvList tbody').append($('<tr class="kv-item" onclick="showModalKv(' + i + ');">')
                 .append($('<td>').text(i + 1))
                 .append($('<td>').text(getTimeString(kvs[i].start != null ? kvs[i].start : nextStart, true)))
                 .append($('<td>').text(getNumberString(kvs[i].sector, 100)))
