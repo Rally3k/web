@@ -395,7 +395,8 @@
         <div>
             <a href="javascript:showModalKvList();">
                 <span class="item-label">Льгота</snap><br>
-                            <span class="item-value" id="benefit">00:05</span>
+                <span class="item-value" id="benefit">00:05</span><br>
+                <span class="item-label" id="key">-</snap>
             </a>
         </div>
     </div>
@@ -405,7 +406,7 @@
         <div>
             <a href="javascript:viewRds();">
                 <span class="item-label">Опоздание</snap><br>
-                            <span class="item-value" id="lateness">-10:00</span>
+                            <span class="item-value" id="lateness">-10:00</span><br>
                 <span class="item-label" id="latenessPdd">10:00</snap>
             </a>
         </div>
@@ -1295,7 +1296,8 @@
 
     function keyDown(e) {
         if (isModalShown) return;
-        var keyCode = e.keyCode;
+        var keyCode = e.which || e.keyCode;
+        $("#key").html(keyCode);
         switch (keyCode) {
             case 83: // s start DS
                 rdsStart();
@@ -1390,7 +1392,7 @@
                 showModalTime('Время', getCurrentTime(), true);
             break;
             default:
-                alert(keyCode);
+                //alert(keyCode);
             break;
         }
     }
