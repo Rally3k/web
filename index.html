@@ -145,7 +145,17 @@
             .col-l-11 {width: 91.66%; float: left;}
             .col-l-12 {width: 100%; float: left;}
 
+            .col-l-pull-1 {right: 8.33%;}
             .col-l-pull-2 {right: 16.66%;}
+            .col-l-pull-3 {right: 25%;}
+            .col-l-pull-4 {right: 33.33%;}
+            .col-l-pull-5 {right: 41.66%;}
+            .col-l-pull-6 {right: 50%;}
+            .col-l-push-1 {left: 8.33%;}
+            .col-l-push-2 {left: 16.66%;}
+            .col-l-push-3 {left: 25%;}
+            .col-l-push-4 {left: 33.33%;}
+            .col-l-push-5 {left: 41.66%;}
             .col-l-push-6 {left: 50%;}
 
             th.visible-l,
@@ -358,7 +368,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-l-2 col-xs-4 border nopadding rect-box">
+        <div class="col-l-2 col-xs-4 border col-l-push-4 nopadding rect-box">
             <div class="square-content">
                 <div>
                     <a href="javascript:showModalNumber('Пройдено', getNumberString(distance, 1000));" oncontextmenu="javascript:resetDistance(); return false;">
@@ -369,7 +379,7 @@
                 </div>
             </div>
     </div>
-<div class="col-l-2 col-xs-4 border nopadding rect-box">
+<div class="col-l-2 col-xs-4 border col-l-push-4 nopadding rect-box">
     <div class="square-content">
         <div>
             <a href="javascript:showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');" oncontextmenu="javascript:resetInterval(); return false;">
@@ -380,7 +390,7 @@
             </div>
         </div>
     </div>
-    <div class="col-l-2 col-xs-4 border nopadding rect-box">
+    <div class="col-l-2 col-xs-4 border col-l-push-4 nopadding rect-box">
         <div class="square-content">
             <div>
                 <a href="javascript:gpsLongClick();">
@@ -390,7 +400,7 @@
 </div>
 </div>
 </div>
-<div class="col-l-2 col-xs-4 border nopadding rect-box">
+<div class="col-l-2 col-xs-4 border col-l-pull-6 nopadding rect-box">
     <div class="square-content">
         <div>
             <a href="javascript:showModalKvList();">
@@ -401,7 +411,7 @@
         </div>
     </div>
 </div>
-<div class="col-l-2 col-xs-4 border nopadding rect-box">
+<div class="col-l-2 col-xs-4 border col-l-pull-6 nopadding rect-box">
     <div class="square-content">
         <div>
             <a href="javascript:viewRds();">
@@ -863,6 +873,7 @@
     var isDemo = false;
     var isIntervalPosition = false;
     var kvs = [];
+    var currentKvIndex = -1;
     var editKvIndex = -1;
     var isKvStart = false;
     var isModalShown = false;
@@ -904,6 +915,7 @@
                     kvs.push(new Kv(kvis[i]));
                 }
             }
+            currentKvIndex = parseInt(localStorage.getItem("currentKvIndex"));
         }
         sector = sector ? sector : 10.0;
         norm = norm ? norm : 3600.0;
@@ -1294,6 +1306,29 @@
         $('.fa-retweet').css('color', isReverse ? 'red' : '');
     }
 
+    function applyKv(index) {
+        if (index < 0 || index >= kvs.length) return;
+
+        if (kvs[index].start == null) {
+            var nextStart = start;
+            for (var i = 0; i < index; ++i) {
+                nextStart = (kvs[i].start != null ? kvs[i].start : nextStart) + kvs[i].norm + (kvs[i].pause != null ? kvs[i].pause : 0);
+            }
+            start = nextStart % (24 * 60 * 60);
+        } else {
+            start = kvs[index].start;
+        }
+        sector = kvs[index].sector;
+        norm = kvs[index].norm;
+        localStorage.setItem("start", start);
+        localStorage.setItem("norm", norm);
+        localStorage.setItem("sector", sector);
+        resetDistance();
+
+        currentKvIndex = index;
+        localStorage.setItem("currentKvIndex", currentKvIndex);
+    }
+
     function keyDown(e) {
         if (isModalShown) return;
         var keyCode = e.which || e.keyCode;
@@ -1362,19 +1397,19 @@
             case 75: // k add KV
                 showModalKv(-1);
             break;
-            case 107: // + add SI
+            case 187: // + add SI
                 showModalAddFormula();
             break;
             case 188: // < previous SI/KV
                 if (e.ctrlKey) {
-                    alert('Prev KV');
+                    applyKv(currentKvIndex - 1);
                 } else {
                     applySpeedInstruction(currentSiIndex - 1);
                 }
             break;
             case 190: // > next SI/KV
                 if (e.ctrlKey) {
-                    alert('Next KV');
+                    applyKv(currentKvIndex + 1);
                 } else {
                     applySpeedInstruction(currentSiIndex + 1);
                 }
@@ -1941,6 +1976,10 @@
         kvs.splice(editKvIndex, 1);
         localStorage.setItem("kvs", JSON.stringify(kvs));
         refreshKvList();
+        if (editKvIndex <= currentKvIndex) {
+            currentKvIndex -= 1;
+            localStorage.setItem("currentKvIndex", currentKvIndex);
+        }
     });
 
     $('#modalKv').on('submit', function (e) {
@@ -1985,26 +2024,14 @@
             $('#modalKv').modal('hide');
             var nk = new Kv(startValue, sectorValue, normValue, pauseValue);
             if (editKvIndex == -1) {
-                kvs.push(nk);
+                editKvIndex = kvs.push(nk) - 1;
             } else {
                 kvs[editKvIndex] = nk;
             }
             localStorage.setItem("kvs", JSON.stringify(kvs));
             if (isKvStart) {
                 $('#modalKvList').modal('hide');
-                var nextStart = start;
-                var i = 0;
-                for (; i < kvs.length && kvs[i] != nk; ++i) {
-                    nextStart = (kvs[i].start != null ? kvs[i].start : nextStart) + kvs[i].norm + (kvs[i].pause != null ? kvs[i].pause : 0);
-                    nextStart = nextStart % (24 * 60 * 60);
-                }
-                start = kvs[i].start != null ? kvs[i].start : nextStart;
-                sector = kvs[i].sector;
-                norm = kvs[i].norm;
-                localStorage.setItem("start", start);
-                localStorage.setItem("norm", norm);
-                localStorage.setItem("sector", sector);
-                resetDistance();
+                applyKv(editKvIndex);
             } else {
                 refreshKvList();
             }
