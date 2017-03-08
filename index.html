@@ -184,7 +184,7 @@
                     <a href="#" onclick="gpsClick();">
                         <i class="fa fa-globe icon"></i>
                     </a>
-                    <a href="javascript:isPause=!isPause;$('.fa-pause').css('color',isPause?'red':'');">
+                    <a href="javascript:pause();">
                         <i class="fa icon fa-pause"></i>
                     </a>
                 </div>
@@ -195,7 +195,8 @@
                 <div>
                     <a href="javascript:showModalTime('Время', getCurrentTime(), true);">
                         <span class="item-label">Время</snap><br>
-                        <span class="item-value" id="time">23:55:55</span>
+                        <span class="item-value" id="time">23:55:55</span><br>
+                        <span class="item-label" id="sectorTime">00:00:00</snap>
                     </a>
                 </div>
             </div>
@@ -203,7 +204,7 @@
         <div class="col-l-2 col-xs-4 col-l-push-6 border nopadding rect-box">
             <div class="square-content">
                 <div>
-                    <a href="javascript:isReverse=!isReverse;$('.fa-retweet').css('color',isReverse?'red':'');">
+                    <a href="javascript:reverse();">
                         <i class="fa fa-retweet icon"></i>
                     </a>
                     <a href="javascript:showModalCorrection();">
@@ -217,7 +218,8 @@
                 <div>
                     <a href="javascript:showModalNumber('Сектор', sector);">
                         <span class="item-label">Сектор</snap><br>
-                            <span class="item-value" id="sector">999.999</span>
+                        <span class="item-value" id="sector">999.999</span><br>
+                        <span class="item-label" id="sectorRest">000.000</snap>
                     </a>
                 </div>
             </div>
@@ -227,7 +229,8 @@
                 <div>
                     <a href="javascript:showModalTime('Норма', norm, false);">
                         <span class="item-label">Норма</snap><br>
-                            <span class="item-value" id="norm">04:55</span>
+                        <span class="item-value" id="norm">04:55</span><br>
+                        <span class="item-label" id="normRest">00:00</snap>
                     </a>
                 </div>
             </div>
@@ -237,7 +240,8 @@
                 <div>
                     <a href="javascript:showModalTime('Старт', start, true);">
                         <span class="item-label">Старт</snap><br>
-                            <span class="item-value" id="start">10:00:00</span>
+                        <span class="item-value" id="start">10:00:00</span><br>
+                        <span class="item-label" id="finish">11:00:00</snap>
                     </a>
                 </div>
             </div>
@@ -358,12 +362,13 @@
             <div class="square-content">
                 <div>
                     <a href="javascript:showModalNumber('Пройдено', getNumberString(distance, 1000));" oncontextmenu="javascript:resetDistance(); return false;">
-<span class="item-label">Пройдено</snap><br>
-                            <span class="item-value" id="distance">999.999</span>
-</a>
-</div>
-</div>
-</div>
+                        <span class="item-label">Пройдено</snap><br>
+                        <span class="item-value" id="distance">999.999</span><br>
+                        <span class="item-label" id="nextPosition">000.000</snap>
+                    </a>
+                </div>
+            </div>
+    </div>
 <div class="col-l-2 col-xs-4 border nopadding rect-box">
     <div class="square-content">
         <div>
@@ -842,6 +847,7 @@
     var currentSpeedInstruction;
     var editRdsItemIndex = 0;
     var speedIns = [];
+    var currentSiIndex = -1;
     var noSleep = new NoSleep();
     var lastLatitude;
     var lastLongitude;
@@ -858,6 +864,7 @@
     var kvs = [];
     var editKvIndex = -1;
     var isKvStart = false;
+    var isModalShown = false;
 
     function loadData() {
         if (typeof(Storage) !== "undefined") {
@@ -886,6 +893,7 @@
                     speedIns.push(new SpeedInstruction((sis[i])));
                 }
             }
+            currentSiIndex = parseInt(localStorage.getItem("currentSiIndex"));
             //lastLatitude = parseFloat(localStorage.getItem("lastLatitude"));
             //lastLongitude = parseFloat(localStorage.getItem("lastLongitude"));
             //isDemo = localStorage.getItem("isDemo") == "true";
@@ -1206,10 +1214,15 @@
             }
         }
         $("#time").html(getTimeString(getCurrentTime(), true));
+        var sectorTime = getCurrentTime() - start + ((getCurrentTime() > start) ? 0 : 24 * 60 * 60);
+        $("#sectorTime").html(getTimeString(sectorTime, true));
         $("#sector").html(sector);
         $("#distance").html(getNumberString(distance, 1000));
+        $("#sectorRest").html(getNumberString(sector - distance, 1000));
         $("#norm").html(getTimeString(norm, false));
+        $("#normRest").html(getTimeString(norm - sectorTime, true));
         $("#start").html(getTimeString(start, true));
+        $("#finish").html(getTimeString(start + norm, true));
         if (intervalDistance > 0 && distance > intervalStart + intervalDistance) {
             intervalStart = intervalStart + intervalDistance;
             localStorage.setItem("intervalStart", intervalStart);
@@ -1218,6 +1231,7 @@
         }
         $("#interval").html(getNumberString(intervalDistance > 0 ? intervalStart + intervalDistance - distance : distance - intervalStart, 1000));
         $("#intervalDistance").html(intervalDistance > 0 ? getNumberString(intervalDistance, 1000) : "");
+        $("#nextPosition").html(intervalDistance > 0 ? getNumberString(intervalStart + intervalDistance, 1000) : "");
         var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
         $("#benefit").html(getTimeString(benefit, false));
         var lateness;
@@ -1269,13 +1283,115 @@
         }, 1000);
     });
 
+    function pause() {
+        isPause = !isPause;
+        $('.fa-pause').css('color', isPause ? 'red' : '');
+    }
+
+    function reverse() {
+        isReverse = !isReverse;
+        $('.fa-retweet').css('color', isReverse ? 'red' : '');
+    }
 
     function keyDown(e) {
+        if (isModalShown) return;
         var keyCode = e.keyCode;
-        if (keyCode==13) {
-            alert("You hit the enter key.");
-        } else {
-            alert(keyCode);
+        switch (keyCode) {
+            case 83: // s start DS
+                rdsStart();
+            break;
+            case 68: // d intermidiate finish
+                rdsPF();
+            break;
+            case 70: // f finish
+                rdsFinish();
+            break;
+            case 192: // ` speed 5
+                changeSpeed(5);
+            break;
+            case 49: // 1 speed 10
+                changeSpeed(10);
+            break;
+            case 50: // 2 speed 20
+                changeSpeed(20);
+            break;
+            case 51: // 3 speed 30
+                changeSpeed(30);
+            break;
+            case 52: // 4 speed 40
+                changeSpeed(40);
+            break;
+            case 53: // 5 speed 50
+                changeSpeed(50);
+            break;
+            case 54: // 6 speed 60
+                changeSpeed(60);
+            break;
+            case 55: // 7 speed 70
+                changeSpeed(70);
+            break;
+            case 56: // 8 speed 80
+                changeSpeed(80);
+            break;
+            case 57: // 9 speed 90
+                changeSpeed(90);
+            break;
+            case 48: // 0 speed 100
+                changeSpeed(100);
+            break;
+            case 189: // - speed 110
+                changeSpeed(110);
+            break;
+            case 82: // r reverse
+                reverse();
+            break;
+            case 80: // p pause
+                pause();
+            break;
+            case 73: // i interval
+                showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');
+            break;
+            case 79: // o distance
+                showModalNumber('Пройдено', getNumberString(distance, 1000));
+            break;
+            case 85: // u clear interval
+                resetInterval();
+            break;
+            case 75: // k add KV
+                showModalKv(-1);
+            break;
+            case 107: // + add SI
+                showModalAddFormula();
+            break;
+            case 188: // < previous SI/KV
+                if (e.ctrlKey) {
+                    alert('Prev KV');
+                } else {
+                    applySpeedInstruction(currentSiIndex - 1);
+                }
+            break;
+            case 190: // > next SI/KV
+                if (e.ctrlKey) {
+                    alert('Next KV');
+                } else {
+                    applySpeedInstruction(currentSiIndex + 1);
+                }
+            break;
+            case 81: // q sector
+                showModalNumber('Сектор', sector);
+            break;
+            case 87: // w norm
+                showModalTime('Норма', norm, false);
+            break;
+            case 69: // e start time
+                showModalTime('Старт', start, true);
+            break;
+            case 84: // t time
+                showModalTime('Время', getCurrentTime(), true);
+            break;
+            default:
+                alert(keyCode);
+            break;
         }
     }
 
@@ -1333,6 +1449,14 @@
         return t - start + (t < start ? 24 * 60 * 60 : 0);
     }
 
+    $('.modal').on('shown.bs.modal', function() {
+        isModalShown = true;
+    })
+
+    $('.modal').on('hidden.bs.modal', function() {
+        isModalShown = false;
+    })
+
     function showModalNumber(title, value) {
         $('#numberValue').val(value);
         $('#modalNumber .modal-title').html(title);
@@ -1349,11 +1473,12 @@
                 break;
         }
         $('#modalNumber').modal('show');
-        setTimeout(function() {
-            $('#numberValue').focus().select();
-            $('#numberValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
-        }, 300);
     }
+
+    $('#modalNumber').on('shown.bs.modal', function() {
+        $('#numberValue').focus().select();
+        $('#numberValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
+    })
 
     $('#fNumberReset').on('click', function (e) {
         switch ($('#modalNumber .modal-title').html()) {
@@ -1402,7 +1527,10 @@
                     break;
                 case 'Пройдено':
                     distance = numberValue;
+                    intervalStart = distance;
+                    intervalDistance = 0;
                     localStorage.setItem("distance", distance);
+                    localStorage.setItem("intervalDistance", intervalDistance);
                     break;
                 case 'Интервал':
                     intervalDistance = isIntervalPosition ? numberValue - intervalStart : numberValue;
@@ -1418,11 +1546,12 @@
         $('#timeValue').val(getTimeString(value, seconds));
         $('#modalTime .modal-title').html(title);
         $('#modalTime').modal('show');
-        setTimeout(function() {
-            $('#timeValue').focus().select();
-            $('#timeValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
-        }, 300);
     }
+
+    $('#modalTime').on('shown.bs.modal', function() {
+        $('#timeValue').focus().select();
+        $('#timeValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
+    })
 
     $('#modalTime').on('submit', function (e) {
         var timeValue = $('#timeValue');
@@ -1471,6 +1600,10 @@
         $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fRdsItemTime').closest('.form-group').removeClass('has-error').removeClass('has-success');
     }
+
+    $('#modalRdsItem').on('shown.bs.modal', function() {
+        $('#fRdsItemDistance').focus().select();
+    })
 
     $('#modalRdsItem').on('submit', function (e) {
         var isGood = true;
@@ -1550,6 +1683,10 @@
         $('#fCorrectionValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
     }
 
+    $('#modalCorrection').on('shown.bs.modal', function() {
+        $('#fCorrectionDistance').focus().select();
+    })
+
     $('#modalCorrection').on('submit', function (e) {
         var c = parseFloat($('#fCorrectionValue').val());
         if (!c) {
@@ -1596,6 +1733,10 @@
         }
     }
 
+    $('#modalSpeed').on('shown.bs.modal', function() {
+        $('#btnAdd').focus().select();
+    })
+
     function applySpeedInstruction(index) {
         if (index < 0 || index >= speedIns.length) {
             return;
@@ -1610,6 +1751,8 @@
             localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
         }
         changeSpeed(si.vPdd || currentPddSpeed);
+        currentSiIndex = index;
+        localStorage.setItem("currentSiIndex", currentSiIndex);
     }
 
     $('#modalSpeed').on('submit', function (e) {
@@ -1622,17 +1765,29 @@
         $('#modalSpeed ul a').eq(index).remove();
         speedIns.splice(index, 1);
         localStorage.setItem("speedIns", JSON.stringify(speedIns));
+        if (index <= currentSiIndex) {
+            currentSiIndex -= 1;
+            localStorage.setItem("currentSiIndex", currentSiIndex);
+        }
         for (var i = index; i < speedIns.length; ++i) {
-            $('#modalSpeed ul a').eq(i).replaceWith('<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item">' + speedIns[i].toString() + '<button type="button" class="close" onclick="deleteSpeedInstruction(' + i + ');return false;">&times;</button></a>');
+            $('#modalSpeed ul a').eq(i).replaceWith('<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item rds-item">' + speedIns[i].toString() + '<button type="button" class="close" onclick="deleteSpeedInstruction(' + i + ');return false;">&times;</button></a>');
         }
     }
 
     $('#modalSpeed #btnAdd').on('click', function (e) {
+        showModalAddFormula();
+    });
+
+    function showModalAddFormula() {
         $('#modalAddFormula').modal('show');
         $('#modalAddFormula #fVpdd').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#modalAddFormula #fVds').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').removeClass('has-success');
-    });
+    }
+
+    $('#modalAddFormula').on('shown.bs.modal', function() {
+        $('#chbVpdd').focus().select();
+    })
 
     $('#modalAddFormula').on('submit', function (e) {
         var isGood = true;
@@ -1721,7 +1876,7 @@
                 + '<td>' + getNumberString(rds[i].distance, 1000) + '</td>'
                 + '<td>' + getNumberString(rds[i].speed, 100) + '</td>'
                 + '<td>' + getNumberString(rds[i].lateness, 10) + '</td>'
-                + '<td>' + getTimeString(rds[i].norm) + '</td>'
+                + '<td>' + getTimeString(rds[i].norm, true) + '</td>'
                 + '<td>' + getTimeString(rds[i].time, true) + '</td>'
                 + '</tr>';
         }
@@ -1737,6 +1892,10 @@
         $('#modalKvList').modal('show');
         refreshKvList();
     }
+
+    $('#modalKvList').on('shown.bs.modal', function() {
+        $('#btnAddKv').focus().select();
+    })
 
     function refreshKvList() {
         $('#modalKvList tbody tr').remove();
@@ -1770,6 +1929,10 @@
         $('#modalKv #fKvNorm').val(i == -1 ? null : getTimeString(kvs[i].norm, false));
         $('#modalKv #fKvPause').val((i == -1 || kvs[i].pause == null) ? null : getTimeString(kvs[i].pause, false));
     }
+
+    $('#modalKv').on('shown.bs.modal', function() {
+        $('#modalKv #fKvSector').focus().select();
+    })
 
     $('#modalKv #fKvDelete').on('click', function (e) {
         $('#modalKv').modal('hide');
