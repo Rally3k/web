@@ -121,6 +121,7 @@
 
         .rds-item {
             font-size: 2rem;
+            color: black;
         }
 
         .kv-item {
@@ -553,8 +554,9 @@
                 </div>
                 <div class="modal-footer">
                     <div class="btn-group btn-group-lg col-xs-12">
-                        <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
-                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                        <button type="submit" class="btn btn-success col-xs-4"><i class="fa fa-check-circle"></i></button>
+                        <button type="button" id="fTimeReset" class="btn btn-warning col-xs-4" data-dismiss="modal"><i class="fa fa-clock-o"></i></button>
+                        <button type="button" class="btn btn-default col-xs-4" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
                 </div>
             </form>
@@ -1160,7 +1162,8 @@
             // other item
             rds[index].norm = 3600.0 * (rds[index].distance - rds[index - 1].distance) / rds[index - 1].speed;
             rds[index].vPddNorm = 3600.0 * (rds[index].distance - rds[index - 1].distance) / rds[index - 1].vPdd;
-            if (rds[index].type != 'S' && rds[index].type != 'P') {
+            if (rds[index].type != 'P') {
+                // do not floor if it is PF
                 rds[index].norm = Math.floor(rds[index].norm);
                 rds[index].vPddNorm = Math.floor(rds[index].vPddNorm);
             }
@@ -1281,11 +1284,11 @@
 
         loadData();
 
-        document.addEventListener("keydown", keyDown, false);
+        document.body.addEventListener("keydown", keyDown, false);
 
         setInterval(function () {
             if (isDemo) {
-                newMove(1/60.0);
+                newMove(1/61.0);
             } else if (!wasUpdate) {
                 newMove(0);
                 if (gpsWatch) {
@@ -1332,7 +1335,7 @@
     function keyDown(e) {
         if (isModalShown) return;
         var keyCode = e.which || e.keyCode;
-        $("#key").html(keyCode);
+        $("#key").html(e.key);
         switch (keyCode) {
             case 83: // s start DS
                 rdsStart();
@@ -1590,6 +1593,24 @@
         $('#timeValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
     })
 
+    $('#fTimeReset').on('click', function () {
+        switch ($('#modalTime .modal-title').html()) {
+            case 'Норма':
+                norm = 3600;
+                localStorage.setItem("norm", norm);
+                break;
+            case 'Старт':
+                start = Math.floor(getCurrentTime() / 60) * 60;
+                localStorage.setItem("start", start);
+                break;
+            case 'Время':
+                timeCorrection = 0;
+                localStorage.setItem("timeCorrection", timeCorrection);
+                break;
+        }
+        newMove(0);
+    });
+
     $('#modalTime').on('submit', function (e) {
         var timeValue = $('#timeValue');
         var result = getTimeValue(timeValue);
@@ -1767,6 +1788,7 @@
         $('#modalSpeed ul a').remove();
         for (var i = 0; i < speedIns.length; ++i) {
             $('#modalSpeed ul').append('<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item rds-item">' + speedIns[i].toString() + '<button type="button" class="close" onclick="deleteSpeedInstruction(' + i + ');return false;">&times;</button></a>');
+            //$('#modalSpeed ul').append('<li class="list-group-item rds-item"><a href="javascript:alert(\'item\');">Item</a><div class="pull-right"><a href="#"><i class="fa fa-times-circle"></i></a> <a href="#"><i class="fa fa-times-circle"></i></a> <a href="#"><i class="fa fa-times-circle"></i></a></div></li>');
         }
     }
 
