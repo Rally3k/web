@@ -396,7 +396,8 @@
             <div>
                 <a href="javascript:gpsLongClick();">
                     <span class="item-label">Ср. скорость</snap><br>
-                            <span class="item-value" id="avgSpeed">90.0</span>
+                    <span class="item-value" id="avgSpeed">90.0</span><br>
+                    <span class="item-label" id="actualSpeed">0</snap>
 </a>
 </div>
 </div>
@@ -490,21 +491,57 @@
             </div>
         </div>
     </div>
-    <table id="rdsTable" class="table">
-        <thead>
-            <tr class="rds-item-header">
-                <th>Тип</th>
-                <th>Дистанция</th>
-                <th>Скорость</th>
-                <th>Опоздание</th>
-                <th class="visible-l">Норма</th>
-                <th class="visible-l">Время</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:applyKv(currentKvIndex - 1);">
+                    <i class="fa fa-chevron-left icon"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:applyKv(currentKvIndex + 1);">
+                    <i class="fa icon fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:applySpeedInstruction(currentSiIndex - 1);">
+                    <i class="fa fa-chevron-up icon"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:applySpeedInstruction(currentSiIndex + 1);">
+                    <i class="fa icon fa-chevron-down"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+<table id="rdsTable" class="table">
+    <thead>
+        <tr class="rds-item-header">
+            <th>Тип</th>
+            <th>Дистанция</th>
+            <th>Скорость</th>
+            <th>Опоздание</th>
+            <th class="visible-l">Норма</th>
+            <th class="visible-l">Время</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
 <!-- Modal Number -->
 <div class="modal fade" id="modalNumber" role="dialog">
@@ -864,6 +901,7 @@
     var noSleep = new NoSleep();
     var lastLatitude;
     var lastLongitude;
+    var lastTime;
     var gpsOptions = {
         enableHighAccuracy: true,
         timeout: Infinity,
@@ -1229,6 +1267,14 @@
                 localStorage.setItem("rds", JSON.stringify(rds));
             }
         }
+
+        if (d != 0) {
+            var time = getCurrentTime();
+            if (lastTime != null) {
+                $("#actualSpeed").html(getNumberString(d / (time - lastTime) * 60 * 60, 10));
+            }
+            lastTime = time;
+        }
         $("#time").html(getTimeString(getCurrentTime(), true));
         var sectorTime = getCurrentTime() - start + ((getCurrentTime() > start) ? 0 : 24 * 60 * 60);
         $("#sectorTime").html(getTimeString(sectorTime, true));
@@ -1290,6 +1336,8 @@
             if (isDemo) {
                 newMove(1/61.0);
             } else if (!wasUpdate) {
+                $("#actualSpeed").html("0");
+                lastTime = getCurrentTime();
                 newMove(0);
                 if (gpsWatch) {
                     $(".fa-globe").css("color", "red");
