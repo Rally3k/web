@@ -1114,7 +1114,7 @@
         }
     }
 
-    function RdsItem(distance, type, speed, time) {
+    function RdsItem(distance, type, speed, time, latitude, longitude) {
         if (type === undefined && typeof(distance) === 'object') {
             for (var prop in distance) {
                 this[prop] = distance[prop];
@@ -1124,6 +1124,8 @@
             this.distance = distance;
             this.speed = speed;
             this.time = time;
+            this.latitude = latitude;
+            this.longitude = longitude;
             this.vPdd = currentPddSpeed;
             this.vPddLateness = 0;
             this.vPddNorm = 0;
@@ -1136,7 +1138,7 @@
         if (!isRds()) {
             rds = [];
         }
-        addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime())));
+        addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
     }
 
     function changeSpeed(pddSpeed) {
@@ -1147,20 +1149,20 @@
         currentPddSpeed = pddSpeed;
         localStorage.setItem("currentPddSpeed", currentPddSpeed);
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime())));
+            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
         }
         newMove(0);
     }
 
     function rdsPF() {
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime())));
+            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
         }
     }
 
     function rdsFinish() {
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime())));
+            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
         }
     }
 
@@ -1978,7 +1980,7 @@
         if (rds.length == 0) {
             return;
         }
-        var message = '<html><body><table><thead><tr><th>Тип</th><th>Дистанция</th><th>Скорость</th><th>Опоздание</th><th>Норма</th><th>Время</th></tr></thead><tbody>';
+        var message = '<html><body><table><thead><tr><th>Тип</th><th>Дистанция</th><th>Скорость</th><th>Опоздание</th><th>Норма</th><th>Время</th><th>Координаты</th></tr></thead><tbody>';
         for (var i = 0; i < rds.length; ++i) {
             message = message + '<tr>'
                 + '<td>' + rds[i].type + '</td>'
@@ -1987,6 +1989,7 @@
                 + '<td>' + getNumberString(rds[i].lateness, 10) + '</td>'
                 + '<td>' + getTimeString(rds[i].norm, true) + '</td>'
                 + '<td>' + getTimeString(rds[i].time, true) + '</td>'
+                + '<td><a href="https://maps.yandex.ru/?text=' + rds[i].latitude + '+' + rds[i].longitude + '">' + rds[i].latitude + ' ' + rds[i].longitude + '</a></td>'
                 + '</tr>';
         }
         message = message + '</tbody></table></body><html>';
