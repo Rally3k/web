@@ -614,18 +614,20 @@
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="fRdsItemType">Тип</label>
                         <div class="col-sm-10">
-                            <label class="radio-inline">
-                                <input type="radio" name="fRdsItemType" value="S"><i class="fa fa-play"></i>
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="fRdsItemType" value="C"><i class="fa fa-tachometer"></i>
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="fRdsItemType" value="P"><i class="fa fa-flag-checkered"></i>
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="fRdsItemType" value="F"><i class="fa fa-stop"></i>
-                            </label>
+                            <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-default" id="testLabel">
+                                    <input type="radio" name="fRdsItemType" value="S"><i class="fa fa-play"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fRdsItemType" value="C"><i class="fa fa-tachometer"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fRdsItemType" value="P"><i class="fa fa-flag-checkered"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fRdsItemType" value="F"><i class="fa fa-stop"></i>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -1700,7 +1702,8 @@
         }
         editRdsItemIndex = index;
         var ri = rds[index];
-        $('input[name=fRdsItemType][value=' + ri.type + ']').prop('checked', true);
+        //$('input[name=fRdsItemType][value=' + ri.type + ']').prop('active', true);
+        $('input[name=fRdsItemType][value=' + ri.type + ']').closest('.btn').button('toggle');
         $('#fRdsItemDistance').val(ri.distance);
         $('#fRdsItemSpeed').val(ri.speed);
         $('#fRdsItemTime').val(getTimeString(ri.time, true));
