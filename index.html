@@ -119,9 +119,10 @@
             font-size: 2rem;
         }
 
-        .rds-item {
+        .si-item {
             font-size: 2rem;
             color: black;
+            padding-right: 0px;
         }
 
         .kv-item {
@@ -899,6 +900,7 @@
     var currentSpeedInstruction;
     var editRdsItemIndex = 0;
     var speedIns = [];
+    var addSiIndex = -1;
     var currentSiIndex = -1;
     var noSleep = new NoSleep();
     var lastLatitude;
@@ -1295,7 +1297,13 @@
             intervalDistance = 0;
             localStorage.setItem("intervalDistance", 0);
         }
-        $("#interval").html(getNumberString(intervalDistance > 0 ? intervalStart + intervalDistance - distance : distance - intervalStart, 1000));
+        var interval = intervalDistance > 0 ? intervalStart + intervalDistance - distance : distance - intervalStart;
+        $("#interval").html(getNumberString(interval, 1000));
+        if (intervalDistance > 0 && interval < 0.5) {
+            $("#interval").css("color", "red");
+        } else {
+            $("#interval").css("color", "black");
+        }
         $("#intervalDistance").html(intervalDistance > 0 ? getNumberString(intervalDistance, 1000) : "");
         $("#nextPosition").html(intervalDistance > 0 ? getNumberString(intervalStart + intervalDistance, 1000) : "");
         var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
@@ -1842,9 +1850,17 @@
 
         $('#modalSpeed ul a').remove();
         for (var i = 0; i < speedIns.length; ++i) {
-            $('#modalSpeed ul').append('<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item rds-item">' + speedIns[i].toString() + '<button type="button" class="close" onclick="deleteSpeedInstruction(' + i + ');return false;">&times;</button></a>');
-            //$('#modalSpeed ul').append('<li class="list-group-item rds-item"><a href="javascript:alert(\'item\');">Item</a><div class="pull-right"><a href="#"><i class="fa fa-times-circle"></i></a> <a href="#"><i class="fa fa-times-circle"></i></a> <a href="#"><i class="fa fa-times-circle"></i></a></div></li>');
+            $('#modalSpeed ul').append(getSpeedInsListItem(i));
         }
+    }
+
+    function getSpeedInsListItem(i) {
+        return '<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item si-item clearfix">'
+                + speedIns[i].toString()
+                + '<span class="pull-right">'
+                + '<button class="btn btn-info" onclick="showModalAddFormula(' + (i+1) + ');return false;"><i class="fa fa-plus-circle"></i></button>\
+                <button class="btn btn-danger" onclick="deleteSpeedInstruction(' + i + ');return false;"><i class="fa fa-trash"></i></button>&nbsp;\
+                </span></a>';
     }
 
     $('#modalSpeed').on('shown.bs.modal', function() {
@@ -1884,15 +1900,17 @@
             localStorage.setItem("currentSiIndex", currentSiIndex);
         }
         for (var i = index; i < speedIns.length; ++i) {
-            $('#modalSpeed ul a').eq(i).replaceWith('<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item rds-item">' + speedIns[i].toString() + '<button type="button" class="close" onclick="deleteSpeedInstruction(' + i + ');return false;">&times;</button></a>');
+            $('#modalSpeed ul a').eq(i).replaceWith(getSpeedInsListItem(i));
         }
     }
 
     $('#modalSpeed #btnAdd').on('click', function (e) {
-        showModalAddFormula();
+        showModalAddFormula(speedIns.length);
     });
 
-    function showModalAddFormula() {
+    function showModalAddFormula(i) {
+        addSiIndex = i;
+        $('#modalSpeed').modal('hide');
         $('#modalAddFormula').modal('show');
         $('#modalAddFormula #fVpdd').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#modalAddFormula #fVds').closest('.form-group').removeClass('has-error').removeClass('has-success');
@@ -1940,7 +1958,7 @@
         }
         if (isGood && (si.isVpdd != null || si.vPdd)) {
             $('#modalAddFormula').modal('hide');
-            speedIns.push(new SpeedInstruction(si.isVpdd, si.vPdd, si.speed, si.sign, si.operand));
+            speedIns.splice(addSiIndex, 0, new SpeedInstruction(si.isVpdd, si.vPdd, si.speed, si.sign, si.operand));
             localStorage.setItem("speedIns", JSON.stringify(speedIns));
             if ($('#modalAddFormula #chbApplySI').prop('checked')) {
                 applySpeedInstruction(speedIns.length - 1);
