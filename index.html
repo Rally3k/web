@@ -495,7 +495,7 @@
     <div class="col-l-1 col-xs-2 border nopadding square-box">
         <div class="square-content">
             <div>
-                <a href="javascript:applyKv(currentKvIndex - 1);">
+                <a href="javascript:startKv(currentKvIndex - 1);">
                     <i class="fa fa-chevron-left icon"></i>
                 </a>
             </div>
@@ -504,7 +504,7 @@
     <div class="col-l-1 col-xs-2 border nopadding square-box">
         <div class="square-content">
             <div>
-                <a href="javascript:applyKv(currentKvIndex + 1);">
+                <a href="javascript:startKv(currentKvIndex + 1);">
                     <i class="fa icon fa-chevron-right"></i>
                 </a>
             </div>
@@ -1386,10 +1386,15 @@
         localStorage.setItem("start", start);
         localStorage.setItem("norm", norm);
         localStorage.setItem("sector", sector);
-        resetDistance();
 
         currentKvIndex = index;
         localStorage.setItem("currentKvIndex", currentKvIndex);
+    }
+
+    function startKv(index) {
+        if (index < 0 || index >= kvs.length) return;
+        applyKv(index);
+        resetDistance();
     }
 
     function keyDown(e) {
@@ -1463,19 +1468,17 @@
             case 187: // + add SI
                 showModalAddFormula();
             break;
-            case 188: // < previous SI/KV
-                if (e.ctrlKey) {
-                    applyKv(currentKvIndex - 1);
-                } else {
-                    applySpeedInstruction(currentSiIndex - 1);
-                }
+            case 78: // n previous KV
+                startKv(currentKvIndex - 1);
             break;
-            case 190: // > next SI/KV
-                if (e.ctrlKey) {
-                    applyKv(currentKvIndex + 1);
-                } else {
-                    applySpeedInstruction(currentSiIndex + 1);
-                }
+            case 77: // m next KV
+                startKv(currentKvIndex + 1);
+            break;
+            case 188: // , previous SI
+                applySpeedInstruction(currentSiIndex - 1);
+            break;
+            case 190: // . next SI
+                applySpeedInstruction(currentSiIndex + 1);
             break;
             case 81: // q sector
                 showModalNumber('Сектор', sector);
@@ -1488,6 +1491,9 @@
             break;
             case 84: // t time
                 showModalTime('Время', getCurrentTime(), true);
+            break;
+            case 71: // g gps
+                gpsClick();
             break;
             default:
                 //alert(keyCode);
@@ -1586,7 +1592,6 @@
         switch ($('#modalNumber .modal-title').html()) {
             case 'Сектор':
                 sector = 0;
-                localStorage.setItem("sector", sector);
                 break;
             case 'Пройдено':
                 resetDistance();
@@ -1626,6 +1631,10 @@
                 case 'Сектор':
                     sector = numberValue;
                     localStorage.setItem("sector", sector);
+                    if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                        kvs[currentKvIndex].sector = sector;
+                        localStorage.setItem("kvs", JSON.stringify(kvs));
+                    }
                     break;
                 case 'Пройдено':
                     distance = numberValue;
@@ -1660,10 +1669,18 @@
             case 'Норма':
                 norm = 3600;
                 localStorage.setItem("norm", norm);
+                if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                    kvs[currentKvIndex].norm = norm;
+                    localStorage.setItem("kvs", JSON.stringify(kvs));
+                }
                 break;
             case 'Старт':
                 start = Math.floor(getCurrentTime() / 60) * 60;
                 localStorage.setItem("start", start);
+                if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                    kvs[currentKvIndex].start = start;
+                    localStorage.setItem("kvs", JSON.stringify(kvs));
+                }
                 break;
             case 'Время':
                 timeCorrection = 0;
@@ -1688,10 +1705,18 @@
                 case 'Норма':
                     norm = result;
                     localStorage.setItem("norm", norm);
+                    if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                        kvs[currentKvIndex].norm = norm;
+                        localStorage.setItem("kvs", JSON.stringify(kvs));
+                    }
                     break;
                 case 'Старт':
                     start = result;
                     localStorage.setItem("start", start);
+                    if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                        kvs[currentKvIndex].start = start;
+                        localStorage.setItem("kvs", JSON.stringify(kvs));
+                    }
                     break;
                 case 'Время':
                     timeCorrection = 0;
@@ -1855,7 +1880,7 @@
     }
 
     function getSpeedInsListItem(i) {
-        return '<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item si-item clearfix">'
+        return '<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item si-item clearfix' + ((currentSiIndex == i) ? ' list-group-item-success' : '') + '">'
                 + speedIns[i].toString()
                 + '<span class="pull-right">'
                 + '<button class="btn btn-info" onclick="showModalAddFormula(' + (i+1) + ');return false;"><i class="fa fa-plus-circle"></i></button>\
@@ -1896,7 +1921,7 @@
         speedIns.splice(index, 1);
         localStorage.setItem("speedIns", JSON.stringify(speedIns));
         if (index <= currentSiIndex) {
-            currentSiIndex -= 1;
+            currentSiIndex = (currentSiIndex == index) ? -1 : currentSiIndex - 1;
             localStorage.setItem("currentSiIndex", currentSiIndex);
         }
         for (var i = index; i < speedIns.length; ++i) {
@@ -2034,7 +2059,7 @@
         $('#modalKvList tbody tr').remove();
         var nextStart = start;
         for (var i = 0; i < kvs.length; ++i) {
-            $('#modalKvList tbody').append($('<tr class="kv-item" onclick="showModalKv(' + i + ');">')
+            $('#modalKvList tbody').append($('<tr class="kv-item' + ((currentKvIndex == i) ? ' success' : '') + '" onclick="showModalKv(' + i + ');">')
                 .append($('<td>').text(i + 1))
                 .append($('<td>').text(getTimeString(kvs[i].start != null ? kvs[i].start : nextStart, true)))
                 .append($('<td>').text(getNumberString(kvs[i].sector, 100)))
@@ -2071,11 +2096,11 @@
         $('#modalKv').modal('hide');
         kvs.splice(editKvIndex, 1);
         localStorage.setItem("kvs", JSON.stringify(kvs));
-        refreshKvList();
         if (editKvIndex <= currentKvIndex) {
-            currentKvIndex -= 1;
+            currentKvIndex = (editKvIndex == currentKvIndex) ? -1 : currentKvIndex - 1;
             localStorage.setItem("currentKvIndex", currentKvIndex);
         }
+        refreshKvList();
     });
 
     $('#modalKv').on('submit', function (e) {
@@ -2125,9 +2150,12 @@
                 kvs[editKvIndex] = nk;
             }
             localStorage.setItem("kvs", JSON.stringify(kvs));
+            if (editKvIndex == currentKvIndex) {
+                applyKv(editKvIndex);
+            }
             if (isKvStart) {
                 $('#modalKvList').modal('hide');
-                applyKv(editKvIndex);
+                startKv(editKvIndex);
             } else {
                 refreshKvList();
             }
