@@ -12,6 +12,8 @@
     <link href="files/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="files/font-awesome/css/font-awesome.min.css">
 
+    <script src="https://api-maps.yandex.ru/2.1/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -28,6 +30,7 @@
             width: 100%;
             height: 100%;
             background-color: #FFFFFF;
+            opacity: .5;
             border: 0.5rem solid #C0C0C0;
             border-radius: 50%;
             text-decoration: none;
@@ -59,6 +62,7 @@
 
         .icon {
             color: #000000;
+            opacity: .5;
             font-size: 4rem;
         }
 
@@ -132,6 +136,16 @@
         .visible-l {
             display: none !important;
         }
+        
+        #map{
+            height:100%;
+            width: 100%;
+            position: absolute; top: 0; left: 0;
+        }
+
+        .content{
+            position: relative;
+        }
 
         @media only screen and (min-aspect-ratio: 7/8) {
             .col-l-1 {width: 8.33%; float: left;}
@@ -175,20 +189,10 @@
     <script src="files/bootstrap.min.js"></script>
     <script type="text/ecmascript" src="files/NoSleep.min.js"></script>
 
-    <script type="text/javascript">
-        function increaseFontSize() {
-            var html = document.documentElement;
-            html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) + 1 + 'px';
-        }
-        function decreaseFontSize() {
-            var html = document.documentElement;
-            html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) - 1 + 'px';
-        }
-    </script>
-
-<div class="alert alert-warning alert-dismissable fade in" id="alertSpeed" onclick="$(this).hide();" style="display: none">Скорость должна быть положительной!</div>
-<div class="alert alert-danger alert-dismissable fade in" id="alDanger" onclick="$(this).hide();" style="display: none"></div>
-<div class="grid container-fluid">
+<div id="map"></div>
+<div class="content alert alert-warning alert-dismissable fade in" id="alertSpeed" onclick="$(this).hide();" style="display: none">Скорость должна быть положительной!</div>
+<div class="content alert alert-danger alert-dismissable fade in" id="alDanger" onclick="$(this).hide();" style="display: none"></div>
+<div class="content grid container-fluid">
     <div class="row">
         <div class="col-l-2 col-xs-4 nopadding rect-box">
             <div class="square-content">
@@ -468,7 +472,7 @@
     <div class="col-l-1 col-xs-2 border nopadding square-box">
         <div class="square-content">
             <div>
-                <a href="javascript:increaseFontSize();">
+                <a href="javascript:plus();">
                     <i class="fa icon fa-plus"></i>
                 </a>
             </div>
@@ -477,7 +481,7 @@
     <div class="col-l-1 col-xs-2 border nopadding square-box">
         <div class="square-content">
             <div>
-                <a href="javascript:decreaseFontSize();">
+                <a href="javascript:minus();">
                     <i class="fa fa-minus icon"></i>
                 </a>
             </div>
@@ -528,8 +532,26 @@
             </div>
         </div>
     </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:map();">
+                    <i class="fa icon fa-map"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-l-1 col-xs-2 border nopadding square-box">
+        <div class="square-content">
+            <div>
+                <a href="javascript:mapType();">
+                    <i class="fa icon fa-rocket"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
-<table id="rdsTable" class="table">
+<table id="rdsTable" class="content table">
     <thead>
         <tr class="rds-item-header">
             <th>Тип</th>
@@ -543,7 +565,6 @@
     <tbody>
     </tbody>
 </table>
-
 <!-- Modal Number -->
 <div class="modal fade" id="modalNumber" role="dialog">
     <div class="modal-dialog">
@@ -921,6 +942,24 @@
     var editKvIndex = -1;
     var isKvStart = false;
     var isModalShown = false;
+    var myMap = null;
+
+    function plus() {
+        if (myMap == null) {
+            var html = document.documentElement;
+            html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) + 1 + 'px';
+        } else {
+            myMap.setZoom(myMap.getZoom() + 1, {checkZoomRange: true, duration: 500});
+        }
+    }
+    function minus() {
+        if (myMap == null) {
+            var html = document.documentElement;
+            html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) - 1 + 'px';
+        } else {
+            myMap.setZoom(myMap.getZoom() - 1, {checkZoomRange: true, duration: 500});
+        }
+    }
 
     function loadData() {
         if (typeof(Storage) !== "undefined") {
@@ -1010,10 +1049,27 @@
         } else {
             $(".fa-globe").css("color", "green");
         }
+        if (myMap != null && lastLatitude) {
+            myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
+            // Создаем ломаную с помощью вспомогательного класса Polyline.
+            var myPolyline = new ymaps.Polyline([
+                    // Указываем координаты вершин ломаной.
+                    [lastLatitude, lastLongitude],
+                    [position.coords.latitude, position.coords.longitude]
+                ], null, {
+                    // Цвет линии.
+                    strokeColor: "#0000FF",
+                    // Ширина линии.
+                    strokeWidth: 4,
+                    // Коэффициент прозрачности.
+                    strokeOpacity: 0.5
+                });
+            myMap.geoObjects.add(myPolyline);
+        }
         lastLatitude = position.coords.latitude;
         lastLongitude = position.coords.longitude;
     }
-
+        
     function rad(x) {
         return x * Math.PI / 180.0;
     };
@@ -1143,6 +1199,9 @@
             rds = [];
         }
         addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
+        if (myMap != null) {
+            myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#darkGreenCircleDotIcon'}));
+        }
     }
 
     function changeSpeed(pddSpeed) {
@@ -1154,6 +1213,9 @@
         localStorage.setItem("currentPddSpeed", currentPddSpeed);
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
+            if (myMap != null) {
+                myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
+            }
         }
         newMove(0);
     }
@@ -1161,12 +1223,18 @@
     function rdsPF() {
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
+            if (myMap != null) {
+                myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#yellowCircleDotIcon'}));
+            }
         }
     }
 
     function rdsFinish() {
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
+            if (myMap != null) {
+                myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
+            }
         }
     }
 
@@ -1357,7 +1425,42 @@
             }
             wasUpdate = false;
         }, 1000);
+
     });
+
+    function map() {
+        if (myMap == null) {
+            ymaps.ready(initMap);
+        } else {
+            myMap.destroy();
+            myMap = null;
+        }
+
+    }
+
+    function mapType() {
+        if (myMap == null) return;
+
+        switch(myMap.getType()) {
+            case 'yandex#map':
+                myMap.setType('yandex#satellite');
+                break;
+            case 'yandex#satellite':
+                myMap.setType('yandex#hybrid');
+                break;
+            case 'yandex#hybrid':
+                myMap.setType('yandex#map');
+                break;
+        }
+    }
+
+    function initMap () {
+        myMap = new ymaps.Map('map', {
+                center: (lastLatitude) ? [lastLatitude, lastLongitude] : [55.751286, 37.616516],
+                zoom: 13,
+                controls: []
+            });
+    }
 
     function pause() {
         isPause = !isPause;
