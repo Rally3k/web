@@ -1400,7 +1400,7 @@
     function keyDown(e) {
         if (isModalShown) return;
         var keyCode = e.which || e.keyCode;
-        $("#key").html(e.key);
+        $("#key").html(e.key + ' (' + keyCode + ')');
         switch (keyCode) {
             case 83: // s start DS
                 rdsStart();
@@ -1499,6 +1499,7 @@
                 //alert(keyCode);
             break;
         }
+        newMove(0);
     }
 
     function getCurrentRdsSpeed() {
