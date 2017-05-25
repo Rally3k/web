@@ -156,6 +156,11 @@
         .visible-l {
             display: none !important;
         }
+
+        .modal-body {
+            max-height: calc(100vh - 212px);
+            overflow-y: auto;
+        }
         
         #map{
             height:100%;
@@ -651,8 +656,8 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">РДС строка</h4>
             </div>
-            <div class="modal-body">
-                <form class="form-horizontal" id="formRdsItem">
+            <form class="form-horizontal" id="formRdsItem">
+                <div class="modal-body">
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="fRdsItemType">Тип</label>
                         <div class="col-sm-10">
@@ -690,15 +695,15 @@
                             <input type="text" class="form-control" id="fRdsItemTime" placeholder="Время отметки">
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <div class="btn-group btn-group-lg col-xs-12">
-                            <button type="submit" class="btn btn-success col-xs-4"><i class="fa fa-check-circle"></i></button>
-                            <button type="button" class="btn btn-danger col-xs-4" data-dismiss="modal" id="fRdsItemDelete"><i class="fa fa-trash"></i></button>
-                            <button type="button" class="btn btn-default  col-xs-4" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
-                        </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-4"><i class="fa fa-check-circle"></i></button>
+                        <button type="button" class="btn btn-danger col-xs-4" data-dismiss="modal" id="fRdsItemDelete"><i class="fa fa-trash"></i></button>
+                        <button type="button" class="btn btn-default  col-xs-4" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -711,8 +716,8 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Тарировка</h4>
             </div>
-            <div class="modal-body">
-                <form class="form-horizontal" id="formCorrection">
+            <form class="form-horizontal" id="formCorrection">
+                <div class="modal-body">
                     <div class="form-group">
                         <label class="control-label col-sm-3" for="fCorrectionType">С колёс</label>
                         <div class="col-sm-9">
@@ -742,14 +747,14 @@
                             <input type="text" class="form-control" id="fCorrectionValue" disabled placeholder="Коэффициент">
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <div class="btn-group btn-group-lg col-xs-12">
-                            <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
-                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
-                        </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -762,19 +767,19 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Формула скорости</h4>
             </div>
-            <div class="modal-body">
-                <form class="form-horizontal" id="formFormula">
-                    <ul class="list-group">
-                        <a href="#" class="list-group-item">First item</a>
-                    </ul>
-                    <div class="modal-footer">
-                        <div class="btn-group btn-group-lg col-xs-12">
-                            <button type="button" class="btn btn-info col-xs-6" id="btnAdd"><i class="fa fa-plus-circle"></i></button>
-                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
-                        </div>
+            <form class="form-horizontal" id="formFormula">
+                <div class="modal-body">
+                        <ul class="list-group">
+                            <a href="#" class="list-group-item">First item</a>
+                        </ul>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="button" class="btn btn-info col-xs-6" id="btnAdd"><i class="fa fa-plus-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -787,8 +792,8 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Добавить формулу</h4>
             </div>
-            <div class="modal-body">
-                <form class="form-horizontal" id="formAddFormula">
+            <form class="form-horizontal" id="formAddFormula">
+                <div class="modal-body">
                     <div class="form-group">
                         <label class="control-label col-xs-3">
                             <input type="checkbox" id="chbVpdd">Vпдд
@@ -829,15 +834,14 @@
                             <input type="checkbox" id="chbApplySI">
                         </div>
                     </div>
-
-                    <div class="modal-footer">
-                        <div class="btn-group btn-group-lg col-xs-12">
-                            <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
-                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
-                        </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -850,8 +854,8 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Список КВ</h4>
             </div>
-            <div class="modal-body">
-                <form class="form-horizontal" id="formKvList">
+            <form class="form-horizontal" id="formKvList">
+                <div class="modal-body">
                     <table class="table">
                         <thead>
                             <tr>
@@ -865,14 +869,14 @@
                         <tbody>
                         </tbody>
                     </table>
-                    <div class="modal-footer">
-                        <div class="btn-group btn-group-lg col-xs-12">
-                            <button type="button" class="btn btn-info col-xs-6" id="btnAddKv"><i class="fa fa-plus-circle"></i></button>
-                            <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
-                        </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="button" class="btn btn-info col-xs-6" id="btnAddKv"><i class="fa fa-plus-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -885,8 +889,8 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">КВ</h4>
             </div>
-            <div class="modal-body">
-                <form class="form-horizontal" id="formKv">
+            <form class="form-horizontal" id="formKv">
+                <div class="modal-body">
                     <div class="form-group">
                         <label class="control-label col-sm-3" for="fKvStart">Старт</label>
                         <div class="col-sm-9">
@@ -911,16 +915,16 @@
                             <input type="text" class="form-control" id="fKvPause" placeholder="Пауза">
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <div class="btn-group btn-group-lg col-xs-12">
-                            <button type="submit" class="btn btn-success col-xs-3" onclick="isKvStart = false;"><i class="fa fa-check-circle"></i></button>
-                            <button type="submit" class="btn btn-warning col-xs-3" onclick="isKvStart = true;"><i class="fa fa-play-circle"></i></button>
-                            <button type="button" class="btn btn-danger col-xs-3" data-dismiss="modal" id="fKvDelete"><i class="fa fa-trash"></i></button>
-                            <button type="button" class="btn btn-default col-xs-3" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
-                        </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-3" onclick="isKvStart = false;"><i class="fa fa-check-circle"></i></button>
+                        <button type="submit" class="btn btn-warning col-xs-3" onclick="isKvStart = true;"><i class="fa fa-play-circle"></i></button>
+                        <button type="button" class="btn btn-danger col-xs-3" data-dismiss="modal" id="fKvDelete"><i class="fa fa-trash"></i></button>
+                        <button type="button" class="btn btn-default col-xs-3" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -1038,7 +1042,6 @@
     }
 
     function gpsClick(e) {
-        beep();
         if (isDemo) {
             gpsLongClick();
             return;
@@ -1114,7 +1117,7 @@
                 $("#alDanger").text("GPS не доступен.");
                 break;
             case error.TIMEOUT:
-                $("#alDanger").text("Пользователь не подтвердил использование GPS.");
+                $("#alDanger").text("Время ожидания GPS вышло.");
                 break;
             case error.UNKNOWN_ERROR:
                 $("#alDanger").text("Неизвестная ошибка GPS.");
@@ -1223,6 +1226,8 @@
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#darkGreenCircleDotIcon'}));
         }
+        newMove(0);
+        beep();
     }
 
     function changeSpeed(pddSpeed) {
@@ -1237,8 +1242,9 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
             }
+            newMove(0);
+            beep();
         }
-        newMove(0);
     }
 
     function rdsPF() {
@@ -1247,6 +1253,8 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#yellowCircleDotIcon'}));
             }
+            newMove(0);
+            beep();
         }
     }
 
@@ -1256,6 +1264,8 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
             }
+            newMove(0);
+            beep();
         }
     }
 
@@ -1491,11 +1501,13 @@
     function pause() {
         isPause = !isPause;
         $('.fa-pause').css('color', isPause ? 'red' : '');
+        beep();
     }
 
     function reverse() {
         isReverse = !isReverse;
         $('.fa-retweet').css('color', isReverse ? 'red' : '');
+        beep();
     }
 
     function applyKv(index) {
@@ -1518,12 +1530,14 @@
 
         currentKvIndex = index;
         localStorage.setItem("currentKvIndex", currentKvIndex);
+        newMove(0);
+        beep();
     }
 
     function startKv(index) {
         if (index < 0 || index >= kvs.length) return;
-        applyKv(index);
         resetDistance();
+        applyKv(index);
     }
 
     function keyDown(e) {
@@ -1628,7 +1642,6 @@
                 //alert(keyCode);
             break;
         }
-        newMove(0);
     }
 
     function getCurrentRdsSpeed() {
@@ -2038,6 +2051,8 @@
         changeSpeed(si.vPdd || currentPddSpeed);
         currentSiIndex = index;
         localStorage.setItem("currentSiIndex", currentSiIndex);
+        newMove(0);
+        beep();
     }
 
     $('#modalSpeed').on('submit', function (e) {
