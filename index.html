@@ -978,6 +978,7 @@
     var isKvStart = false;
     var isModalShown = false;
     var myMap = null;
+    var myPolyline = null;
     var isApply = false;
 
     function plus() {
@@ -985,7 +986,7 @@
             var html = document.documentElement;
             html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) + 1 + 'px';
         } else {
-            myMap.setZoom(myMap.getZoom() + 1, {duration: 500});
+            myMap.setZoom(myMap.getZoom() + 1);
         }
     }
     function minus() {
@@ -993,7 +994,7 @@
             var html = document.documentElement;
             html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) - 1 + 'px';
         } else {
-            myMap.setZoom(myMap.getZoom() - 1, {duration: 500});
+            myMap.setZoom(myMap.getZoom() - 1);
         }
     }
 
@@ -1078,7 +1079,7 @@
 
     function newPosition(position) {
         if (lastLatitude) {
-            newMove(getDistance(position.coords.latitude, position.coords.longitude));
+            newMove(getDistance(lastLatitude, lastLongitude, position.coords.latitude, position.coords.longitude));
         }
         if (position.coords.accuracy > 10) {
             $(".fa-globe").css("color", "orange");
@@ -1087,20 +1088,26 @@
         }
         if (myMap != null && lastLatitude) {
             myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
-            // Создаем ломаную с помощью вспомогательного класса Polyline.
-            var myPolyline = new ymaps.Polyline([
-                    // Указываем координаты вершин ломаной.
-                    [lastLatitude, lastLongitude],
-                    [position.coords.latitude, position.coords.longitude]
-                ], null, {
-                    // Цвет линии.
-                    strokeColor: "#0000FF",
-                    // Ширина линии.
-                    strokeWidth: 4,
-                    // Коэффициент прозрачности.
-                    strokeOpacity: 0.5
-                });
-            myMap.geoObjects.add(myPolyline);
+            if (!myPolyline) {
+                // Создаем ломаную с помощью вспомогательного класса Polyline.
+                myPolyline = new ymaps.Polyline([
+                        // Указываем координаты вершин ломаной.
+                        [lastLatitude, lastLongitude],
+                        [position.coords.latitude, position.coords.longitude]
+                    ], null, {
+                        // Цвет линии.
+                        strokeColor: "#0000FF",
+                        // Ширина линии.
+                        strokeWidth: 4,
+                        // Коэффициент прозрачности.
+                        strokeOpacity: 0.5
+                    });
+                myMap.geoObjects.add(myPolyline);
+            } else if (getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020) {
+                alert(getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude));
+                myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
+            }
+            //alert(myPolyline.geometry.get(0)[0]);
         }
         lastLatitude = position.coords.latitude;
         lastLongitude = position.coords.longitude;
@@ -1110,11 +1117,11 @@
         return x * Math.PI / 180.0;
     };
 
-    function getDistance(latitude, longitude) {
+    function getDistance(lat1, long1, lat2, long2) {
         var R = 6378.137; // Earth’s mean radius in km
-        var dLat = rad(latitude - lastLatitude);
-        var dLong = rad(longitude - lastLongitude);
-        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(lastLatitude)) * Math.cos(rad(latitude)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var dLat = rad(lat2 - lat1);
+        var dLong = rad(long2 - long1);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         var d = R * c;
         return d; // returns the distance in km
@@ -1321,8 +1328,8 @@
             // other item
             rds[index].norm = 3600.0 * (rds[index].distance - rds[index - 1].distance) / rds[index - 1].speed;
             rds[index].vPddNorm = 3600.0 * (rds[index].distance - rds[index - 1].distance) / rds[index - 1].vPdd;
-            if (rds[index].type != 'P') {
-                // do not floor if it is PF
+            if (rds[index].type != 'P' && rds[index].type != 'C') {
+                // do not floor if it is PF or C
                 rds[index].norm = Math.floor(rds[index].norm);
                 rds[index].vPddNorm = Math.floor(rds[index].vPddNorm);
             }
@@ -1486,6 +1493,7 @@
         } else {
             myMap.destroy();
             myMap = null;
+            myPolyline = null;
         }
 
     }
@@ -2157,7 +2165,7 @@
         }
         if (isGood && (si.isVpdd != null || si.vPdd || (si.position != null && !isNaN(si.position)))) {
             $('#modalAddFormula').modal('hide');
-            speedIns.splice(addSiIndex, 0, new SpeedInstruction(si.isVpdd, si.vPdd, si.speed, si.sign, si.operand, si.position));
+            speedIns.splice(addSiIndex, 0, si); //new SpeedInstruction(si.isVpdd, si.vPdd, si.speed, si.sign, si.operand, si.position));
             localStorage.setItem("speedIns", JSON.stringify(speedIns));
             if (isApply) {
                 applySpeedInstruction(addSiIndex);
