@@ -806,6 +806,14 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="control-label col-xs-3">
+                            Позиция
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="number" class="form-control" id="fPosition" step="any" placeholder="Позиция">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
                             <input type="checkbox" id="chbVpdd">Vпдд
                         </label>
                         <div class="col-xs-3">
@@ -1172,7 +1180,7 @@
         }
     }
 
-    function SpeedInstruction(isVpdd, vPdd, speed, sign, operand) {
+    function SpeedInstruction(isVpdd, vPdd, speed, sign, operand, position) {
         if (vPdd === undefined && typeof(isVpdd) === 'object') {
             for (var prop in isVpdd) {
                 this[prop] = isVpdd[prop];
@@ -1183,11 +1191,15 @@
             this.speed = speed;
             this.sign = sign;
             this.operand = operand;
+            this.position = position;
         }
 
         this.getSpeed = function (v) {
             if (this.isVpdd == null && this.vPdd && this != currentSpeedInstruction) {
                 return currentSpeedInstruction.getSpeed(this.vPdd);
+            }
+            if (this.isVpdd == null && this.speed == null) {
+                return currentSpeedInstruction.getSpeed(currentPddSpeed);
             }
             var s = this.isVpdd ? (v ? v : currentPddSpeed) : this.speed;
             switch (this.sign) {
@@ -1204,7 +1216,7 @@
         this.toString = function (f) {
             return f ?
                 (this.isVpdd ? "V" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") :
-                (this.vPdd ? "Vпдд = " + this.vPdd + " " : "") + (this.isVpdd != null ? "Vдс = " + (this.isVpdd ? "Vпдд" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") : "");
+                (this.position != null && !isNaN(this.position) ? this.position + " " : "") + (this.vPdd ? "Vпдд = " + this.vPdd + " " : "") + (this.isVpdd != null ? "Vдс = " + (this.isVpdd ? "Vпдд" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") : "");
         }
     }
 
@@ -2050,6 +2062,13 @@
             return;
         }
         var si = speedIns[index];
+        if (si.position != null && !isNaN(si.position)) {
+            distance = si.position;
+            intervalStart = distance;
+            intervalDistance = 0;
+            localStorage.setItem("distance", distance);
+            localStorage.setItem("intervalDistance", intervalDistance);
+        }
         if ((si.vPdd && !si.getSpeed(si.vPdd)) || !si.getSpeed()) {
             $("#alertSpeed").show();
             return;
@@ -2058,7 +2077,9 @@
             currentSpeedInstruction = si;
             localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
         }
-        changeSpeed(si.vPdd || currentPddSpeed);
+        if (si.vPdd || si.isVpdd != null) {
+            changeSpeed(si.vPdd || currentPddSpeed);
+        }
         currentSiIndex = index;
         localStorage.setItem("currentSiIndex", currentSiIndex);
         newMove(0);
@@ -2092,9 +2113,11 @@
         addSiIndex = i;
         $('#modalSpeed').modal('hide');
         $('#modalAddFormula').modal('show');
+        $('#modalAddFormula #fPosition').val("");
         $('#modalAddFormula #fVpdd').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#modalAddFormula #fVds').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#modalAddFormula #fPosition').closest('.form-group').removeClass('has-error').removeClass('has-success');
     }
 
     $('#modalAddFormula').on('shown.bs.modal', function() {
@@ -2104,6 +2127,8 @@
     $('#modalAddFormula').on('submit', function (e) {
         var isGood = true;
         var si = new SpeedInstruction();
+
+        si.position = parseFloat($('#modalAddFormula #fPosition').val());
         if ($('#modalAddFormula #chbVpdd').prop('checked')) {
             var vPdd = parseFloat($('#modalAddFormula #fVpdd').val());
             if (vPdd) {
@@ -2136,9 +2161,9 @@
                 }
             }
         }
-        if (isGood && (si.isVpdd != null || si.vPdd)) {
+        if (isGood && (si.isVpdd != null || si.vPdd || (si.position != null && !isNaN(si.position)))) {
             $('#modalAddFormula').modal('hide');
-            speedIns.splice(addSiIndex, 0, new SpeedInstruction(si.isVpdd, si.vPdd, si.speed, si.sign, si.operand));
+            speedIns.splice(addSiIndex, 0, new SpeedInstruction(si.isVpdd, si.vPdd, si.speed, si.sign, si.operand, si.position));
             localStorage.setItem("speedIns", JSON.stringify(speedIns));
             if ($('#modalAddFormula #chbApplySI').prop('checked')) {
                 applySpeedInstruction(addSiIndex);
