@@ -1104,7 +1104,7 @@
                     });
                 myMap.geoObjects.add(myPolyline);
             } else if (getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020) {
-                alert(getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude));
+               // alert(getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude));
                 myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
             }
             //alert(myPolyline.geometry.get(0)[0]);
