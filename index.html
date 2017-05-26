@@ -844,19 +844,12 @@
                             <input type="number" class="form-control" id="fOperand" step="any" value="0" disabled>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-xs-3">
-                            Применить
-                        </label>
-                        <div class="col-xs-3">
-                            <input type="checkbox" id="chbApplySI">
-                        </div>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <div class="btn-group btn-group-lg col-xs-12">
-                        <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
-                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                        <button type="submit" class="btn btn-success col-xs-4" onclick="isApply=false;"><i class="fa fa-check-circle"></i></button>
+                        <button type="submit" class="btn btn-warning col-xs-4" onclick="isApply=true;"><i class="fa fa-play-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-4" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
                 </div>
             </form>
@@ -985,6 +978,7 @@
     var isKvStart = false;
     var isModalShown = false;
     var myMap = null;
+    var isApply = false;
 
     function plus() {
         if (myMap == null) {
@@ -2165,7 +2159,7 @@
             $('#modalAddFormula').modal('hide');
             speedIns.splice(addSiIndex, 0, new SpeedInstruction(si.isVpdd, si.vPdd, si.speed, si.sign, si.operand, si.position));
             localStorage.setItem("speedIns", JSON.stringify(speedIns));
-            if ($('#modalAddFormula #chbApplySI').prop('checked')) {
+            if (isApply) {
                 applySpeedInstruction(addSiIndex);
             } else {
                 showModalSpeed();
