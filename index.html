@@ -979,6 +979,7 @@
     var isModalShown = false;
     var myMap = null;
     var myPolyline = null;
+    var myPosition = null;
     var isApply = false;
 
     function plus() {
@@ -1104,10 +1105,14 @@
                     });
                 myMap.geoObjects.add(myPolyline);
             } else if (getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020) {
-               // alert(getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude));
                 myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
             }
-            //alert(myPolyline.geometry.get(0)[0]);
+            if (!myPosition) {
+                myPosition = new ymaps.Circle([[position.coords.latitude, position.coords.longitude], position.coords.accuracy], {}, {});
+                myMap.geoObjects.add(myPosition);
+            } else {
+                myPosition.geometry.setCoordinates([position.coords.latitude, position.coords.longitude]);
+            }
         }
         lastLatitude = position.coords.latitude;
         lastLongitude = position.coords.longitude;
@@ -1494,6 +1499,7 @@
             myMap.destroy();
             myMap = null;
             myPolyline = null;
+            myPosition = null;
         }
 
     }
