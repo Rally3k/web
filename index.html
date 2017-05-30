@@ -1112,7 +1112,7 @@
                 myMap.geoObjects.add(myPosition);
             } else {
                 myPosition.geometry.setCoordinates([position.coords.latitude, position.coords.longitude]);
-                myPosition.geometry.setCoordinates(position.coords.accuracy);
+                myPosition.geometry.setRadius(position.coords.accuracy);
             }
         }
         lastLatitude = position.coords.latitude;
