@@ -13,6 +13,39 @@
     <link rel="stylesheet" href="files/font-awesome/css/font-awesome.min.css">
 
     <style>
+
+        .square {
+            float:left;
+            position: relative;
+            margin:0;
+            overflow:hidden;
+        }
+
+        .square:before{
+            content: "";
+            display: block;
+            padding-top: 50%;
+        }
+
+        .content {
+            position:absolute;
+            height:100%; /* = 100% - 2*10% padding */
+            width:100%; /* = 100% - 2*5% padding */
+            padding:0;
+        }
+        .table{
+            display:table;
+            height:100%;
+            width:100%;
+        }
+        .table-cell{
+            display:table-cell;
+            vertical-align:middle;
+            height:100%;
+            width:100%;
+        }
+
+
         .square-box{
             position: relative;
             overflow: hidden;
@@ -94,6 +127,63 @@
     <script type="text/ecmascript" src="files/NoSleep.min.js"></script>
 
 <div class="content grid container-fluid">
+    <div class="row">
+        <div class="col-l-2 col-xs-4 square">
+            <div class="content">
+                <div class="table">
+                    <div class="table-cell">
+                        ... CONTENT HERE ...
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 square">
+            <div class="content">
+                <div class="table">
+                    <div class="table-cell">
+                        ... CONTENT HERE ...
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 square">
+            <div class="content">
+                <div class="table">
+                    <div class="table-cell">
+                        ... CONTENT HERE ...
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 square">
+            <div class="content">
+                <div class="table">
+                    <div class="table-cell">
+                        ... CONTENT HERE ...
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 square">
+            <div class="content">
+                <div class="table">
+                    <div class="table-cell">
+                        ... CONTENT HERE ...
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 square">
+            <div class="content">
+                <div class="table">
+                    <div class="table-cell">
+                        ... CONTENT HERE ...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-l-2 col-xs-4 nopadding rect-box">
             <div class="square-content">

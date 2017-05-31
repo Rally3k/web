@@ -49,7 +49,7 @@
             font-family: Trebuchet MS;
             font-size: 1.3rem;
             font-weight: bold;
-            line-height: 1.5rem;
+            line-height: 1.6rem;
             display: block;
             text-shadow:
                 -1px -1px 0 #FFF,
@@ -65,10 +65,43 @@
             font-weight: bold;
         }
 
+        .item-label-big {
+            margin: auto;
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 2.6rem;
+            font-weight: bold;
+            line-height: 3.2rem;
+            display: block;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .item-value-big {
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 5rem;
+            font-weight: bold;
+        }
+
         .icon {
             color: #000000;
             opacity: .5;
             font-size: 4rem;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .icon-big {
+            color: #000000;
+            opacity: .5;
+            font-size: 12rem;
             text-shadow:
                 -1px -1px 0 #FFF,
                 1px -1px 0 #FFF,
@@ -102,11 +135,18 @@
             bottom: 0;
             right: 0;
         }
-        .square-content div {
+        .no-split {
             display: table;
             width: 100%;
             height: 100%;
         }
+
+        .split-vertical {
+            display: table;
+            width: 100%;
+            height: 50%;
+        }
+
         .square-content a {
             display: table-cell;
             text-align: center;
@@ -229,66 +269,16 @@
 <div class="content alert alert-danger alert-dismissable fade in" id="alDanger" onclick="$(this).hide();" style="display: none"></div>
 <div class="content grid container-fluid">
     <div class="row">
-        <div class="col-l-2 col-xs-4 nopadding rect-box">
+        <div class="col-l-2 col-xs-4 border nopadding square-box">
             <div class="square-content">
-                <div>
-                    <a href="#" onclick="gpsClick();">
-                        <i class="fa fa-globe icon"></i>
-                    </a>
-                    <a href="javascript:pause();">
-                        <i class="fa icon fa-pause"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 border nopadding rect-box">
-            <div class="square-content">
-                <div>
+                <div class="split-vertical">
                     <a href="javascript:showModalTime('Время', getCurrentTime(), true);">
                         <span class="item-label">Время</snap><br>
                         <span class="item-value" id="time">23:55:55</span><br>
                         <span class="item-label" id="sectorTime">00:00:00</snap>
                     </a>
                 </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 col-l-push-6 border nopadding rect-box">
-            <div class="square-content">
-                <div>
-                    <a href="javascript:reverse();">
-                        <i class="fa fa-retweet icon"></i>
-                    </a>
-                    <a href="javascript:showModalCorrection();">
-                        <i class="fa icon fa-car"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 col-l-pull-2 border nopadding rect-box">
-            <div class="square-content">
-                <div>
-                    <a href="javascript:showModalNumber('Сектор', sector);">
-                        <span class="item-label">Сектор</snap><br>
-                        <span class="item-value" id="sector">999.999</span><br>
-                        <span class="item-label" id="sectorRest">000.000</snap>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 col-l-pull-2 border nopadding rect-box">
-            <div class="square-content">
-                <div>
-                    <a href="javascript:showModalTime('Норма', norm, false);">
-                        <span class="item-label">Норма</snap><br>
-                        <span class="item-value" id="norm">04:55</span><br>
-                        <span class="item-label" id="normRest">00:00</snap>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 col-l-pull-2 border nopadding rect-box">
-            <div class="square-content">
-                <div>
+                <div class="split-vertical">
                     <a href="javascript:showModalTime('Старт', start, true);">
                         <span class="item-label">Старт</snap><br>
                         <span class="item-value" id="start">10:00:00</span><br>
@@ -297,11 +287,117 @@
                 </div>
             </div>
         </div>
+        <div class="col-l-4 col-xs-8 border nopadding rect-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:showModalNumber('Пройдено', getNumberString(distance, 1000));" oncontextmenu="javascript:resetDistance(); return false;">
+                        <span class="item-label-big">Пройдено</snap><br>
+                        <span class="item-value-big" id="distance">999.999</span><br>
+                        <span class="item-label-big" id="nextPosition">000.000</snap>
+                    </a>
+                </div>
+            </div>
+            <div class="square-content" style="display: none" id="movePause">
+                <div class="no-split">
+                    <a class="fa icon-big fa-pause"></a>
+                </div>
+            </div>
+            <div class="square-content" style="display: none" id="moveReverse">
+                <div class="no-split">
+                    <a class="fa icon-big fa-retweet"></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-4 col-xs-8 border nopadding rect-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');" oncontextmenu="javascript:resetInterval(); return false;">
+                        <span class="item-label-big">Интервал</snap><br>
+                        <span class="item-value-big" id="interval">99.999</span><br>
+                        <span class="item-label-big" id="intervalDistance">(--.---)</snap>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 border nopadding square-box">
+            <div class="square-content">
+                <div class="split-vertical">
+                    <a href="javascript:showModalKvList();">
+                        <span class="item-label">Льгота</snap><br>
+                        <span class="item-value" id="benefit">00:05</span><br>
+                        <span class="item-label" id="key">-</snap>
+                    </a>
+                </div>
+                <div class="split-vertical">
+                    <a href="javascript:showModalSpeed();">
+                        <span class="item-label">Скорость</snap><br>
+                        <span class="item-value" id="speed">V - 5</span><br>
+                        <span class="item-label" id="vpdd">60</snap>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row">
+        <div class="col-l-2 col-xs-4 border nopadding square-box">
+            <div class="square-content">
+                <div class="split-vertical">
+                    <a href="javascript:showModalNumber('Сектор', sector);">
+                        <span class="item-label">Сектор</snap><br>
+                        <span class="item-value" id="sector">999.999</span><br>
+                        <span class="item-label" id="sectorRest">000.000</snap>
+                    </a>
+                </div>
+                <div class="split-vertical">
+                    <a href="javascript:showModalTime('Норма', norm, false);">
+                        <span class="item-label">Норма</snap><br>
+                        <span class="item-value" id="norm">04:55</span><br>
+                        <span class="item-label" id="normRest">00:00</snap>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-4 col-xs-8 border nopadding rect-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:viewRds();">
+                        <span class="item-label-big">Опоздание</snap><br>
+                        <span class="item-value-big" id="lateness">-10:00</span><br>
+                        <span class="item-label-big" id="latenessPdd">10:00</snap>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-4 col-xs-8 border nopadding rect-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:gpsLongClick();">
+                        <span class="item-label-big">Ср. скорость</snap><br>
+                        <span class="item-value-big" id="avgSpeed">90.0</span><br>
+                        <span class="item-label-big" id="actualSpeed">0</snap>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 border nopadding square-box">
+            <div class="square-content">
+                <div class="split-vertical">
+                    <a href="#" onclick="$('#modalSettings').modal('show');">
+                        <i class="fa fa-cog icon"></i>
+                    </a>
+                </div>
+                <div class="split-vertical">
+                    <a href="#" onclick="showHideControls();">
+                        <i class="fa fa-keyboard-o icon"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="speedButtons">
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(10);" class="road-sign">
                         <span class="speed-limit">10</span>
                     </a>
@@ -310,7 +406,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(20);" class="road-sign">
                         <span class="speed-limit">20</span>
                     </a>
@@ -319,7 +415,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(30);" class="road-sign">
                         <span class="speed-limit">30</span>
                     </a>
@@ -328,7 +424,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(40);" class="road-sign">
                         <span class="speed-limit">40</span>
                     </a>
@@ -337,7 +433,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(50);" class="road-sign">
                         <span class="speed-limit">50</span>
                     </a>
@@ -346,7 +442,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(60);" class="road-sign">
                         <span class="speed-limit">60</span>
                     </a>
@@ -355,7 +451,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(70);" class="road-sign">
                         <span class="speed-limit">70</span>
                     </a>
@@ -364,7 +460,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(80);" class="road-sign">
                         <span class="speed-limit">80</span>
                     </a>
@@ -373,7 +469,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(90);" class="road-sign">
                         <span class="speed-limit">90</span>
                     </a>
@@ -382,7 +478,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(100);" class="road-sign">
                         <span class="speed-limit">100</span>
                     </a>
@@ -391,7 +487,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(110);" class="road-sign">
                         <span class="speed-limit">110</span>
                     </a>
@@ -400,7 +496,7 @@
         </div>
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
+                <div class="no-split">
                     <a href="javascript:changeSpeed(130);" class="road-sign">
                         <span class="speed-limit">130</span>
                     </a>
@@ -408,180 +504,113 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-l-2 col-xs-4 border col-l-push-4 nopadding rect-box">
+    <div class="row" id="actionButtons">
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
-                <div>
-                    <a href="javascript:showModalNumber('Пройдено', getNumberString(distance, 1000));" oncontextmenu="javascript:resetDistance(); return false;">
-                        <span class="item-label">Пройдено</snap><br>
-                        <span class="item-value" id="distance">999.999</span><br>
-                        <span class="item-label" id="nextPosition">000.000</snap>
+                <div class="no-split">
+                    <a href="javascript:pause();">
+                        <i class="fa icon fa-pause"></i>
                     </a>
                 </div>
             </div>
-    </div>
-<div class="col-l-2 col-xs-4 border col-l-push-4 nopadding rect-box">
-    <div class="square-content">
-        <div>
-            <a href="javascript:showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');" oncontextmenu="javascript:resetInterval(); return false;">
-                <span class="item-label">Интервал</snap><br>
-                <span class="item-value" id="interval">99.999</span><br>
-                <span class="item-label" id="intervalDistance">(--.---)</snap>
-            </a>
+        </div>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:reverse();">
+                        <i class="fa fa-retweet icon"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-l-2 col-xs-4 border col-l-push-4 nopadding rect-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:gpsLongClick();">
-                    <span class="item-label">Ср. скорость</snap><br>
-                    <span class="item-value" id="avgSpeed">90.0</span><br>
-                    <span class="item-label" id="actualSpeed">0</snap>
-</a>
-</div>
-</div>
-</div>
-<div class="col-l-2 col-xs-4 border col-l-pull-6 nopadding rect-box">
-    <div class="square-content">
-        <div>
-            <a href="javascript:showModalKvList();">
-                <span class="item-label">Льгота</snap><br>
-                <span class="item-value" id="benefit">00:05</span><br>
-                <span class="item-label" id="key">-</snap>
-            </a>
-        </div>
-    </div>
-</div>
-<div class="col-l-2 col-xs-4 border col-l-pull-6 nopadding rect-box">
-    <div class="square-content">
-        <div>
-            <a href="javascript:viewRds();">
-                <span class="item-label">Опоздание</snap><br>
-                            <span class="item-value" id="lateness">-10:00</span><br>
-                <span class="item-label" id="latenessPdd">10:00</snap>
-            </a>
-        </div>
-    </div>
-</div>
-<div class="col-l-2 col-xs-4 border nopadding rect-box">
-    <div class="square-content">
-        <div>
-            <a href="javascript:showModalSpeed();">
-                <span class="item-label">Скорость</snap><br>
-                <span class="item-value" id="speed">V - 5</span><br>
-                <span class="item-label" id="vpdd">60</snap>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:startKv(currentKvIndex - 1);">
+                        <i class="fa fa-chevron-left icon"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:rdsStart();">
-                    <i class="fa fa-play icon"></i>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:startKv(currentKvIndex + 1);">
+                        <i class="fa icon fa-chevron-right"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:rdsPF();">
-                    <i class="fa icon fa-flag-checkered"></i>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:plus();">
+                        <i class="fa icon fa-search-plus"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:rdsFinish();">
-                    <i class="fa fa-stop icon"></i>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:minus();">
+                        <i class="fa icon fa-search-minus"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:plus();">
-                    <i class="fa icon fa-plus"></i>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:rdsStart();">
+                        <i class="fa fa-play icon"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:minus();">
-                    <i class="fa fa-minus icon"></i>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:rdsPF();">
+                        <i class="fa icon fa-flag-checkered"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:noSleep.enable();">
-                    <i class="fa fa-lightbulb-o icon"></i>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:rdsFinish();">
+                        <i class="fa fa-stop icon"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:startKv(currentKvIndex - 1);">
-                    <i class="fa fa-chevron-left icon"></i>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:applySpeedInstruction(currentSiIndex - 1);">
+                        <i class="fa fa-chevron-up icon"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:startKv(currentKvIndex + 1);">
-                    <i class="fa icon fa-chevron-right"></i>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:applySpeedInstruction(currentSiIndex + 1);">
+                        <i class="fa icon fa-chevron-down"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:applySpeedInstruction(currentSiIndex - 1);">
-                    <i class="fa fa-chevron-up icon"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:applySpeedInstruction(currentSiIndex + 1);">
-                    <i class="fa icon fa-chevron-down"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:map();">
-                    <i class="fa icon fa-map"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="col-l-1 col-xs-2 border nopadding square-box">
-        <div class="square-content">
-            <div>
-                <a href="javascript:mapType();">
-                    <i class="fa icon fa-rocket"></i>
-                </a>
+        <div class="col-l-1 col-xs-2 border nopadding square-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:resetInterval();">
+                        <i class="fa icon fa-recycle"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -936,6 +965,41 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Settings -->
+<div class="modal fade" id="modalSettings" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Настройки</h4>
+            </div>
+            <div class="modal-body">
+                    <a href="#" onclick="gpsClick();">
+                        <i class="fa fa-globe icon"></i>
+                    </a>
+                    <a href="javascript:showModalCorrection();">
+                        <i class="fa icon fa-car"></i>
+                    </a>
+                    <a href="javascript:plus();">
+                        <i class="fa icon fa-plus"></i>
+                    </a>
+                    <a href="javascript:minus();">
+                        <i class="fa fa-minus icon"></i>
+                    </a>
+                    <a href="javascript:noSleep.enable();">
+                        <i class="fa fa-lightbulb-o icon"></i>
+                    </a>
+                    <a href="javascript:map();">
+                        <i class="fa icon fa-map"></i>
+                    </a>
+                    <a href="javascript:mapType();">
+                        <i class="fa icon fa-rocket"></i>
+                    </a>
+            </div>
         </div>
     </div>
 </div>
@@ -1465,6 +1529,16 @@
             var i = distance - intervalStart;
             $('#fCorrectionInterval').val(getNumberString(i, 1000));
             refreshCorrection(i);
+        }
+    }
+
+    function showHideControls() {
+        if ($("#speedButtons").css("display") != "none") {
+            $("#speedButtons").hide();
+            $("#actionButtons").hide();
+        } else {
+            $("#speedButtons").show();
+            $("#actionButtons").show();
         }
     }
 
