@@ -339,7 +339,32 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-l-2 col-xs-4 border nopadding square-box">
+        <div class="col-l-4 col-xs-8 border col-l-push-2 nopadding rect-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:viewRds();">
+                        <span class="item-label-big">Опоздание</snap><br>
+                        <span class="item-value-big" id="lateness">-10:00</span><br>
+                        <span class="item-label-big" id="latenessPdd">10:00</snap>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 border col-l-push-6 nopadding square-box">
+            <div class="square-content">
+                <div class="split-vertical">
+                    <a href="#" onclick="$('#modalSettings').modal('show');">
+                        <i class="fa fa-cog icon"></i>
+                    </a>
+                </div>
+                <div class="split-vertical">
+                    <a href="#" onclick="showHideControls();">
+                        <i class="fa fa-keyboard-o icon"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 border col-l-pull-6 nopadding square-box">
             <div class="square-content">
                 <div class="split-vertical">
                     <a href="javascript:showModalNumber('Сектор', sector);">
@@ -357,38 +382,13 @@
                 </div>
             </div>
         </div>
-        <div class="col-l-4 col-xs-8 border nopadding rect-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:viewRds();">
-                        <span class="item-label-big">Опоздание</snap><br>
-                        <span class="item-value-big" id="lateness">-10:00</span><br>
-                        <span class="item-label-big" id="latenessPdd">10:00</snap>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-4 col-xs-8 border nopadding rect-box">
+        <div class="col-l-4 col-xs-8 border col-l-pull-2 nopadding rect-box">
             <div class="square-content">
                 <div class="no-split">
                     <a href="javascript:gpsLongClick();">
                         <span class="item-label-big">Ср. скорость</snap><br>
                         <span class="item-value-big" id="avgSpeed">90.0</span><br>
                         <span class="item-label-big" id="actualSpeed">0</snap>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 border nopadding square-box">
-            <div class="square-content">
-                <div class="split-vertical">
-                    <a href="#" onclick="$('#modalSettings').modal('show');">
-                        <i class="fa fa-cog icon"></i>
-                    </a>
-                </div>
-                <div class="split-vertical">
-                    <a href="#" onclick="showHideControls();">
-                        <i class="fa fa-keyboard-o icon"></i>
                     </a>
                 </div>
             </div>
