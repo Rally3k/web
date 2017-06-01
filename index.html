@@ -978,27 +978,32 @@
                 <h4 class="modal-title">Настройки</h4>
             </div>
             <div class="modal-body">
-                    <a href="#" onclick="gpsClick();">
+                    <a href="#" onclick="gpsClick();" data-dismiss="modal">
                         <i class="fa fa-globe icon"></i>
                     </a>
-                    <a href="javascript:showModalCorrection();">
+                    <a href="#" onclick="showModalCorrection();" data-dismiss="modal">
                         <i class="fa icon fa-car"></i>
                     </a>
-                    <a href="javascript:plus();">
+                    <a href="#" onclick="plus();">
                         <i class="fa icon fa-plus"></i>
                     </a>
-                    <a href="javascript:minus();">
+                    <a href="#" onclick="minus();">
                         <i class="fa fa-minus icon"></i>
                     </a>
-                    <a href="javascript:noSleep.enable();">
+                    <a href="#" onclick="noSleep.enable();" data-dismiss="modal">
                         <i class="fa fa-lightbulb-o icon"></i>
                     </a>
-                    <a href="javascript:map();">
+                    <a href="#" onclick="map();" data-dismiss="modal">
                         <i class="fa icon fa-map"></i>
                     </a>
-                    <a href="javascript:mapType();">
+                    <a href="#" onclick="mapType();">
                         <i class="fa icon fa-rocket"></i>
                     </a>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group btn-group-lg col-xs-12">
+                    <button type="button" class="btn btn-default col-xs-12" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                </div>
             </div>
         </div>
     </div>
@@ -1045,11 +1050,13 @@
     var myPolyline = null;
     var myPosition = null;
     var isApply = false;
+    var fontSize = null;
 
     function plus() {
         if (myMap == null) {
             var html = document.documentElement;
-            html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) + 1 + 'px';
+            html.style.fontSize = ++fontSize + 'px';
+            localStorage.setItem("fontSize", fontSize);
         } else {
             myMap.setZoom(myMap.getZoom() + 1);
         }
@@ -1057,14 +1064,27 @@
     function minus() {
         if (myMap == null) {
             var html = document.documentElement;
-            html.style.fontSize = parseInt(getComputedStyle(html, '').fontSize) - 1 + 'px';
+            html.style.fontSize = --fontSize + 'px';
+            localStorage.setItem("fontSize", fontSize);
         } else {
             myMap.setZoom(myMap.getZoom() - 1);
         }
     }
 
+    function setFontSize() {
+        parseInt(getComputedStyle(html, '').fontSize) - 1 + 'px';
+        
+    }
+
     function loadData() {
         if (typeof(Storage) !== "undefined") {
+            fontSize = parseInt(localStorage.getItem("fontSize"));
+            if (isNaN(fontSize)) {
+                fontSize = 12;//parseInt(getComputedStyle(document.documentElement.html, '').fontSize);
+            } else {
+                var html = document.documentElement;
+                html.style.fontSize = fontSize + 'px';
+            }
             sector = parseFloat(localStorage.getItem("sector"));
             norm = parseFloat(localStorage.getItem("norm"));
             start = parseFloat(localStorage.getItem("start"));
