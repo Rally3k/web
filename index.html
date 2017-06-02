@@ -162,6 +162,7 @@
         }
 
         .split-vertical {
+            margin: 0;
             display: table;
             width: 100%;
             height: 50%;
@@ -1353,6 +1354,11 @@
 
     function rdsStart() {
         if (!isRds()) {
+            if (rds && rds.length > 0) {
+                var i = 0;
+                while (localStorage.getItem("rds" + i)) { ++i; }
+                localStorage.setItem("rds" + i, JSON.stringify(rds));
+            }
             rds = [];
         }
         addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
