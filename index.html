@@ -323,15 +323,6 @@
             </div>
         </div>
         <div class="col-l-4 col-xs-8 border nopadding rect-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:showModalNumber('Пройдено', getNumberString(distance, 1000));" oncontextmenu="javascript:resetDistance(); return false;" class="line-height-big">
-                        <span class="item-label-big" style="color:darkblue">Пройдено</span>
-                        <span class="item-value-big" id="distance">999.999</span>
-                        <span class="item-label-big" id="nextPosition">000.000</span>
-                    </a>
-                </div>
-            </div>
             <div class="square-content" style="display: none" id="movePause">
                 <div class="no-split">
                     <a class="fa icon-big fa-pause"></a>
@@ -340,6 +331,15 @@
             <div class="square-content" style="display: none" id="moveReverse">
                 <div class="no-split">
                     <a class="fa icon-big fa-retweet"></a>
+                </div>
+            </div>
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:showModalNumber('Пройдено', getNumberString(distance, 1000));" oncontextmenu="javascript:resetDistance(); return false;" class="line-height-big">
+                        <span class="item-label-big" style="color:darkblue">Пройдено</span>
+                        <span class="item-value-big" id="distance">999.999</span>
+                        <span class="item-label-big" id="nextPosition">000.000</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -1658,7 +1658,7 @@
     function initMap () {
         myMap = new ymaps.Map('map', {
                 center: (lastLatitude) ? [lastLatitude, lastLongitude] : [55.751286, 37.616516],
-                zoom: 13,
+                zoom: 16,
                 controls: []
             });
     }
