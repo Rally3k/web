@@ -82,6 +82,7 @@
                     for (var i = 0; i < rds.length; ++i) {
                         var t = '';
                         var s = '';
+                        var c = '';
                         switch (rds[i].type) {
                             case 'S':
                                 t = '<i class="fa fa-play"></i>';
@@ -90,6 +91,7 @@
                             case 'C':
                                 t = '<i class="fa fa-tachometer"></i>';
                                 s = 'islands#grayCircleIcon';
+                                c = getNumberString(rds[i].speed, 1)
                                 break;
                             case 'P':
                                 t = '<i class="fa fa-flag-checkered"></i>';
@@ -109,7 +111,7 @@
                             .append($('<td>').text(getTimeString(rds[i].time, true)))
                         );
                         if (myMap && rds[i].latitude && rds[i].longitude) {
-                            myMap.geoObjects.add(new ymaps.Placemark([rds[i].latitude, rds[i].longitude], {balloonContent: 'D: ' + getNumberString(rds[i].distance, 1000) + '<br>L: ' + getNumberString(rds[i].lateness, 10) + '<br>N: ' + getTimeString(rds[i].norm, true) + '<br>T: ' + getTimeString(rds[i].time, true)}, {preset: s}));
+                            myMap.geoObjects.add(new ymaps.Placemark([rds[i].latitude, rds[i].longitude], {iconContent:c, balloonContent: 'D: ' + getNumberString(rds[i].distance, 1000) + '<br>S: ' + getNumberString(rds[i].speed, 100) + '<br>L: ' + getNumberString(rds[i].lateness, 10) + '<br>N: ' + getTimeString(rds[i].norm, true) + '<br>T: ' + getTimeString(rds[i].time, true)}, {preset: s}));
                         }
                     }
                     if (myMap && rds.length > 0) {
