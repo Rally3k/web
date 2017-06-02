@@ -118,10 +118,21 @@
                 1px 1px 0 #FFF;
         }
 
+        .icon-small {
+            color: #000000;
+            opacity: .5;
+            font-size: 2rem;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
         .icon-big {
             color: #000000;
             opacity: .5;
-            font-size: 12rem;
+            font-size: 11rem;
             text-shadow:
                 -1px -1px 0 #FFF,
                 1px -1px 0 #FFF,
@@ -291,6 +302,9 @@
 <div class="content grid container-fluid">
     <div class="row">
         <div class="col-l-2 col-xs-4 border nopadding square-box">
+            <div class="square-content">
+                <i class="fa icon-small fa-globe"></i>
+            </div>
             <div class="square-content">
                 <div class="split-vertical">
                     <a href="javascript:showModalTime('Время', getCurrentTime(), true);" class="line-height-small">
@@ -1652,12 +1666,22 @@
     function pause() {
         isPause = !isPause;
         $('.fa-pause').css('color', isPause ? 'red' : '');
+        if (isPause) {
+            $('#movePause').show();
+        } else {
+            $('#movePause').hide();
+        }
         beep();
     }
 
     function reverse() {
         isReverse = !isReverse;
         $('.fa-retweet').css('color', isReverse ? 'red' : '');
+        if (isReverse) {
+            $('#moveReverse').show();
+        } else {
+            $('#moveReverse').hide();
+        }
         beep();
     }
 
@@ -1783,10 +1807,10 @@
             case 69: // e start time
                 showModalTime('Старт', start, true);
             break;
-            case 84: // t time
+            case 84: // t minus
                 minus();
             break;
-            case 71: // g gps
+            case 71: // g plus
                 plus();
             break;
             default:
