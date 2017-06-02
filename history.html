@@ -21,6 +21,10 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <style>
+        #map {
+            height:100vh;
+            width:95%;
+        }
     </style>
 </head>
 
@@ -35,16 +39,12 @@
     <form class="form-inline">
         <label for="selectRds">РДС:</label>
         <select class="form-control" id="selectRds">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
         </select>
     </form>
     <div class="content grid container-fluid">
     </div>
         <div class="row">
-            <div class=" col-xs-6">
+            <div class="col-xs-6">
                 <table id="rdsTable" class="table">
                     <thead>
                         <tr>
@@ -54,7 +54,6 @@
                             <th>Опоздание</th>
                             <th>Норма</th>
                             <th>Время</th>
-                            <th>Координаты</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -63,38 +62,58 @@
             </div>
         </div>
     </div>
+    <div id="map"></div>
+    <p id="json"></p>
     <script type="text/javascript">
+        var myMap = null;
+
         $(document).ready(function () {
+            ymaps.ready(initMap);
+
             $('#selectRds').change(function() {
-                var rds = JSON.parse(localStorage.getItem("rds" + $('#selectRds').val()));
+                var j = localStorage.getItem("rds" + $('#selectRds').val());
+                var rds = JSON.parse(j);
+                $("#json").text(j);
                 $("#rdsTable > tbody tr").remove();
+                if (myMap) {
+                    myMap.geoObjects.remove();
+                }
                 if (rds) {
                     for (var i = 0; i < rds.length; ++i) {
-                        //rds.push(new RdsItem(ris[i]));
                         var t = '';
+                        var s = '';
                         switch (rds[i].type) {
                             case 'S':
-                                t = '<i class="fa fa-play rdsIcon"></i>';
+                                t = '<i class="fa fa-play"></i>';
+                                s = 'islands#darkGreenCircleDotIcon';
                                 break;
                             case 'C':
-                                t = '<i class="fa fa-tachometer rdsIcon"></i>';
+                                t = '<i class="fa fa-tachometer"></i>';
+                                s = 'islands#grayCircleIcon';
                                 break;
                             case 'P':
-                                t = '<i class="fa fa-flag-checkered rdsIcon"></i>';
+                                t = '<i class="fa fa-flag-checkered"></i>';
+                                s = 'islands#yellowCircleDotIcon';
                                 break;
                             case 'F':
-                                t = '<i class="fa fa-stop rdsIcon"></i>';
+                                t = '<i class="fa fa-stop"></i>';
+                                s = 'islands#redCircleDotIcon';
                                 break;
                         }
                         $('#rdsTable > tbody').append($('<tr>')
                             .append($('<td>').html(t))
-                            .append($('<td>').text(getNumberString(rds[i].distance, 1000)))
+                            .append($('<td>').html('<a href="#" onclick="show(' + rds[i].latitude + ', ' + rds[i].longitude + ')">' + getNumberString(rds[i].distance, 1000) + '</a>'))
                             .append($('<td>').text(getNumberString(rds[i].speed, 100)))
                             .append($('<td>').text(getNumberString(rds[i].lateness, 10)))
                             .append($('<td>').text(getTimeString(rds[i].norm, true)))
                             .append($('<td>').text(getTimeString(rds[i].time, true)))
-                            .append($('<td>').html('<a href="https://maps.yandex.ru/?text=' + rds[i].latitude + ', ' + rds[i].longitude + '">' + rds[i].latitude + ' ' + rds[i].longitude + '</a>'))
                         );
+                        if (myMap && rds[i].latitude && rds[i].longitude) {
+                            myMap.geoObjects.add(new ymaps.Placemark([rds[i].latitude, rds[i].longitude], {balloonContent: 'D: ' + getNumberString(rds[i].distance, 1000) + '<br>L: ' + getNumberString(rds[i].lateness, 10) + '<br>N: ' + getTimeString(rds[i].norm, true) + '<br>T: ' + getTimeString(rds[i].time, true)}, {preset: s}));
+                        }
+                    }
+                    if (myMap && rds.length > 0) {
+                        myMap.setCenter([rds[0].latitude, rds[0].longitude]);
                     }
                 }
             });
@@ -105,26 +124,21 @@
                     $('#selectRds').prepend($('<option>', { value: i, text: "РДС " + i}));
                 }
             }
+            $('#selectRds').val('');
         });
 
-        function RdsItem(distance, type, speed, time, latitude, longitude) {
-            if (type === undefined && typeof(distance) === 'object') {
-                for (var prop in distance) {
-                    this[prop] = distance[prop];
-                }
-            } else {
-                this.type = type;
-                this.distance = distance;
-                this.speed = speed;
-                this.time = time;
-                this.latitude = latitude;
-                this.longitude = longitude;
-                this.vPdd = currentPddSpeed;
-                this.vPddLateness = 0;
-                this.vPddNorm = 0;
-                this.lateness = 0;
-                this.norm = 0;
+        function show(lat, long) {
+            if (myMap) {
+                myMap.setCenter([lat, long]);
             }
+        }
+
+        function initMap () {
+            myMap = new ymaps.Map('map', {
+                    center: [55.751286, 37.616516],
+                    zoom: 16,
+                    controls: []
+                });
         }
 
         function getTimeString(value, seconds) {
