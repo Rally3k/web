@@ -1541,8 +1541,8 @@
         } else {
             $("#interval").css("color", "rgb(0, 0, 0)");
         }
-        $("#intervalDistance").html(intervalDistance > 0 ? getNumberString(intervalDistance, 1000) : "");
-        $("#nextPosition").html(intervalDistance > 0 ? getNumberString(intervalStart + intervalDistance, 1000) : "");
+        $("#intervalDistance").html(intervalDistance > 0 ? getNumberString(intervalDistance, 1000) : "-");
+        $("#nextPosition").html(intervalDistance > 0 ? getNumberString(intervalStart + intervalDistance, 1000) : "-");
         var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
         $("#benefit").html(getTimeString(benefit, false));
         var lateness;
@@ -1559,7 +1559,7 @@
         } else {
             $("#avgSpeed").html(norm > 0 ? getNumberString(3600 * sector / norm, 100) : "--.--");
             $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
-            $("#latenessPdd").html("");
+            $("#latenessPdd").html("-");
         }
         $("#speed").html(currentSpeedInstruction.toString(true));
         $("#vpdd").html(getNumberString(currentPddSpeed, 100));
