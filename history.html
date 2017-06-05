@@ -76,7 +76,7 @@
                 $("#json").text(j);
                 $("#rdsTable > tbody tr").remove();
                 if (myMap) {
-                    myMap.geoObjects.remove();
+                    myMap.geoObjects.removeAll();
                 }
                 if (rds) {
                     for (var i = 0; i < rds.length; ++i) {
