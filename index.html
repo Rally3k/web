@@ -244,6 +244,70 @@
             font-size:2.5rem;
             height:5rem;
         }
+/*
+        [type="checkbox"]:not(:checked),
+        [type="checkbox"]:checked {
+        position: absolute;
+        left: -9999px;
+        }
+        [type="checkbox"]:not(:checked) + label,
+        [type="checkbox"]:checked + label {
+        position: relative;
+        padding-left: 5rem;
+        cursor: pointer;
+        }
+
+        /* checkbox aspect */
+  /*      [type="checkbox"]:not(:checked) + label:before,
+        [type="checkbox"]:checked + label:before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0;
+        width: 5rem; height: 5rem;
+        border: 2px solid #ccc;
+        background: #fff;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
+        }
+        /* checked mark aspect */
+/*        [type="checkbox"]:not(:checked) + label:after,
+        [type="checkbox"]:checked + label:after {
+        content: '✔';
+        position: absolute;
+        top: 1rem; left: 1rem;
+        font-size: 2.5rem;
+        line-height: 0.8;
+        color: #09ad7e;
+        transition: all .2s;
+        }
+        /* checked mark aspect changes */
+/*        [type="checkbox"]:not(:checked) + label:after {
+        opacity: 0;
+        transform: scale(0);
+        }
+        [type="checkbox"]:checked + label:after {
+        opacity: 1;
+        transform: scale(1);
+        }
+        /* disabled checkbox */
+/*        [type="checkbox"]:disabled:not(:checked) + label:before,
+        [type="checkbox"]:disabled:checked + label:before {
+        box-shadow: none;
+        border-color: #bbb;
+        background-color: #ddd;
+        }
+        [type="checkbox"]:disabled:checked + label:after {
+        color: #999;
+        }
+        [type="checkbox"]:disabled + label {
+        color: #aaa;
+        }
+        /* accessibility */
+/*        [type="checkbox"]:checked:focus + label:before,
+        [type="checkbox"]:not(:checked):focus + label:before {
+        border: 2px dotted blue;
+        }
+*/
 
         #map{
             height:100%;
@@ -869,6 +933,25 @@
             </div>
             <form class="form-horizontal" id="formAddFormula">
                 <div class="modal-body">
+                    <!--div class="form-group">
+                        <label class="control-label col-xs-3" for="fFormulaItemType">Тип</label>
+                        <div class="col-xs-9">
+                            <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fFormulaItemType" value="S"><i class="fa fa-play"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fFormulaItemType" value="C"><i class="fa fa-tachometer"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fFormulaItemType" value="P"><i class="fa fa-flag-checkered"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fFormulaItemType" value="F"><i class="fa fa-stop"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div-->
                     <div class="form-group">
                         <label class="control-label col-xs-3">
                             Позиция
@@ -879,10 +962,10 @@
                     </div>
                     <div class="form-group">
                         <label class="control-label col-xs-3">
-                            <input type="checkbox" id="chbVpdd">Vпдд
+                            Vпдд
                         </label>
                         <div class="col-xs-3">
-                            <input type="number" class="form-control" id="fVpdd" step="any" disabled placeholder="Vпдд">
+                            <input type="number" class="form-control" id="fVpdd" step="any" placeholder="Vпдд">
                         </div>
                         <div class="col-xs-3">
                             <label>
@@ -892,7 +975,7 @@
                     </div>
                     <div class="form-group">
                         <label class="control-label col-xs-3">
-                            <input type="checkbox" id="chbVds" checked>Vдс
+                            Vдс
                         </label>
                         <div class="col-xs-3">
                             <input type="number" class="form-control" id="fVds" step="any" style="display:none;" placeholder="Vдс">
@@ -1323,14 +1406,16 @@
             this.position = position;
         }
 
+        this.isFormula = function () {
+            return this.isVpdd || (this.speed != null && !isNaN(this.speed));
+        }
+        
         this.getSpeed = function (v) {
-            if (this.isVpdd == null && this.vPdd && this != currentSpeedInstruction) {
-                return currentSpeedInstruction.getSpeed(this.vPdd);
+            if (!this.isFormula() && this != currentSpeedInstruction) {
+                return currentSpeedInstruction.getSpeed(v);
             }
-            if (this.isVpdd == null && this.speed == null) {
-                return currentSpeedInstruction.getSpeed(currentPddSpeed);
-            }
-            var s = this.isVpdd ? (v ? v : currentPddSpeed) : this.speed;
+
+            var s = this.isVpdd ? (v ? v : currentPddSpeed) : (this.speed != null && !isNaN(this.speed) ? this.speed : 0.0);
             switch (this.sign) {
                 case '-':
                     s = s - this.operand;
@@ -1345,7 +1430,7 @@
         this.toString = function (f) {
             return f ?
                 (this.isVpdd ? "V" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") :
-                (this.position != null && !isNaN(this.position) ? this.position + " " : "") + (this.vPdd ? "Vпдд = " + this.vPdd + " " : "") + (this.isVpdd != null ? "Vдс = " + (this.isVpdd ? "Vпдд" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") : "");
+                (this.position != null && !isNaN(this.position) ? this.position + " " : "") + (this.vPdd ? "Vпдд = " + this.vPdd + " " : "") + (this.isVpdd ? "Vдс = Vпдд" + (this.sign ? " " + this.sign + " " + this.operand : "") : (this.speed != null && !isNaN(this.speed) ? "Vдс = " + this.speed : ""));
         }
     }
 
@@ -2225,16 +2310,16 @@
             localStorage.setItem("distance", distance);
             localStorage.setItem("intervalDistance", intervalDistance);
         }
-        if ((si.vPdd && !si.getSpeed(si.vPdd)) || !si.getSpeed()) {
+        if (((si.vPdd != null && !isNaN(si.vPdd)) ? si.getSpeed(si.vPdd) : si.getSpeed()) <= 0) {
             $("#alertSpeed").show();
             return;
         }
-        if (si.isVpdd != null) {
+        if (si.isFormula()) {
             currentSpeedInstruction = si;
             localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
         }
-        if (si.vPdd || si.isVpdd != null) {
-            changeSpeed(si.vPdd || currentPddSpeed);
+        if ((si.vPdd != null && !isNaN(si.vPdd)) || si.isFormula()) {
+            changeSpeed((si.vPdd != null && !isNaN(si.vPdd)) ? si.vPdd : currentPddSpeed);
         }
         currentSiIndex = index;
         localStorage.setItem("currentSiIndex", currentSiIndex);
@@ -2270,10 +2355,14 @@
         $('#modalSpeed').modal('hide');
         $('#modalAddFormula').modal('show');
         $('#modalAddFormula #fPosition').val("");
-        $('#modalAddFormula #fVpdd').closest('.form-group').removeClass('has-error').removeClass('has-success');
-        $('#modalAddFormula #fVds').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#modalAddFormula #fVpdd').val("");
+        $('#modalAddFormula #fVds').val("");
+        $('#modalAddFormula #chbUseVpdd').prop('checked', false);
+        $('#modalAddFormula #fVds').show();
+        $('#modalAddFormula #lVpdd').hide();
+        $('#modalAddFormula #fSign').hide();
+        $('#modalAddFormula #fOperand').hide();
         $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').removeClass('has-success');
-        $('#modalAddFormula #fPosition').closest('.form-group').removeClass('has-error').removeClass('has-success');
     }
 
     $('#modalAddFormula').on('shown.bs.modal', function() {
@@ -2285,17 +2374,9 @@
         var si = new SpeedInstruction();
 
         si.position = parseFloat($('#modalAddFormula #fPosition').val());
-        if ($('#modalAddFormula #chbVpdd').prop('checked')) {
-            var vPdd = parseFloat($('#modalAddFormula #fVpdd').val());
-            if (vPdd) {
-                $('#modalAddFormula #fVpdd').closest('.form-group').removeClass('has-error').addClass('has-success');
-                si.vPdd = vPdd;
-            } else {
-                $('#modalAddFormula #fVpdd').closest('.form-group').removeClass('has-success').addClass('has-error');
-                isGood = false;
-            }
-        }
-        if ($('#modalAddFormula #chbVds').prop('checked')) {
+        si.vPdd = parseFloat($('#modalAddFormula #fVpdd').val());
+        si.isVpdd = $('#modalAddFormula #chbUseVpdd').prop('checked');
+        if (si.isVpdd) {
             si.sign = $('#modalAddFormula #fSign').val();
             if (si.sign) {
                 si.operand = parseFloat($('#modalAddFormula #fOperand').val());
@@ -2306,20 +2387,12 @@
                     isGood = false;
                 }
             }
-            si.isVpdd = $('#modalAddFormula #chbUseVpdd').prop('checked');
-            if (!si.isVpdd) {
-                si.speed = parseFloat($('#modalAddFormula #fVds').val());
-                if (si.speed) {
-                    $('#modalAddFormula #fVds').closest('.form-group').removeClass('has-error').addClass('has-success');
-                } else {
-                    $('#modalAddFormula #fVds').closest('.form-group').removeClass('has-success').addClass('has-error');
-                    isGood = false;
-                }
-            }
+        } else {
+            si.speed = parseFloat($('#modalAddFormula #fVds').val());
         }
-        if (isGood && (si.isVpdd != null || si.vPdd || (si.position != null && !isNaN(si.position)))) {
+        if (isGood && ((si.position && !isNaN(si.position)) || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed)))) {
             $('#modalAddFormula').modal('hide');
-            speedIns.splice(addSiIndex, 0, si); //new SpeedInstruction(si.isVpdd, si.vPdd, si.speed, si.sign, si.operand, si.position));
+            speedIns.splice(addSiIndex, 0, si);
             localStorage.setItem("speedIns", JSON.stringify(speedIns));
             if (isApply) {
                 applySpeedInstruction(addSiIndex);
@@ -2338,9 +2411,13 @@
         if (this.checked) {
             $('#modalAddFormula #fVds').hide();
             $('#modalAddFormula #lVpdd').show();
+            $('#modalAddFormula #fSign').show();
+            $('#modalAddFormula #fOperand').show();
         } else {
             $('#modalAddFormula #fVds').show();
             $('#modalAddFormula #lVpdd').hide();
+            $('#modalAddFormula #fSign').hide();
+            $('#modalAddFormula #fOperand').hide();
         }
     });
 
