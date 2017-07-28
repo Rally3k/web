@@ -498,7 +498,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(10);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(10);" class="road-sign">
                         <span class="speed-limit">10</span>
                     </a>
                 </div>
@@ -507,7 +507,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(20);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(20);" class="road-sign">
                         <span class="speed-limit">20</span>
                     </a>
                 </div>
@@ -516,7 +516,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(30);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(30);" class="road-sign">
                         <span class="speed-limit">30</span>
                     </a>
                 </div>
@@ -525,7 +525,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(40);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(40);" class="road-sign">
                         <span class="speed-limit">40</span>
                     </a>
                 </div>
@@ -534,7 +534,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(50);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(50);" class="road-sign">
                         <span class="speed-limit">50</span>
                     </a>
                 </div>
@@ -543,7 +543,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(60);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(60);" class="road-sign">
                         <span class="speed-limit">60</span>
                     </a>
                 </div>
@@ -552,7 +552,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(70);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(70);" class="road-sign">
                         <span class="speed-limit">70</span>
                     </a>
                 </div>
@@ -561,7 +561,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(80);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(80);" class="road-sign">
                         <span class="speed-limit">80</span>
                     </a>
                 </div>
@@ -570,7 +570,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(90);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(90);" class="road-sign">
                         <span class="speed-limit">90</span>
                     </a>
                 </div>
@@ -579,7 +579,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(100);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(100);" class="road-sign">
                         <span class="speed-limit">100</span>
                     </a>
                 </div>
@@ -588,7 +588,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(110);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(110);" class="road-sign">
                         <span class="speed-limit">110</span>
                     </a>
                 </div>
@@ -597,7 +597,7 @@
         <div class="col-l-1 col-xs-2 border nopadding square-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:changeSpeed(130);" class="road-sign">
+                    <a href="javascript:rdsSpeedChange(130);" class="road-sign">
                         <span class="speed-limit">130</span>
                     </a>
                 </div>
@@ -933,7 +933,7 @@
             </div>
             <form class="form-horizontal" id="formAddFormula">
                 <div class="modal-body">
-                    <!--div class="form-group">
+                    <div class="form-group">
                         <label class="control-label col-xs-3" for="fFormulaItemType">Тип</label>
                         <div class="col-xs-9">
                             <div class="btn-group" data-toggle="buttons">
@@ -951,7 +951,7 @@
                                 </label>
                             </div>
                         </div>
-                    </div-->
+                    </div>
                     <div class="form-group">
                         <label class="control-label col-xs-3">
                             Позиция
@@ -1392,12 +1392,13 @@
         }
     }
 
-    function SpeedInstruction(isVpdd, vPdd, speed, sign, operand, position) {
+    function SpeedInstruction(isVpdd, vPdd, speed, sign, operand, position, type) {
         if (vPdd === undefined && typeof(isVpdd) === 'object') {
             for (var prop in isVpdd) {
                 this[prop] = isVpdd[prop];
             }
         } else {
+            this.type = type;
             this.vPdd = vPdd;
             this.isVpdd = isVpdd;
             this.speed = speed;
@@ -1454,7 +1455,8 @@
         }
     }
 
-    function rdsStart() {
+    function rdsStart(pddSpeed) {
+        changePddSpeed(pddSpeed);
         if (!isRds()) {
             if (rds && rds.length > 0) {
                 var i = 0;
@@ -1471,13 +1473,20 @@
         beep();
     }
 
-    function changeSpeed(pddSpeed) {
-        if (currentSpeedInstruction.getSpeed(pddSpeed) <= 0) {
-            $("#alertSpeed").show();
+    function changePddSpeed(pddSpeed) {
+        if (pddSpeed == null || isNaN(pddSpeed)) {
             return;
         }
-        currentPddSpeed = pddSpeed;
-        localStorage.setItem("currentPddSpeed", currentPddSpeed);
+        if (currentSpeedInstruction.getSpeed(pddSpeed) <= 0) {
+            $("#alertSpeed").show();
+        } else {
+            currentPddSpeed = pddSpeed;
+            localStorage.setItem("currentPddSpeed", currentPddSpeed);
+        }
+    }
+
+    function rdsSpeedChange(pddSpeed) {
+        changePddSpeed(pddSpeed);
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
             if (myMap != null) {
@@ -1488,7 +1497,8 @@
         }
     }
 
-    function rdsPF() {
+    function rdsPF(pddSpeed) {
+        changePddSpeed(pddSpeed);
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
             if (myMap != null) {
@@ -1499,7 +1509,8 @@
         }
     }
 
-    function rdsFinish() {
+    function rdsFinish(pddSpeed) {
+        changePddSpeed(pddSpeed);
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
             if (myMap != null) {
@@ -1818,40 +1829,40 @@
                 rdsFinish();
             break;
             case 192: // ` speed 5
-                changeSpeed(5);
+                rdsSpeedChange(5);
             break;
             case 49: // 1 speed 10
-                changeSpeed(10);
+                rdsSpeedChange(10);
             break;
             case 50: // 2 speed 20
-                changeSpeed(20);
+                rdsSpeedChange(20);
             break;
             case 51: // 3 speed 30
-                changeSpeed(30);
+                rdsSpeedChange(30);
             break;
             case 52: // 4 speed 40
-                changeSpeed(40);
+                rdsSpeedChange(40);
             break;
             case 53: // 5 speed 50
-                changeSpeed(50);
+                rdsSpeedChange(50);
             break;
             case 54: // 6 speed 60
-                changeSpeed(60);
+                rdsSpeedChange(60);
             break;
             case 55: // 7 speed 70
-                changeSpeed(70);
+                rdsSpeedChange(70);
             break;
             case 56: // 8 speed 80
-                changeSpeed(80);
+                rdsSpeedChange(80);
             break;
             case 57: // 9 speed 90
-                changeSpeed(90);
+                rdsSpeedChange(90);
             break;
             case 48: // 0 speed 100
-                changeSpeed(100);
+                rdsSpeedChange(100);
             break;
             case 189: // - speed 110
-                changeSpeed(110);
+                rdsSpeedChange(110);
             break;
             case 82: // r reverse
                 reverse();
@@ -2141,7 +2152,6 @@
         }
         editRdsItemIndex = index;
         var ri = rds[index];
-        //$('input[name=fRdsItemType][value=' + ri.type + ']').prop('active', true);
         $('input[name=fRdsItemType][value=' + ri.type + ']').closest('.btn').button('toggle');
         $('#fRdsItemDistance').val(ri.distance);
         $('#fRdsItemSpeed').val(ri.speed);
@@ -2286,7 +2296,23 @@
     }
 
     function getSpeedInsListItem(i) {
+        var t = '';
+        switch (speedIns[i].type) {
+            case 'S':
+                t = '<i class="fa fa-play rdsIcon"></i>';
+                break;
+            case 'P':
+                t = '<i class="fa fa-flag-checkered rdsIcon"></i>';
+                break;
+            case 'F':
+                t = '<i class="fa fa-stop rdsIcon"></i>';
+                break;
+            default:
+                t = '<i class="fa fa-tachometer rdsIcon"></i>';
+                break;
+        }
         return '<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item si-item clearfix' + ((currentSiIndex == i) ? ' list-group-item-success' : '') + '">'
+                + t + ' '
                 + speedIns[i].toString()
                 + '<span class="pull-right">'
                 + '<button class="btn btn-info" onclick="showModalAddFormula(' + (i+1) + ');return false;"><i class="fa fa-plus-circle"></i></button>\
@@ -2305,22 +2331,37 @@
         var si = speedIns[index];
         if (si.position != null && !isNaN(si.position)) {
             distance = si.position;
-            intervalStart = distance;
-            intervalDistance = 0;
             localStorage.setItem("distance", distance);
-            localStorage.setItem("intervalDistance", intervalDistance);
         }
+        intervalStart = distance;
+        intervalDistance = (index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStart : 0;
+        localStorage.setItem('intervalStart', intervalStart);
+        localStorage.setItem('intervalDistance', intervalDistance);
+        /*
         if (((si.vPdd != null && !isNaN(si.vPdd)) ? si.getSpeed(si.vPdd) : si.getSpeed()) <= 0) {
             $("#alertSpeed").show();
             return;
-        }
+        }*/
         if (si.isFormula()) {
             currentSpeedInstruction = si;
             localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
         }
-        if ((si.vPdd != null && !isNaN(si.vPdd)) || si.isFormula()) {
-            changeSpeed((si.vPdd != null && !isNaN(si.vPdd)) ? si.vPdd : currentPddSpeed);
+        switch (si.type) {
+            case 'S':
+                rdsStart(si.vPdd);
+                break;
+            case 'P':
+                rdsPF(si.vPdd);
+                break;
+            case 'F':
+                rdsFinish(si.vPdd);
+                break;
+            default:
+                rdsSpeedChange(si.vPdd);
+                break;
         }
+        //if ((si.vPdd != null && !isNaN(si.vPdd)) || si.isFormula()) {
+        //}
         currentSiIndex = index;
         localStorage.setItem("currentSiIndex", currentSiIndex);
         newMove(0);
@@ -2354,6 +2395,7 @@
         addSiIndex = i;
         $('#modalSpeed').modal('hide');
         $('#modalAddFormula').modal('show');
+        $('input[name=fFormulaItemType][value=C]').closest('.btn').button('toggle');
         $('#modalAddFormula #fPosition').val("");
         $('#modalAddFormula #fVpdd').val("");
         $('#modalAddFormula #fVds').val("");
@@ -2373,6 +2415,7 @@
         var isGood = true;
         var si = new SpeedInstruction();
 
+        si.type = $('input[name=fFormulaItemType]:checked').val();
         si.position = parseFloat($('#modalAddFormula #fPosition').val());
         si.vPdd = parseFloat($('#modalAddFormula #fVpdd').val());
         si.isVpdd = $('#modalAddFormula #chbUseVpdd').prop('checked');
@@ -2390,7 +2433,7 @@
         } else {
             si.speed = parseFloat($('#modalAddFormula #fVds').val());
         }
-        if (isGood && ((si.position && !isNaN(si.position)) || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed)))) {
+        if (isGood && (si.type != 'C' || (si.position && !isNaN(si.position)) || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed)))) {
             $('#modalAddFormula').modal('hide');
             speedIns.splice(addSiIndex, 0, si);
             localStorage.setItem("speedIns", JSON.stringify(speedIns));
