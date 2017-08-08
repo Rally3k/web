@@ -41,6 +41,7 @@
         <select class="form-control" id="selectRds">
         </select>
     </form>
+    Смены скоростей:
     <div class="content grid container-fluid">
     </div>
         <div class="row">
@@ -52,8 +53,29 @@
                             <th>Дистанция</th>
                             <th>Скорость</th>
                             <th>Опоздание</th>
-                            <th>Норма</th>
+                            <th>Норма&nbsp;времени</th>
+                            <th>Норма&nbsp;(с)</th>
                             <th>Время</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    Нормативы:
+    <div class="content grid container-fluid">
+    </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <table id="normTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Тип</th>
+                            <th>Дистанция</th>
+                            <th>Норма&nbsp;времени</th>
+                            <th>Норма&nbsp;(с)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,14 +97,17 @@
                 var rds = JSON.parse(j);
                 $("#json").text(j);
                 $("#rdsTable > tbody tr").remove();
+                $("#normTable > tbody tr").remove();
                 if (myMap) {
                     myMap.geoObjects.removeAll();
                 }
                 if (rds) {
+                    var n = 0;
                     for (var i = 0; i < rds.length; ++i) {
                         var t = '';
                         var s = '';
-                        var c = '';
+                        var c = getNumberString(rds[i].speed, 1);
+                        n += rds[i].norm;
                         switch (rds[i].type) {
                             case 'S':
                                 t = '<i class="fa fa-play"></i>';
@@ -91,7 +116,6 @@
                             case 'C':
                                 t = '<i class="fa fa-tachometer"></i>';
                                 s = 'islands#grayCircleIcon';
-                                c = getNumberString(rds[i].speed, 1)
                                 break;
                             case 'P':
                                 t = '<i class="fa fa-flag-checkered"></i>';
@@ -108,10 +132,23 @@
                             .append($('<td>').text(getNumberString(rds[i].speed, 100)))
                             .append($('<td>').text(getNumberString(rds[i].lateness, 10)))
                             .append($('<td>').text(getTimeString(rds[i].norm, true)))
+                            .append($('<td>').text(getNumberString(rds[i].norm, 100)))
                             .append($('<td>').text(getTimeString(rds[i].time, true)))
                         );
+                        if (rds[i].type != 'C') {
+                            $('#normTable > tbody').append($('<tr>')
+                                .append($('<td>').html(t))
+                                .append($('<td>').html('<a href="#" onclick="show(' + rds[i].latitude + ', ' + rds[i].longitude + ')">' + getNumberString(rds[i].distance, 1000) + '</a>'))
+                                .append($('<td>').text(getTimeString(n, true)))
+                                .append($('<td>').text(getNumberString(n, 100)))
+                            );
+                            if (rds[i].type != 'P') n = 0;
+                        }
                         if (myMap && rds[i].latitude && rds[i].longitude) {
-                            myMap.geoObjects.add(new ymaps.Placemark([rds[i].latitude, rds[i].longitude], {iconContent:c, balloonContent: 'D: ' + getNumberString(rds[i].distance, 1000) + '<br>S: ' + getNumberString(rds[i].speed, 100) + '<br>L: ' + getNumberString(rds[i].lateness, 10) + '<br>N: ' + getTimeString(rds[i].norm, true) + '<br>T: ' + getTimeString(rds[i].time, true)}, {preset: s}));
+                            myMap.geoObjects.add(new ymaps.Placemark([rds[i].latitude, rds[i].longitude],
+                                {iconContent:c,
+                                balloonContent: 'D: ' + getNumberString(rds[i].distance, 1000) + '<br>S: ' + getNumberString(rds[i].speed, 100) + '<br>L: ' + getNumberString(rds[i].lateness, 10) + '<br>N: ' + getTimeString(rds[i].norm, true) + '<br>T: ' + getTimeString(rds[i].time, true)},
+                                {preset: s}));
                         }
                     }
                     if (myMap && rds.length > 0) {
@@ -121,9 +158,11 @@
             });
 
             $('#selectRds > option').remove();
-            for (var i = 0; i < 100; ++i) {
-                if (localStorage.getItem("rds" + i)) {
-                    $('#selectRds').prepend($('<option>', { value: i, text: "РДС " + i}));
+            for (var i = 0; i < 999; ++i) {
+                var j = localStorage.getItem("rds" + i);
+                if (j) {
+                    var rds = JSON.parse(j);
+                    $('#selectRds').prepend($('<option>', { value: i, text: "РДС " + i + " (" + getTimeString(rds[0].time, true) + ")"}));
                 }
             }
             $('#selectRds').val('');
@@ -152,7 +191,7 @@
             var h = Math.floor(value / 3600);
             var m = Math.floor((value - 3600 * h) / 60);
             if (seconds) {
-                var s = Math.floor(value - 60 * m - 3600 * h);
+                var s = Math.floor(100 * (value - 60 * m - 3600 * h)) / 100;
                 return (n ? "-" : "") + h + (m < 10 ? ":0" : ":") + m + (s < 10 ? ":0" : ":") + s;
             } else {
                 return (n ? "-" : "") + h + (m < 10 ? ":0" : ":") + m;
@@ -165,7 +204,7 @@
             }
             var n = value < 0;
             value = Math.abs(value);
-            if (size < 1) {
+            if (size <= 1) {
                 return (n ? "-" : "") + Math.floor(value * size) / size;
             }
             var s = Math.round(value * size) / size + '';

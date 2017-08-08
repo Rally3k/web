@@ -2672,7 +2672,7 @@
         }
         var n = value < 0;
         value = Math.abs(value);
-        if (size < 1) {
+        if (size <= 1) {
             return (n ? "-" : "") + Math.floor(value * size) / size;
         }
         var s = Math.round(value * size) / size + '';
