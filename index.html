@@ -1634,6 +1634,19 @@
         }
         $("#time").html(getTimeString(getCurrentTime(), true));
         var sectorTime = getCurrentTime() - start + ((getCurrentTime() > start) ? 0 : 24 * 60 * 60);
+        if (norm - sectorTime > 60) {
+            $("#time").css("color", "rgb(0, 0, 0)");
+        } else if (norm - sectorTime > 0) {
+            if ($("#time").css("color") == "rgb(0, 0, 0)") {
+                $("#time").css("color", "rgb(255, 200, 0)");
+                beep();
+            }
+        } else if (norm - sectorTime > -60) {
+            $("#time").css("color", "rgb(0, 255, 0)");
+            beep();
+        } else {
+            $("#time").css("color", "rgb(0, 255, 0)");
+        }
         $("#sectorTime").html(getTimeString(sectorTime, true));
         $("#sector").html(sector);
         $("#distance").html(getNumberString(distance, 1000));
@@ -1641,7 +1654,7 @@
         $("#norm").html(getTimeString(norm, false));
         $("#normRest").html(getTimeString(norm - sectorTime, true));
         $("#start").html(getTimeString(start, true));
-        $("#finish").html(getTimeString(start + norm, true));
+        $("#finish").html(getTimeString((start + norm) % (24 * 60 * 60), true));
         if (intervalDistance > 0 && distance > intervalStart + intervalDistance) {
             intervalStart = intervalStart + intervalDistance;
             localStorage.setItem("intervalStart", intervalStart);
@@ -1785,22 +1798,24 @@
     }
 
     function applyKv(index) {
-        if (index < 0 || index >= kvs.length) return;
-
-        if (kvs[index].start == null) {
-            var nextStart = start;
-            for (var i = 0; i < index; ++i) {
-                nextStart = (kvs[i].start != null ? kvs[i].start : nextStart) + kvs[i].norm + (kvs[i].pause != null ? kvs[i].pause : 0);
+        if (index >= 0 && index < kvs.length) {
+            if (kvs[index].start == null) {
+                var nextStart = start;
+                for (var i = 0; i < index; ++i) {
+                    nextStart = (kvs[i].start != null ? kvs[i].start : nextStart) + kvs[i].norm + (kvs[i].pause != null ? kvs[i].pause : 0);
+                }
+                start = nextStart % (24 * 60 * 60);
+            } else {
+                start = kvs[index].start;
             }
-            start = nextStart % (24 * 60 * 60);
-        } else {
-            start = kvs[index].start;
+            sector = kvs[index].sector;
+            norm = kvs[index].norm;
+            localStorage.setItem("start", start);
+            localStorage.setItem("norm", norm);
+            localStorage.setItem("sector", sector);
+        } else if (index != -1) {
+            return;
         }
-        sector = kvs[index].sector;
-        norm = kvs[index].norm;
-        localStorage.setItem("start", start);
-        localStorage.setItem("norm", norm);
-        localStorage.setItem("sector", sector);
 
         currentKvIndex = index;
         localStorage.setItem("currentKvIndex", currentKvIndex);
@@ -1809,7 +1824,7 @@
     }
 
     function startKv(index) {
-        if (index < 0 || index >= kvs.length) return;
+        if (index < -1 || index >= kvs.length) return;
         resetDistance();
         applyKv(index);
     }
@@ -2325,43 +2340,37 @@
     })
 
     function applySpeedInstruction(index) {
-        if (index < 0 || index >= speedIns.length) {
+        if (index >= 0 && index < speedIns.length) {
+            var si = speedIns[index];
+            if (si.position != null && !isNaN(si.position)) {
+                distance = si.position;
+                localStorage.setItem("distance", distance);
+            }
+            intervalStart = distance;
+            intervalDistance = (index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStart : 0;
+            localStorage.setItem('intervalStart', intervalStart);
+            localStorage.setItem('intervalDistance', intervalDistance);
+            if (si.isFormula()) {
+                currentSpeedInstruction = si;
+                localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
+            }
+            switch (si.type) {
+                case 'S':
+                    rdsStart(si.vPdd);
+                    break;
+                case 'P':
+                    rdsPF(si.vPdd);
+                    break;
+                case 'F':
+                    rdsFinish(si.vPdd);
+                    break;
+                default:
+                    rdsSpeedChange(si.vPdd);
+                    break;
+            }
+        } else if (index != -1) {
             return;
         }
-        var si = speedIns[index];
-        if (si.position != null && !isNaN(si.position)) {
-            distance = si.position;
-            localStorage.setItem("distance", distance);
-        }
-        intervalStart = distance;
-        intervalDistance = (index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStart : 0;
-        localStorage.setItem('intervalStart', intervalStart);
-        localStorage.setItem('intervalDistance', intervalDistance);
-        /*
-        if (((si.vPdd != null && !isNaN(si.vPdd)) ? si.getSpeed(si.vPdd) : si.getSpeed()) <= 0) {
-            $("#alertSpeed").show();
-            return;
-        }*/
-        if (si.isFormula()) {
-            currentSpeedInstruction = si;
-            localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
-        }
-        switch (si.type) {
-            case 'S':
-                rdsStart(si.vPdd);
-                break;
-            case 'P':
-                rdsPF(si.vPdd);
-                break;
-            case 'F':
-                rdsFinish(si.vPdd);
-                break;
-            default:
-                rdsSpeedChange(si.vPdd);
-                break;
-        }
-        //if ((si.vPdd != null && !isNaN(si.vPdd)) || si.isFormula()) {
-        //}
         currentSiIndex = index;
         localStorage.setItem("currentSiIndex", currentSiIndex);
         newMove(0);
@@ -2379,7 +2388,7 @@
         speedIns.splice(index, 1);
         localStorage.setItem("speedIns", JSON.stringify(speedIns));
         if (index <= currentSiIndex) {
-            currentSiIndex = (currentSiIndex == index) ? -1 : currentSiIndex - 1;
+            currentSiIndex = currentSiIndex - 1;
             localStorage.setItem("currentSiIndex", currentSiIndex);
         }
         for (var i = index; i < speedIns.length; ++i) {
