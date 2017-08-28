@@ -29,15 +29,13 @@
             display: block;
             width: 100%;
             height: 100%;
-            background-color: #FFFFFF;
-            opacity: .5;
             border: 0.5rem solid #C0C0C0;
             border-radius: 50%;
             text-decoration: none;
         }
 
         .speed-limit {
-            color: #000000;
+            color: #FFFFFF;
             font-family: Trebuchet MS;
             font-size: 2rem;
             font-weight: bold;
@@ -109,7 +107,6 @@
 
         .icon {
             color: #000000;
-            opacity: .5;
             font-size: 4rem;
             text-shadow:
                 -1px -1px 0 #FFF,
@@ -120,9 +117,7 @@
 
         .icon-small {
             color: #000000;
-            opacity: .5;
             font-size: 2rem;
-            position: fixed; top: 0; left: 0;
             text-shadow:
                 -1px -1px 0 #FFF,
                 1px -1px 0 #FFF,
@@ -244,6 +239,21 @@
             font-size:2.5rem;
             height:5rem;
         }
+
+        .actions {
+            height: 100%; /* 100% Full-height */
+            width: 100%;
+            display: none;
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Stay on top */
+            top: 0;
+            left: 0;
+            padding-left: 15px;
+            padding-right: 15px;
+            background-color: #111; /* Black*/
+            overflow-x: hidden; /* Disable horizontal scroll */
+            opacity: 0.7;
+        }
 /*
         [type="checkbox"]:not(:checked),
         [type="checkbox"]:checked {
@@ -345,6 +355,11 @@
             .col-l-push-4 {left: 33.33%;}
             .col-l-push-5 {left: 41.66%;}
             .col-l-push-6 {left: 50%;}
+            .col-l-push-7 {left: 58.33%;}
+            .col-l-push-8 {left: 66.66%;}
+            .col-l-push-9 {left: 75%;}
+            .col-l-push-10 {left: 83.33%;}
+            .col-l-push-11 {left: 91.66%;}
 
             th.visible-l,
             td.visible-l {
@@ -368,7 +383,7 @@
     <div class="row">
         <div class="col-l-2 col-xs-4 border nopadding square-box">
             <div class="square-content">
-                <i class="fa icon-small fa-globe"></i>
+                <i class="fa icon-small fa-globe" style="position: fixed; top: 0; left: 0;"></i>
             </div>
             <div class="square-content">
                 <div class="split-vertical">
@@ -452,13 +467,8 @@
         </div>
         <div class="col-l-2 col-xs-4 border col-l-push-6 nopadding square-box">
             <div class="square-content">
-                <div class="split-vertical">
-                    <a href="#" onclick="$('#modalSettings').modal('show');">
-                        <i class="fa fa-cog icon"></i>
-                    </a>
-                </div>
-                <div class="split-vertical">
-                    <a href="#" onclick="showHideControls();">
+                <div class="no-split">
+                    <a href="#" onclick="showActions();">
                         <i class="fa fa-keyboard-o icon"></i>
                     </a>
                 </div>
@@ -494,222 +504,300 @@
             </div>
         </div>
     </div>
-    <div class="row" id="speedButtons">
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(10);" class="road-sign">
-                        <span class="speed-limit">10</span>
-                    </a>
+    <div id="actions" class="actions">
+        <div class="row">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();gpsClick();">
+                            <i class="fa icon fa-globe"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 col-xs-push-8 col-l-push-10 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();">
+                            <i class="fa fa-times icon"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(20);" class="road-sign">
-                        <span class="speed-limit">20</span>
-                    </a>
+        <div class="row" id="speedButtons">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(10);" class="road-sign">
+                            <span class="speed-limit">10</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(20);" class="road-sign">
+                            <span class="speed-limit">20</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(30);" class="road-sign">
+                            <span class="speed-limit">30</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(40);" class="road-sign">
+                            <span class="speed-limit">40</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(50);" class="road-sign">
+                            <span class="speed-limit">50</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(60);" class="road-sign">
+                            <span class="speed-limit">60</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(70);" class="road-sign">
+                            <span class="speed-limit">70</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(80);" class="road-sign">
+                            <span class="speed-limit">80</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(90);" class="road-sign">
+                            <span class="speed-limit">90</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(100);" class="road-sign">
+                            <span class="speed-limit">100</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(110);" class="road-sign">
+                            <span class="speed-limit">110</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(130);" class="road-sign">
+                            <span class="speed-limit">130</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(30);" class="road-sign">
-                        <span class="speed-limit">30</span>
-                    </a>
+        <div class="row" id="actionButtons">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();pause();">
+                            <i class="fa icon fa-pause"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();reverse();">
+                            <i class="fa fa-retweet icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();startKv(currentKvIndex - 1);">
+                            <i class="fa fa-chevron-left icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();startKv(currentKvIndex + 1);">
+                            <i class="fa icon fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:plus();">
+                            <i class="fa icon fa-search-plus"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:minus();">
+                            <i class="fa icon fa-search-minus"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsStart();">
+                            <i class="fa fa-play icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsPF();">
+                            <i class="fa icon fa-flag-checkered"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsFinish();">
+                            <i class="fa fa-stop icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();applySpeedInstruction(currentSiIndex - 1);">
+                            <i class="fa fa-chevron-up icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();applySpeedInstruction(currentSiIndex + 1);">
+                            <i class="fa icon fa-chevron-down"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();resetInterval();">
+                            <i class="fa icon fa-recycle"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(40);" class="road-sign">
-                        <span class="speed-limit">40</span>
-                    </a>
+        <div class="row">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();showModalCorrection();">
+                            <i class="fa icon fa-car"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(50);" class="road-sign">
-                        <span class="speed-limit">50</span>
-                    </a>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();noSleep.enable();">
+                            <i class="fa icon fa-lightbulb-o"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(60);" class="road-sign">
-                        <span class="speed-limit">60</span>
-                    </a>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:map();">
+                            <i class="fa icon fa-map"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(70);" class="road-sign">
-                        <span class="speed-limit">70</span>
-                    </a>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:mapType();">
+                            <i class="fa icon fa-rocket"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(80);" class="road-sign">
-                        <span class="speed-limit">80</span>
-                    </a>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:plusFont();">
+                            <i class="fa icon fa-font"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(90);" class="road-sign">
-                        <span class="speed-limit">90</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(100);" class="road-sign">
-                        <span class="speed-limit">100</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(110);" class="road-sign">
-                        <span class="speed-limit">110</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsSpeedChange(130);" class="road-sign">
-                        <span class="speed-limit">130</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row" id="actionButtons">
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:pause();">
-                        <i class="fa icon fa-pause"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:reverse();">
-                        <i class="fa fa-retweet icon"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:startKv(currentKvIndex - 1);">
-                        <i class="fa fa-chevron-left icon"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:startKv(currentKvIndex + 1);">
-                        <i class="fa icon fa-chevron-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:plus();">
-                        <i class="fa icon fa-search-plus"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:minus();">
-                        <i class="fa icon fa-search-minus"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsStart();">
-                        <i class="fa fa-play icon"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsPF();">
-                        <i class="fa icon fa-flag-checkered"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:rdsFinish();">
-                        <i class="fa fa-stop icon"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:applySpeedInstruction(currentSiIndex - 1);">
-                        <i class="fa fa-chevron-up icon"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:applySpeedInstruction(currentSiIndex + 1);">
-                        <i class="fa icon fa-chevron-down"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-1 col-xs-2 border nopadding square-box">
-            <div class="square-content">
-                <div class="no-split">
-                    <a href="javascript:resetInterval();">
-                        <i class="fa icon fa-recycle"></i>
-                    </a>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:minusFont();">
+                            <i class="fa icon-small fa-font"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1172,22 +1260,25 @@
     var fontSize = null;
 
     function plus() {
-        if (myMap == null) {
-            var html = document.documentElement;
-            html.style.fontSize = ++fontSize + 'px';
-            localStorage.setItem("fontSize", fontSize);
-        } else {
+        if (myMap != null) {
             myMap.setZoom(myMap.getZoom() + 1);
         }
     }
     function minus() {
-        if (myMap == null) {
-            var html = document.documentElement;
-            html.style.fontSize = --fontSize + 'px';
-            localStorage.setItem("fontSize", fontSize);
-        } else {
+        if (myMap != null) {
             myMap.setZoom(myMap.getZoom() - 1);
         }
+    }
+
+    function plusFont() {
+        var html = document.documentElement;
+        html.style.fontSize = ++fontSize + 'px';
+        localStorage.setItem("fontSize", fontSize);
+    }
+    function minusFont() {
+        var html = document.documentElement;
+        html.style.fontSize = --fontSize + 'px';
+        localStorage.setItem("fontSize", fontSize);
     }
 
     function setFontSize() {
@@ -2689,6 +2780,14 @@
             s = s + '0';
         }
         return (n ? "-" : "") + s;
+    }
+
+    function showActions() {
+        $('#actions').css('display', 'block');
+    }
+
+    function hideActions() {
+        $('#actions').css('display', 'none');
     }
 
     var snd = new Audio("data:audio/wav;base64,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qJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=");
