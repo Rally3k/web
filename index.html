@@ -515,7 +515,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col-l-1 col-xs-2 col-xs-push-8 col-l-push-10 border nopadding square-box">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:test();">
+                            <i class="fa icon fa-hourglass-o"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 col-xs-push-6 col-l-push-9 border nopadding square-box">
                 <div class="square-content">
                     <div class="no-split">
                         <a href="javascript:hideActions();">
@@ -1258,6 +1267,20 @@
     var myPosition = null;
     var isApply = false;
     var fontSize = null;
+
+    function test() {
+        httpGetAsync('http://192.168.100.163/', function (a) { distance = distance + parseInt(a); });
+    }
+
+    function httpGetAsync(theUrl, callback) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() { 
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                callback(xmlHttp.responseText);
+        }
+        xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+        xmlHttp.send(null);
+    }
 
     function plus() {
         if (myMap != null) {
