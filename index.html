@@ -1818,16 +1818,6 @@
         }
     }
 
-    function showHideControls() {
-        if ($("#speedButtons").css("display") != "none") {
-            $("#speedButtons").hide();
-            $("#actionButtons").hide();
-        } else {
-            $("#speedButtons").show();
-            $("#actionButtons").show();
-        }
-    }
-
     $(document).ready(function () {
         window.onbeforeunload = function() {
             return "Data will be lost if you leave the page, are you sure?";
@@ -2130,7 +2120,7 @@
     }
 
     $('#modalNumber').on('shown.bs.modal', function() {
-        $('#numberValue').focus().select();
+        setTimeout(function () { $('#numberValue').focus().select(); }, 20);
         $('#numberValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
     })
 
