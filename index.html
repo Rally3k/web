@@ -254,70 +254,6 @@
             overflow-x: hidden; /* Disable horizontal scroll */
             opacity: 0.7;
         }
-/*
-        [type="checkbox"]:not(:checked),
-        [type="checkbox"]:checked {
-        position: absolute;
-        left: -9999px;
-        }
-        [type="checkbox"]:not(:checked) + label,
-        [type="checkbox"]:checked + label {
-        position: relative;
-        padding-left: 5rem;
-        cursor: pointer;
-        }
-
-        /* checkbox aspect */
-  /*      [type="checkbox"]:not(:checked) + label:before,
-        [type="checkbox"]:checked + label:before {
-        content: '';
-        position: absolute;
-        left: 0; top: 0;
-        width: 5rem; height: 5rem;
-        border: 2px solid #ccc;
-        background: #fff;
-        border-radius: 4px;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
-        }
-        /* checked mark aspect */
-/*        [type="checkbox"]:not(:checked) + label:after,
-        [type="checkbox"]:checked + label:after {
-        content: '✔';
-        position: absolute;
-        top: 1rem; left: 1rem;
-        font-size: 2.5rem;
-        line-height: 0.8;
-        color: #09ad7e;
-        transition: all .2s;
-        }
-        /* checked mark aspect changes */
-/*        [type="checkbox"]:not(:checked) + label:after {
-        opacity: 0;
-        transform: scale(0);
-        }
-        [type="checkbox"]:checked + label:after {
-        opacity: 1;
-        transform: scale(1);
-        }
-        /* disabled checkbox */
-/*        [type="checkbox"]:disabled:not(:checked) + label:before,
-        [type="checkbox"]:disabled:checked + label:before {
-        box-shadow: none;
-        border-color: #bbb;
-        background-color: #ddd;
-        }
-        [type="checkbox"]:disabled:checked + label:after {
-        color: #999;
-        }
-        [type="checkbox"]:disabled + label {
-        color: #aaa;
-        }
-        /* accessibility */
-/*        [type="checkbox"]:checked:focus + label:before,
-        [type="checkbox"]:not(:checked):focus + label:before {
-        border: 2px dotted blue;
-        }
-*/
 
         #map{
             height:100%;
@@ -1307,15 +1243,11 @@
         html.style.fontSize = ++fontSize + 'px';
         localStorage.setItem("fontSize", fontSize);
     }
+
     function minusFont() {
         var html = document.documentElement;
         html.style.fontSize = --fontSize + 'px';
         localStorage.setItem("fontSize", fontSize);
-    }
-
-    function setFontSize() {
-        parseInt(getComputedStyle(html, '').fontSize) - 1 + 'px';
-        
     }
 
     function loadData() {
@@ -1415,26 +1347,6 @@
         }
         if (myMap != null && lastLatitude) {
             myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
-            /*
-            if (!myPolyline) {
-                // Создаем ломаную с помощью вспомогательного класса Polyline.
-                myPolyline = new ymaps.Polyline([
-                        // Указываем координаты вершин ломаной.
-                        [lastLatitude, lastLongitude],
-                        [position.coords.latitude, position.coords.longitude]
-                    ], null, {
-                        // Цвет линии.
-                        strokeColor: "#0000FF",
-                        // Ширина линии.
-                        strokeWidth: 4,
-                        // Коэффициент прозрачности.
-                        strokeOpacity: 0.5
-                    });
-                myMap.geoObjects.add(myPolyline);
-            } else if (getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020) {
-                myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
-            }
-            */
             if (myPolyline && (myPolyline.geometry.getLength() < 1 || getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020)) {
                 myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
             }
@@ -1596,8 +1508,6 @@
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#darkGreenCircleDotIcon'}));
         }
-        newMove();
-        beep();
     }
 
     function changePddSpeed(pddSpeed) {
@@ -1619,8 +1529,6 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
             }
-            newMove();
-            beep();
         }
     }
 
@@ -1631,8 +1539,6 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#yellowCircleDotIcon'}));
             }
-            newMove();
-            beep();
         }
     }
 
@@ -1643,8 +1549,6 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
             }
-            newMove();
-            beep();
         }
     }
 
@@ -1654,6 +1558,8 @@
         recalculateRds();
         refreshRdsTable();
         localStorage.setItem("rds", JSON.stringify(rds));
+        newMove();
+        beep();
     }
 
     function isRds() {
@@ -2163,6 +2069,7 @@
         switch ($('#modalNumber .modal-title').html()) {
             case 'Сектор':
                 sector = 0;
+                newMove();
                 break;
             case 'Пройдено':
                 resetDistance();
@@ -2171,7 +2078,6 @@
                 resetInterval();
                 break;
         }
-        newMove();
     })
 
     function resetDistance() {
@@ -2248,7 +2154,7 @@
                 }
                 break;
             case 'Старт':
-                start = Math.floor(getCurrentTime() / 60) * 60;
+                start = Math.floor(getCurrentTime() / 60) * 60 + 60; // next minute
                 localStorage.setItem("start", start);
                 if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
                     kvs[currentKvIndex].start = start;
