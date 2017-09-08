@@ -1583,7 +1583,7 @@
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#darkGreenCircleDotIcon'}));
         }
-        newMove(0);
+        newMove();
         beep();
     }
 
@@ -1606,7 +1606,7 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
             }
-            newMove(0);
+            newMove();
             beep();
         }
     }
@@ -1618,7 +1618,7 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#yellowCircleDotIcon'}));
             }
-            newMove(0);
+            newMove();
             beep();
         }
     }
@@ -1630,7 +1630,7 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
             }
-            newMove(0);
+            newMove();
             beep();
         }
     }
@@ -1718,7 +1718,7 @@
 
     function newMove(d) {
         wasUpdate = true;
-        if (!isPause) {
+        if (!isPause && !isNaN(d)) {
             distance = distance + correction * (isReverse ? -d : d);
             localStorage.setItem("distance", distance);
         }
@@ -1739,7 +1739,7 @@
             }
         }
 
-        if (d != 0) {
+        if (!isNaN(d)) {
             var time = getCurrentTime();
             if (lastTime != null) {
                 $("#actualSpeed").html(getNumberString(d / (time - lastTime) * 60 * 60, 10));
@@ -1831,9 +1831,9 @@
             if (isDemo) {
                 newMove(1/61.0);
             } else if (!wasUpdate) {
-                $("#actualSpeed").html("0");
+                $("#actualSpeed").html("0.0");
                 lastTime = getCurrentTime();
-                newMove(0);
+                newMove();
                 if (gpsWatch) {
                     $(".fa-globe").css("color", "red");
                 }
@@ -1923,7 +1923,7 @@
 
         currentKvIndex = index;
         localStorage.setItem("currentKvIndex", currentKvIndex);
-        newMove(0);
+        newMove();
         beep();
     }
 
@@ -2136,7 +2136,7 @@
                 resetInterval();
                 break;
         }
-        newMove(0);
+        newMove();
     })
 
     function resetDistance() {
@@ -2146,6 +2146,7 @@
         localStorage.setItem('distance', 0);
         localStorage.setItem('intervalStart', 0);
         localStorage.setItem('intervalDistance', 0);
+        newMove();
     }
 
     function resetInterval() {
@@ -2153,6 +2154,7 @@
         intervalDistance = 0;
         localStorage.setItem('intervalStart', intervalStart);
         localStorage.setItem('intervalDistance', 0);
+        newMove();
     }
 
     $('#modalNumber').on('submit', function (e) {
@@ -2184,7 +2186,7 @@
                     localStorage.setItem("intervalDistance", intervalDistance);
                     break;
             }
-            newMove(0);
+            newMove();
             return false;
         }
     });
@@ -2223,7 +2225,7 @@
                 localStorage.setItem("timeCorrection", timeCorrection);
                 break;
         }
-        newMove(0);
+        newMove();
     });
 
     $('#modalTime').on('submit', function (e) {
@@ -2260,7 +2262,7 @@
                     localStorage.setItem("timeCorrection", timeCorrection);
                     break;
             }
-            newMove(0);
+            newMove();
             return false;
         }
     });
@@ -2329,7 +2331,7 @@
                 recalculateRds();
                 refreshRdsTable();
                 localStorage.setItem("rds", JSON.stringify(rds));
-                newMove(0);
+                newMove();
             }
             return false;
         }
@@ -2343,7 +2345,7 @@
         recalculateRds(editRdsItemIndex);
         refreshRdsTable();
         localStorage.setItem("rds", JSON.stringify(rds));
-        newMove(0);
+        newMove();
     });
 
     function compareRdsItems(a, b) {
@@ -2477,13 +2479,13 @@
         }
         currentSiIndex = index;
         localStorage.setItem("currentSiIndex", currentSiIndex);
-        newMove(0);
+        newMove();
         beep();
     }
 
     $('#modalSpeed').on('submit', function (e) {
         $('#modalSpeed').modal('hide');
-        newMove(0);
+        newMove();
         return false;
     });
 
