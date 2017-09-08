@@ -524,7 +524,34 @@
                     </div>
                 </div>
             </div>
-            <div class="col-l-1 col-xs-2 col-xs-push-6 col-l-push-9 border nopadding square-box">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:map();">
+                            <i class="fa icon fa-map"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:mapType();">
+                            <i class="fa icon fa-rocket"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:mapTrack();">
+                            <i class="fa icon fa-plane"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 col-l-push-6 border nopadding square-box">
                 <div class="square-content">
                     <div class="no-split">
                         <a href="javascript:hideActions();">
@@ -769,24 +796,6 @@
                     <div class="no-split">
                         <a href="javascript:hideActions();noSleep.enable();">
                             <i class="fa icon fa-lightbulb-o"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-l-1 col-xs-2 border nopadding square-box">
-                <div class="square-content">
-                    <div class="no-split">
-                        <a href="javascript:map();">
-                            <i class="fa icon fa-map"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-l-1 col-xs-2 border nopadding square-box">
-                <div class="square-content">
-                    <div class="no-split">
-                        <a href="javascript:mapType();">
-                            <i class="fa icon fa-rocket"></i>
                         </a>
                     </div>
                 </div>
@@ -1426,6 +1435,10 @@
                 myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
             }
             */
+            if (myPolyline) {
+                myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
+            }
+
             if (!myPosition) {
                 myPosition = new ymaps.Circle([[position.coords.latitude, position.coords.longitude], position.coords.accuracy], {}, {});
                 myMap.geoObjects.add(myPosition);
@@ -1851,6 +1864,7 @@
             myMap = null;
             myPolyline = null;
             myPosition = null;
+            $('.fa-plane').css('color', '');
         }
 
     }
@@ -1869,6 +1883,27 @@
                 myMap.setType('yandex#map');
                 break;
         }
+    }
+
+    function mapTrack() {
+        if (myMap == null) return;
+
+        if (!myPolyline) {
+            // Создаем ломаную с помощью вспомогательного класса Polyline.
+            myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
+                    // Цвет линии.
+                    strokeColor: "#0000FF",
+                    // Ширина линии.
+                    strokeWidth: 4,
+                    // Коэффициент прозрачности.
+                    strokeOpacity: 0.5
+                });
+            myMap.geoObjects.add(myPolyline);
+        } else {
+            myMap.geoObjects.remove(myPolyline);
+            myPolyline = null;
+        }
+        $('.fa-plane').css('color', myPolyline ? 'blue' : '');
     }
 
     function initMap () {
