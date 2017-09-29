@@ -1972,8 +1972,9 @@
         } else {
             switch (keyCode) {
                 case 13:
+                    // TODO: replace decimal point
                     var numberValue = parseFloat($('#enterValue').text());
-                    alert($('#enterValue').text());
+                    //alert($('#enterValue').text());
                     if (isNaN(numberValue)) {
                         alert('Not a number');
                         break;
