@@ -403,9 +403,16 @@
         </div>
         <div class="col-l-2 col-xs-4 border col-l-push-6 nopadding square-box">
             <div class="square-content">
-                <div class="no-split">
+                <div class="split-vertical">
                     <a href="#" onclick="showActions();">
                         <i class="fa fa-keyboard-o icon"></i>
+                    </a>
+                </div>
+                <div class="split-vertical">
+                    <a href="javascript:;" class="line-height-small">
+                        <span class="item-label" style="color:darkblue">Ввод</span>
+                        <span class="item-value" id="enterValue">99.999</span>
+                        <span class="item-label" id="enterType">Интервал</span>
                     </a>
                 </div>
             </div>
@@ -1878,103 +1885,115 @@
         if (isModalShown) return;
         var keyCode = e.which || e.keyCode;
         $("#key").html(e.key + ' (' + keyCode + ')');
-        switch (keyCode) {
-            case 83: // s start DS
-                rdsStart();
-            break;
-            case 68: // d intermidiate finish
-                rdsPF();
-            break;
-            case 70: // f finish
-                rdsFinish();
-            break;
-            case 192: // ` speed 5
-                rdsSpeedChange(5);
-            break;
-            case 49: // 1 speed 10
-                rdsSpeedChange(10);
-            break;
-            case 50: // 2 speed 20
-                rdsSpeedChange(20);
-            break;
-            case 51: // 3 speed 30
-                rdsSpeedChange(30);
-            break;
-            case 52: // 4 speed 40
-                rdsSpeedChange(40);
-            break;
-            case 53: // 5 speed 50
-                rdsSpeedChange(50);
-            break;
-            case 54: // 6 speed 60
-                rdsSpeedChange(60);
-            break;
-            case 55: // 7 speed 70
-                rdsSpeedChange(70);
-            break;
-            case 56: // 8 speed 80
-                rdsSpeedChange(80);
-            break;
-            case 57: // 9 speed 90
-                rdsSpeedChange(90);
-            break;
-            case 48: // 0 speed 100
-                rdsSpeedChange(100);
-            break;
-            case 189: // - speed 110
-                rdsSpeedChange(110);
-            break;
-            case 82: // r reverse
-                reverse();
-            break;
-            case 80: // p pause
-                pause();
-            break;
-            case 73: // i interval
-                showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');
-            break;
-            case 79: // o distance
-                showModalNumber('Пройдено', getNumberString(distance, 1000));
-            break;
-            case 85: // u clear interval
-                resetInterval();
-            break;
-            case 75: // k add KV
-                showModalKv(-1);
-            break;
-            case 187: // + add SI
-                showModalAddFormula();
-            break;
-            case 78: // n previous KV
-                startKv(currentKvIndex - 1);
-            break;
-            case 77: // m next KV
-                startKv(currentKvIndex + 1);
-            break;
-            case 188: // , previous SI
-                applySpeedInstruction(currentSiIndex - 1);
-            break;
-            case 190: // . next SI
-                applySpeedInstruction(currentSiIndex + 1);
-            break;
-            case 81: // q sector
-                showModalNumber('Сектор', sector);
-            break;
-            case 87: // w norm
-                showModalTime('Норма', norm, false);
-            break;
-            case 69: // e start time
-                showModalTime('Старт', start, true);
-            break;
-            case 84: // t minus
-                minus();
-            break;
-            case 71: // g plus
-                plus();
-            break;
-            default:
-                //alert(keyCode);
-            break;
+
+        if ($('#enterType').text() == '-') {
+            switch (keyCode) {
+                case 83: // s start DS
+                    rdsStart();
+                break;
+                case 68: // d intermidiate finish
+                    rdsPF();
+                break;
+                case 70: // f finish
+                    rdsFinish();
+                break;
+                case 192: // ` speed 5
+                    rdsSpeedChange(5);
+                break;
+                case 189: // - speed 110
+                    rdsSpeedChange(110);
+                break;
+                case 82: // r reverse
+                    reverse();
+                break;
+                case 80: // p pause
+                    pause();
+                break;
+                case 73: // i interval
+                    $('#enterType').text('Интервал');
+                    //showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');
+                break;
+                case 79: // o distance
+                    $('#enterType').text('Пройдено');
+                    //showModalNumber('Пройдено', getNumberString(distance, 1000));
+                break;
+                case 85: // u clear interval
+                    resetInterval();
+                break;
+                case 75: // k add KV
+                    showModalKv(-1);
+                break;
+                case 187: // + add SI
+                    showModalAddFormula();
+                break;
+                case 78: // n previous KV
+                    startKv(currentKvIndex - 1);
+                break;
+                case 77: // m next KV
+                    startKv(currentKvIndex + 1);
+                break;
+                case 188: // , previous SI
+                    applySpeedInstruction(currentSiIndex - 1);
+                break;
+                case 190: // . next SI
+                    applySpeedInstruction(currentSiIndex + 1);
+                break;
+                case 81: // q sector
+                    showModalNumber('Сектор', sector);
+                break;
+                case 87: // w norm
+                    showModalTime('Норма', norm, false);
+                break;
+                case 69: // e start time
+                    showModalTime('Старт', start, true);
+                break;
+                case 84: // t minus
+                    minus();
+                break;
+                case 71: // g plus
+                    plus();
+                break;
+                case 27: // esc
+                    $('#enterType').text('-');
+                    $('#enterValue').text('-');
+                break;
+                default:
+                    //alert(keyCode);
+                    if (keyCode > 47 && keyCode < 58) {
+                        rdsSpeedChange((keyCode == 48) ? 100 : 10 * (keyCode - 48));
+                    }
+                break;
+            }
+        } else {
+            switch (keyCode) {
+                case 13:
+                    var numberValue = parseFloat($('#enterValue').text());
+                    if (isNaN(numberValue)) {
+                        alert('Not a number');
+                        break;
+                    }
+                    switch ($('#enterType').text()) {
+                        case 'Пройдено':
+                            distance = numberValue;
+                            intervalStart = distance;
+                            intervalDistance = 0;
+                            localStorage.setItem("distance", distance);
+                            localStorage.setItem("intervalDistance", intervalDistance);
+                            break;
+                        case 'Интервал':
+                            intervalDistance = isIntervalPosition ? numberValue - intervalStart : numberValue;
+                            localStorage.setItem("intervalDistance", intervalDistance);
+                            break;
+                    }
+                    newMove();
+                case 27:
+                    $('#enterType').text('-');
+                    $('#enterValue').text('-');
+                break;
+                default:
+                    $('#enterValue').text(($('#enterValue').text() == '-') ? e.key : $('#enterValue').text() + e.key);
+                break;
+            }
         }
     }
 
