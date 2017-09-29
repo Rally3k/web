@@ -1752,6 +1752,7 @@
         loadData();
 
         document.addEventListener("keydown", keyDown, false);
+        document.addEventListener("keypress", keyPress, false);
 
         setInterval(function () {
             if (isDemo) {
@@ -1881,9 +1882,13 @@
         applyKv(index);
     }
 
+    function keyPress(e) {
+        alert('Which = ' + e.which + ' KeyCode = ' + e.keyCode + ' Key = ' + e.key);
+    }
+
     function keyDown(e) {
         if (isModalShown) return;
-        var keyCode = e.which || e.keyCode;
+        var keyCode = e.which || e.keyCode || e.key;
         $("#key").html(e.key + ' (' + keyCode + ')');
 
         if ($('#enterType').text() == '-') {
@@ -1968,6 +1973,7 @@
             switch (keyCode) {
                 case 13:
                     var numberValue = parseFloat($('#enterValue').text());
+                    alert($('#enterValue').text());
                     if (isNaN(numberValue)) {
                         alert('Not a number');
                         break;
