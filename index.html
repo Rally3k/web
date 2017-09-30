@@ -1884,11 +1884,8 @@
     function keyDown(e) {
         if (isModalShown) return;
         var keyCode = e.which || e.keyCode || e.key;
-        switch (keyCode) {
-            case 'UIKeyInputEscape':
-            case 'undefined':
-                keyCode = 27;
-            break;
+        if (keyCode == 'UIKeyInputEscape' || keyCode === 'undefined') {
+            keyCode = 27;
         }
         $("#key").html(e.key + ' (' + keyCode + ')');
 
