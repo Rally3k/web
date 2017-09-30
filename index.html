@@ -1884,7 +1884,7 @@
     function keyDown(e) {
         if (isModalShown) return;
         var keyCode = e.which || e.keyCode || e.key;
-        if (keyCode == 'UIKeyInputEscape' || keyCode == 'undefined') {
+        if (keyCode == 'UIKeyInputEscape' || keyCode === undefined) {
             keyCode = 27;
         }
         $("#key").html(e.key + ' (' + keyCode + ')');
