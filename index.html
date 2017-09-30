@@ -411,8 +411,8 @@
                 <div class="split-vertical">
                     <a href="javascript:;" class="line-height-small">
                         <span class="item-label" style="color:darkblue">Ввод</span>
-                        <span class="item-value" id="enterValue">99.999</span>
-                        <span class="item-label" id="enterType">Интервал</span>
+                        <span class="item-value" id="enterValue">-</span>
+                        <span class="item-label" id="enterType">-</span>
                     </a>
                 </div>
             </div>
@@ -1220,6 +1220,10 @@
     var isApply = false;
     var fontSize = null;
 
+    var decimalPoint = 1.1 + '';
+    decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
+
+
     function test() {
         httpGetAsync('http://192.168.100.163/', function (a) { distance = distance + parseInt(a); });
     }
@@ -1884,10 +1888,10 @@
     function keyDown(e) {
         if (isModalShown) return;
         var keyCode = e.which || e.keyCode || e.key;
+        $("#key").html(e.key + ' (' + keyCode + ')');
         if (keyCode == 'UIKeyInputEscape' || keyCode == null) {
             keyCode = 27;
         }
-        $("#key").html(e.key + ' (' + keyCode + ')');
 
         if ($('#enterType').text() == '-') {
             switch (keyCode) {
@@ -1970,11 +1974,10 @@
         } else {
             switch (keyCode) {
                 case 13:
+                case 79: // o
                     // replace decimal point
-                    var dp = 1.1 + '';
-                    dp = dp.toLocaleString().substring(1, 2);
                     var val = $('#enterValue').text();
-                    if (dp == '.') {
+                    if (decimalPoint == '.') {
                         val = val.replace(',', '.');
                     } else {
                         val = val.replace('.', ',');
@@ -1995,17 +1998,28 @@
                             localStorage.setItem("intervalDistance", intervalDistance);
                             break;
                         case 'Интервал':
-                            intervalDistance = isIntervalPosition ? numberValue - intervalStart : numberValue;
+                            intervalDistance = (keyCode == 79) ? numberValue - intervalStart : numberValue;
                             localStorage.setItem("intervalDistance", intervalDistance);
                             break;
                     }
                     newMove();
+                    // no break!
                 case 27:
                     $('#enterType').text('-');
                     $('#enterValue').text('-');
                 break;
+                case 188: // ,
+                case 190: // .
+                    $('#enterValue').text(($('#enterValue').text() == '-') ? decimalPoint : $('#enterValue').text() + decimalPoint);
+                break;
+                case 8: // backspace
+                    var val = $('#enterValue').text();
+                    $('#enterValue').text((val.length < 2) ? "-" : val.substr(0, val.length - 1));
+                break;
                 default:
-                    $('#enterValue').text(($('#enterValue').text() == '-') ? String.fromCharCode(e.keyCode) : $('#enterValue').text() + String.fromCharCode(e.keyCode));
+                    if (keyCode > 47 && keyCode < 58) {
+                        $('#enterValue').text(($('#enterValue').text() == '-') ? String.fromCharCode(e.keyCode) : $('#enterValue').text() + String.fromCharCode(e.keyCode));
+                    }
                 break;
             }
         }
@@ -2756,12 +2770,10 @@
             return (n ? "-" : "") + Math.floor(value * size) / size;
         }
         var s = Math.round(value * size) / size + '';
-        var dp = 1.1 + '';
-        dp = dp.toLocaleString().substring(1, 2);
-        var d = s.indexOf(dp);
+        var d = s.indexOf(decimalPoint);
         if (d == -1) {
             d = size;
-            s = s + dp;
+            s = s + decimalPoint;
         } else {
             d = size / Math.pow(10, s.length - d - 1);
         }
