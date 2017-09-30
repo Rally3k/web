@@ -2008,7 +2008,7 @@
                     $('#enterValue').text('-');
                 break;
                 default:
-                    $('#enterValue').text(($('#enterValue').text() == '-') ? e.key : $('#enterValue').text() + e.key);
+                    $('#enterValue').text(($('#enterValue').text() == '-') ? String.fromCharCode(e.keyCode) : $('#enterValue').text() + String.fromCharCode(e.keyCode));
                 break;
             }
         }
