@@ -1886,6 +1886,7 @@
         var keyCode = e.which || e.keyCode || e.key;
         switch (keyCode) {
             case 'UIKeyInputEscape':
+            case 'undefined':
                 keyCode = 27;
             break;
         }
@@ -1972,11 +1973,20 @@
         } else {
             switch (keyCode) {
                 case 13:
-                    // TODO: replace decimal point
-                    var numberValue = parseFloat($('#enterValue').text());
+                    // replace decimal point
+                    var dp = 1.1 + '';
+                    dp = dp.toLocaleString().substring(1, 2);
+                    var val = $('#enterValue').text();
+                    if (dp == '.') {
+                        val = val.replace(',', '.');
+                    } else {
+                        val = val.replace('.', ',');
+                    }
+
+                    var numberValue = parseFloat(val);
                     //alert($('#enterValue').text());
                     if (isNaN(numberValue)) {
-                        alert('Not a number');
+                        alert('Введено не число!');
                         break;
                     }
                     switch ($('#enterType').text()) {
