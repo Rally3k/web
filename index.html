@@ -314,6 +314,7 @@
 
 <div id="map"></div>
 <div class="content alert alert-warning alert-dismissable fade in" id="alertSpeed" onclick="$(this).hide();" style="display: none">Скорость должна быть положительной!</div>
+<div class="content alert alert-warning alert-dismissable fade in" id="alertNumber" onclick="$(this).hide();" style="display: none">Введено не число!</div>
 <div class="content alert alert-danger alert-dismissable fade in" id="alDanger" onclick="$(this).hide();" style="display: none"></div>
 <div class="content grid container-fluid">
     <div class="row">
@@ -352,7 +353,7 @@
             <div class="square-content">
                 <div class="no-split">
                     <a href="javascript:showModalNumber('Пройдено', getNumberString(distance, 1000));" oncontextmenu="javascript:resetDistance(); return false;" class="line-height-big">
-                        <span class="item-label-big" style="color:darkblue">Пройдено</span>
+                        <span class="item-label-big" style="color:darkblue" id="labelDistance">Пройдено</span>
                         <span class="item-value-big" id="distance">999.999</span>
                         <span class="item-label-big" id="nextPosition">000.000</span>
                     </a>
@@ -363,7 +364,7 @@
             <div class="square-content">
                 <div class="no-split">
                     <a href="javascript:showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');" oncontextmenu="javascript:resetInterval(); return false;" class="line-height-big">
-                        <span class="item-label-big" style="color:darkblue">Интервал</span>
+                        <span class="item-label-big" style="color:darkblue" id="labelInterval">Интервал</span>
                         <span class="item-value-big" id="interval">99.999</span>
                         <span class="item-label-big" id="intervalDistance">(--.---)</span>
                     </a>
@@ -1893,7 +1894,60 @@
             keyCode = 27;
         }
 
-        if ($('#enterType').text() == '-') {
+        if ($('#enterType').text() != '-' && (keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || keyCode == 69 || (keyCode > 47 && keyCode < 58))) {
+            switch (keyCode) {
+                case 13:
+                case 69: // e
+                    // replace decimal point
+                    var val = $('#enterValue').text();
+                    if (decimalPoint == '.') {
+                        val = val.replace(',', '.');
+                    } else {
+                        val = val.replace('.', ',');
+                    }
+
+                    var numberValue = parseFloat(val);
+                    //alert($('#enterValue').text());
+                    if (isNaN(numberValue)) {
+                        $("#alertNumber").show();
+                        break;
+                    }
+                    switch ($('#enterType').text()) {
+                        case 'Пройдено':
+                            distance = numberValue;
+                            intervalStart = distance;
+                            intervalDistance = 0;
+                            localStorage.setItem("distance", distance);
+                            localStorage.setItem("intervalDistance", intervalDistance);
+                            break;
+                        case 'Интервал':
+                            intervalDistance = (keyCode == 69) ? numberValue - intervalStart : numberValue;
+                            localStorage.setItem("intervalDistance", intervalDistance);
+                            break;
+                    }
+                    newMove();
+                    // no break!
+                case 27:
+                    $('#labelDistance').css('color', 'darkblue');
+                    $('#labelInterval').css('color', 'darkblue');
+                    $('#enterType').text('-');
+                    $('#enterValue').text('-');
+                break;
+                case 188: // ,
+                case 190: // .
+                    $('#enterValue').text(($('#enterValue').text() == '-') ? decimalPoint : $('#enterValue').text() + decimalPoint);
+                break;
+                case 8: // backspace
+                    var val = $('#enterValue').text();
+                    $('#enterValue').text((val.length < 2) ? "-" : val.substr(0, val.length - 1));
+                break;
+                default:
+                    if (keyCode > 47 && keyCode < 58) {
+                        $('#enterValue').text(($('#enterValue').text() == '-') ? String.fromCharCode(e.keyCode) : $('#enterValue').text() + String.fromCharCode(e.keyCode));
+                    }
+                break;
+            }
+        } else {
             switch (keyCode) {
                 case 83: // s start DS
                     rdsStart();
@@ -1917,10 +1971,14 @@
                     pause();
                 break;
                 case 73: // i interval
+                    $('#labelDistance').css('color', 'darkblue');
+                    $('#labelInterval').css('color', 'orange');
                     $('#enterType').text('Интервал');
                     //showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');
                 break;
                 case 79: // o distance
+                    $('#labelInterval').css('color', 'darkblue');
+                    $('#labelDistance').css('color', 'orange');
                     $('#enterType').text('Пройдено');
                     //showModalNumber('Пройдено', getNumberString(distance, 1000));
                 break;
@@ -1960,65 +2018,10 @@
                 case 71: // g plus
                     plus();
                 break;
-                case 27: // esc
-                    $('#enterType').text('-');
-                    $('#enterValue').text('-');
-                break;
                 default:
                     //alert(keyCode);
                     if (keyCode > 47 && keyCode < 58) {
                         rdsSpeedChange((keyCode == 48) ? 100 : 10 * (keyCode - 48));
-                    }
-                break;
-            }
-        } else {
-            switch (keyCode) {
-                case 13:
-                case 79: // o
-                    // replace decimal point
-                    var val = $('#enterValue').text();
-                    if (decimalPoint == '.') {
-                        val = val.replace(',', '.');
-                    } else {
-                        val = val.replace('.', ',');
-                    }
-
-                    var numberValue = parseFloat(val);
-                    //alert($('#enterValue').text());
-                    if (isNaN(numberValue)) {
-                        alert('Введено не число!');
-                        break;
-                    }
-                    switch ($('#enterType').text()) {
-                        case 'Пройдено':
-                            distance = numberValue;
-                            intervalStart = distance;
-                            intervalDistance = 0;
-                            localStorage.setItem("distance", distance);
-                            localStorage.setItem("intervalDistance", intervalDistance);
-                            break;
-                        case 'Интервал':
-                            intervalDistance = (keyCode == 79) ? numberValue - intervalStart : numberValue;
-                            localStorage.setItem("intervalDistance", intervalDistance);
-                            break;
-                    }
-                    newMove();
-                    // no break!
-                case 27:
-                    $('#enterType').text('-');
-                    $('#enterValue').text('-');
-                break;
-                case 188: // ,
-                case 190: // .
-                    $('#enterValue').text(($('#enterValue').text() == '-') ? decimalPoint : $('#enterValue').text() + decimalPoint);
-                break;
-                case 8: // backspace
-                    var val = $('#enterValue').text();
-                    $('#enterValue').text((val.length < 2) ? "-" : val.substr(0, val.length - 1));
-                break;
-                default:
-                    if (keyCode > 47 && keyCode < 58) {
-                        $('#enterValue').text(($('#enterValue').text() == '-') ? String.fromCharCode(e.keyCode) : $('#enterValue').text() + String.fromCharCode(e.keyCode));
                     }
                 break;
             }
