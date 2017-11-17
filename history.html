@@ -40,6 +40,8 @@
         <label for="selectRds">РДС:</label>
         <select class="form-control" id="selectRds">
         </select>
+        <button class="btn btn-warning" onclick="deleteItem(); return false;"><i class="fa fa-trash"></i></button>
+        <button class="btn btn-danger" onclick="deleteAll(); return false;"><i class="fa fa-trash"></i></button>
     </form>
     Смены скоростей:
     <div class="content grid container-fluid">
@@ -167,6 +169,24 @@
             }
             $('#selectRds').val('');
         });
+
+        function deleteItem() {
+            var i = $('#selectRds').val();
+            if (i && confirm("Удалить?")) {
+                $('#selectRds option[value=' + i + ']').remove();
+                localStorage.removeItem("rds" + i);
+                $('#selectRds').onchange();
+            }
+        }
+
+        function deleteAll() {
+            if (confirm("Удалить все?")) {
+                $('#selectRds > option').remove();
+                for (var i = 0; i < 999; ++i) {
+                    localStorage.removeItem("rds" + i);
+                }
+            }
+        }
 
         function show(lat, long) {
             if (myMap) {
