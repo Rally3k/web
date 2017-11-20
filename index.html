@@ -936,6 +936,12 @@
                             <input type="text" class="form-control" id="fCorrectionValue" disabled placeholder="Коэффициент">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="fCorrectionMinMove">Погрешность</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="fCorrectionMinMove" placeholder="Не учитывать сдвиг до (км)">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <div class="btn-group btn-group-lg col-xs-12">
@@ -1220,6 +1226,7 @@
     var myPosition = null;
     var isApply = false;
     var fontSize = null;
+    var minMove = 0;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1276,6 +1283,7 @@
             start = parseFloat(localStorage.getItem("start"));
             distance = parseFloat(localStorage.getItem("distance"));
             correction = parseFloat(localStorage.getItem("correction"));
+            minMove = parseFloat(localStorage.getItem("minMove"));
             intervalStart = parseFloat(localStorage.getItem("intervalStart"));
             intervalDistance = parseFloat(localStorage.getItem("intervalDistance"));
             timeCorrection = parseFloat(localStorage.getItem("timeCorrection"));
@@ -1313,6 +1321,7 @@
         start = start ? start : 0.0;
         distance = distance ? distance : 0.0;
         correction = correction ? correction : 1.0;
+        minMove = minMove ? minMove : 0.0;
         intervalStart = intervalStart ? intervalStart : 0.0;
         intervalDistance = intervalDistance ? intervalDistance : 0.0;
         timeCorrection = timeCorrection ? timeCorrection : 0.0;
@@ -1349,8 +1358,10 @@
     }
 
     function newPosition(position) {
+        var d = 0.0;
         if (lastLatitude) {
-            newMove(getDistance(lastLatitude, lastLongitude, position.coords.latitude, position.coords.longitude));
+            d = getDistance(lastLatitude, lastLongitude, position.coords.latitude, position.coords.longitude);
+            newMove((d >= minMove) ? d : 0);
         }
         if (position.coords.accuracy > 10) {
             $(".fa-globe").css("color", "orange");
@@ -1371,8 +1382,10 @@
                 myPosition.geometry.setRadius(position.coords.accuracy);
             }
         }
-        lastLatitude = position.coords.latitude;
-        lastLongitude = position.coords.longitude;
+        if (!lastLatitude || d >= minMove) {
+            lastLatitude = position.coords.latitude;
+            lastLongitude = position.coords.longitude;
+        }
     }
         
     function rad(x) {
@@ -1572,6 +1585,17 @@
         localStorage.setItem("rds", JSON.stringify(rds));
         newMove();
         beep();
+    }
+
+    function removeRdsItem(i) {
+        if (i < 0 || i >= rds.length) {
+            return;
+        }
+        rds.splice(i, 1);
+        recalculateRds(i);
+        refreshRdsTable();
+        localStorage.setItem("rds", JSON.stringify(rds));
+        newMove();
     }
 
     function isRds() {
@@ -2018,6 +2042,25 @@
                 case 71: // g plus
                     plus();
                 break;
+                case 8: // backspace
+                    if (rds && rds.length && confirm("Удалить последнюю запись РДС?")) {
+                        removeRdsItem(rds.length - 1);
+                        if (confirm("Переместиться на предыдущую формулу?")) {
+                            if (currentSiIndex >= 0) {
+                                localStorage.setItem("currentSiIndex", --currentSiIndex);
+                            }
+                            var i = currentSiIndex;
+                            while (i >= 0 && !speedIns[i].isFormula()) {
+                                --i;
+                            }
+                            if (i >= 0) {
+                                currentSpeedInstruction = speedIns[i];
+                                localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
+                            }
+                            newMove();
+                        }
+                    }
+                break;
                 default:
                     //alert(keyCode);
                     if (keyCode > 47 && keyCode < 58) {
@@ -2329,14 +2372,7 @@
     });
 
     $('#fRdsItemDelete').on('click', function () {
-        if (editRdsItemIndex < 0 || editRdsItemIndex >= rds.length) {
-            return;
-        }
-        rds.splice(editRdsItemIndex, 1);
-        recalculateRds(editRdsItemIndex);
-        refreshRdsTable();
-        localStorage.setItem("rds", JSON.stringify(rds));
-        newMove();
+        removeRdsItem(editRdsItemIndex);
     });
 
     function compareRdsItems(a, b) {
@@ -2355,6 +2391,8 @@
     function showModalCorrection() {
         $('#modalCorrection').modal('show');
         $('#fCorrectionValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fCorrectionMinMove').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fCorrectionMinMove').val(minMove);
     }
 
     $('#modalCorrection').on('shown.bs.modal', function() {
@@ -2363,12 +2401,19 @@
 
     $('#modalCorrection').on('submit', function (e) {
         var c = parseFloat($('#fCorrectionValue').val());
+        var m = parseFloat($('#fCorrectionMinMove').val());
         if (!c) {
             $('#fCorrectionValue').closest('.form-group').removeClass('has-success').addClass('has-error');
-        } else {
+        }
+        if (!m) {
+            $('#fCorrectionMinMove').closest('.form-group').removeClass('has-success').addClass('has-error');
+        }
+        if (c && m) {
             $('#modalCorrection').modal('hide');
             correction = c;
             localStorage.setItem("correction", correction);
+            minMove = m;
+            localStorage.setItem("minMove", minMove);
         }
         return false;
     });
