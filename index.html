@@ -1231,7 +1231,11 @@
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
 
-
+    var enterType = ['Время', 'Старт', 'Пройдено', 'Интервал', 'Позиция', 'КВ', 'Формула', 'Сектор', 'Норма'];
+    var lastEnterType = 5; // KV
+    var rdsItemHtmlTypes = ['<i class="fa fa-play rdsIcon"></i>', '<i class="fa fa-tachometer rdsIcon"></i>', '<i class="fa fa-flag-checkered rdsIcon"></i>', '<i class="fa fa-stop rdsIcon"></i>'];
+    var selectedRdsItemType = 1;
+    
     function test() {
         httpGetAsync('http://192.168.100.163/', function (a) { distance = distance + parseInt(a); });
     }
@@ -1918,10 +1922,10 @@
             keyCode = 27;
         }
 
-        if ($('#enterType').text() != '-' && (keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || keyCode == 69 || (keyCode > 47 && keyCode < 58))) {
+        if ($('#enterType').text() != '-' && (keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || (keyCode > 36 && keyCode < 41) || (keyCode > 47 && keyCode < 58))) {
             switch (keyCode) {
-                case 13:
-                case 69: // e
+                case 13: // no break!
+                //case 69: // e
                     // replace decimal point
                     var val = $('#enterValue').text();
                     if (decimalPoint == '.') {
@@ -1952,15 +1956,37 @@
                     newMove();
                     // no break!
                 case 27:
-                    $('#labelDistance').css('color', 'darkblue');
-                    $('#labelInterval').css('color', 'darkblue');
+                    //$('#labelDistance').css('color', 'darkblue');
+                    //$('#labelInterval').css('color', 'darkblue');
                     $('#enterType').text('-');
                     $('#enterValue').text('-');
                 break;
                 case 188: // ,
                 case 190: // .
-                    $('#enterValue').text(($('#enterValue').text() == '-') ? decimalPoint : $('#enterValue').text() + decimalPoint);
+                    $('#enterValue').html(($('#enterValue').html() == '-') ? decimalPoint : $('#enterValue').html() + decimalPoint);
                 break;
+                case 37: // arrow left
+                    $('#enterValue').html(($('#enterValue').html() == '-') ? 'L' : $('#enterValue').html() + 'L');
+                break;
+                case 39: // arrow right
+                    $('#enterValue').html(($('#enterValue').html() == '-') ? 'R' : $('#enterValue').html() + 'R');
+                break;
+                case 38: // arrow up
+                    switch ($('#enterType').text()) {
+                        case 'Формула':
+                            selectedRdsItemType = (selectedRdsItemType <= 0) ? rdsItemHtmlTypes.length - 1 : selectedRdsItemType - 1;
+                            $('#enterValue').html(rdsItemHtmlTypes[selectedRdsItemType]);
+                        break;
+                    }
+                break;
+                case 40: // arrow down
+                    switch ($('#enterType').text()) {
+                        case 'Формула':
+                            selectedRdsItemType = (selectedRdsItemType >= rdsItemHtmlTypes.length - 1) ? 0 : selectedRdsItemType + 1;
+                            $('#enterValue').html(rdsItemHtmlTypes[selectedRdsItemType]);
+                        break;
+                    }
+            break;
                 case 8: // backspace
                     var val = $('#enterValue').text();
                     $('#enterValue').text((val.length < 2) ? "-" : val.substr(0, val.length - 1));
@@ -1995,16 +2021,30 @@
                     pause();
                 break;
                 case 73: // i interval
-                    $('#labelDistance').css('color', 'darkblue');
-                    $('#labelInterval').css('color', 'orange');
-                    $('#enterType').text('Интервал');
+                    //$('#labelDistance').css('color', 'darkblue');
+                    //$('#labelInterval').css('color', 'orange');
+                    lastEnterType = 3;
+                    $('#enterType').text(enterType[lastEnterType]);
                     //showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');
                 break;
                 case 79: // o distance
-                    $('#labelInterval').css('color', 'darkblue');
-                    $('#labelDistance').css('color', 'orange');
-                    $('#enterType').text('Пройдено');
+                    //$('#labelInterval').css('color', 'darkblue');
+                    //$('#labelDistance').css('color', 'orange');
+                    lastEnterType = 2;
+                    $('#enterType').text(enterType[lastEnterType]);
                     //showModalNumber('Пройдено', getNumberString(distance, 1000));
+                break;
+                case 69: // e change enter type
+                    if ($('#enterType').text() != '-') {
+                        lastEnterType = (lastEnterType >= enterType.length - 1) ? 0 : lastEnterType + 1;
+                    }
+                    $('#enterType').text(enterType[lastEnterType]);
+                    switch (enterType[lastEnterType]) {
+                        case 'Формула':
+                            selectedRdsItemType = 1
+                            $('#enterValue').html(rdsItemHtmlTypes[selectedRdsItemType]);
+                        break;
+                    }
                 break;
                 case 85: // u clear interval
                     resetInterval();
@@ -2033,9 +2073,9 @@
                 case 87: // w norm
                     showModalTime('Норма', norm, false);
                 break;
-                case 69: // e start time
-                    showModalTime('Старт', start, true);
-                break;
+                //case 69: // e start time
+                //    showModalTime('Старт', start, true);
+                //break;
                 case 84: // t minus
                     minus();
                 break;
