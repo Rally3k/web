@@ -411,9 +411,9 @@
                 </div>
                 <div class="split-vertical">
                     <a href="javascript:;" class="line-height-small">
-                        <span class="item-label" style="color:darkblue">Ввод</span>
-                        <span class="item-value" id="enterValue">-</span>
-                        <span class="item-label" id="enterType">-</span>
+                        <span class="item-label" id="enterType" style="color:darkblue">Ввод</span>
+                        <span class="item-value" id="enterValue">x</span>
+                        <span class="item-label" id="enterSubType">-</span>
                     </a>
                 </div>
             </div>
@@ -1231,10 +1231,24 @@
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
 
-    var enterType = ['Время', 'Старт', 'Пройдено', 'Интервал', 'Позиция', 'КВ', 'Формула', 'Сектор', 'Норма'];
-    var lastEnterType = 5; // KV
-    var rdsItemHtmlTypes = ['<i class="fa fa-play rdsIcon"></i>', '<i class="fa fa-tachometer rdsIcon"></i>', '<i class="fa fa-flag-checkered rdsIcon"></i>', '<i class="fa fa-stop rdsIcon"></i>'];
-    var selectedRdsItemType = 1;
+    var enterType = [
+          ['Время']
+        , ['Старт']
+        , ['Сектор']
+        , ['Норма']
+        , ['Пройдено']
+        , ['Следующая', 'Интервал', 'Позиция']
+        , ['Новое КВ', 'Старт', 'Сектор', 'Норма', 'Пауза']
+        , ['Новая формула', 'Тип', 'Позиция', 'Vпдд', 'Vдс', 'Операция', 'Операнд']
+    ];
+    var enterValue = [[], [], [], [], [], [], [], []];
+    var enterTypeId = 2;
+    var enterSubTypeId;
+    var rdsItemHtmlTypes = ['<i class="fa fa-play"></i>', '<i class="fa fa-tachometer"></i>', '<i class="fa fa-flag-checkered"></i>', '<i class="fa fa-stop"></i>'];
+    var rdsItemCodes = ['S', 'C', 'P', 'F'];
+    var vdsItemTypes = ['x', 'Vпдд', '5', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '130'];
+    var pddSpeedTypes = ['x', '5', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '130']
+    var operationsTypes = ['нет', '-', '*'];
     
     function test() {
         httpGetAsync('http://192.168.100.163/', function (a) { distance = distance + parseInt(a); });
@@ -1499,7 +1513,10 @@
         this.toString = function (f) {
             return f ?
                 (this.isVpdd ? "V" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") :
-                (this.position != null && !isNaN(this.position) ? this.position + " " : "") + (this.vPdd ? "Vпдд = " + this.vPdd + " " : "") + (this.isVpdd ? "Vдс = Vпдд" + (this.sign ? " " + this.sign + " " + this.operand : "") : (this.speed != null && !isNaN(this.speed) ? "Vдс = " + this.speed : ""));
+                (this.position != null && !isNaN(this.position) ? this.position + " " : "")
+                    + (this.vPdd ? "Vпдд = " + this.vPdd + " " : "")
+                    + (this.isVpdd ? "Vдс = Vпдд" : (this.speed != null && !isNaN(this.speed) ? "Vдс = " + this.speed : "")
+                    + (this.sign ? " " + this.sign + " " + this.operand : ""));
         }
     }
 
@@ -1914,6 +1931,170 @@
         applyKv(index);
     }
 
+    function getDefaultEnterValue(typeId, subTypeId) {
+        switch (enterType[typeId][subTypeId]) {
+            case 'Тип':
+                return rdsItemHtmlTypes[1];
+            case 'Операция':
+                return operationsTypes[0];
+            default:
+                return 'x';
+        }
+    }
+
+    function rollEnterOption(array, direction) {
+        var i = array.indexOf(enterValue[enterTypeId][enterSubTypeId]);
+        if (i == -1) {
+            i = 0;
+        } else if (direction) {
+            i = (i >= array.length - 1) ? 0 : i + 1;
+        } else {
+            i = (i == 0) ? array.length - 1 : i - 1;
+        }
+        enterValue[enterTypeId][enterSubTypeId] = array[i];
+        $('#enterValue').html(array[i]);
+    }
+
+    function setPosition(value) {
+        var numberValue = parseFloat(value);
+        if (isNaN(numberValue)) {
+            return 0;
+        } else {
+            distance = numberValue;
+            intervalStart = distance;
+            intervalDistance = 0;
+            localStorage.setItem("distance", distance);
+            localStorage.setItem("intervalDistance", intervalDistance);
+        }
+        return -1;
+    }
+
+    function setSector(value) {
+        var numberValue = parseFloat(value);
+        if (isNaN(numberValue)) {
+            return 0;
+        } else {
+            sector = numberValue;
+            localStorage.setItem("sector", sector);
+            if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                kvs[currentKvIndex].sector = sector;
+                localStorage.setItem("kvs", JSON.stringify(kvs));
+            }
+        }
+        return -1;
+    }
+
+    function setNextPosition(value, isPosition) {
+        var numberValue = parseFloat(value);
+        if (isNaN(numberValue)) {
+            return 0;
+        } else {
+            intervalDistance = isPosition ? numberValue - intervalStart : numberValue;
+            localStorage.setItem("intervalDistance", intervalDistance);
+        }
+        return -1;
+    }
+
+    function setTime(value) {
+        var result = getTimeValue(value);
+        if (result < 0) {
+            return 0;
+        } else {
+            result = result % (24 * 60 * 60);
+            timeCorrection = 0;
+            timeCorrection = result - getCurrentTime();
+            localStorage.setItem("timeCorrection", timeCorrection);
+        }
+        return -1;
+    }
+
+    function setStart(value) {
+        var result = getTimeValue(value);
+        if (result < 0) {
+            return 0;
+        } else {
+            result = result % (24 * 60 * 60);
+            start = result;
+            localStorage.setItem("start", start);
+            if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                kvs[currentKvIndex].start = start;
+                localStorage.setItem("kvs", JSON.stringify(kvs));
+            }
+        }
+        return -1;
+    }
+
+    function setNorm(value) {
+        var result = getTimeValue(value);
+        if (result < 0) {
+            return 0;
+        } else {
+            result = result % (24 * 60 * 60);
+            norm = result;
+            localStorage.setItem("norm", norm);
+            if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                kvs[currentKvIndex].norm = norm;
+                localStorage.setItem("kvs", JSON.stringify(kvs));
+            }
+        }
+        return -1;
+    }
+
+    function addFromula(type, position, vPdd, vDs, sign, operand) {
+        var si = new SpeedInstruction();
+        si.type = type;
+        si.position = (!position || position == '') ? null : parseFloat(position);
+        if (isNaN(si.position)) return 1;
+        si.vPdd = (!vPdd || vPdd == '') ? null : parseFloat(vPdd);
+        if (isNaN(si.vPdd)) return 2;
+        si.isVpdd = (vDs == vdsItemTypes[1]);
+        if (!si.isVpdd) {
+            si.speed = (!vDs || vDs == '') ? null : parseFloat(vDs);
+            if (isNaN(si.speed)) return 3;
+        }
+        si.sign = sign;
+        if (si.sign) {
+            si.operand = parseFloat(operand);
+            if (!si.operand) return 5;
+        }
+        if (si.type != 'C' || (si.position && !isNaN(si.position)) || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed))) {
+            //speedIns.splice(addSiIndex, 0, si);
+            speedIns.push(si);
+            localStorage.setItem("speedIns", JSON.stringify(speedIns));
+            //if (isApply) {
+            //    applySpeedInstruction(addSiIndex);
+            //} else {
+            //    showModalSpeed();
+            //}
+        } else {
+            return 0;
+        }
+        return -1;
+    }
+
+    function addKv(start, sector, norm, pause) {
+        var kv = new Kv();
+
+        kv.start = (!start || start == '') ? null : getTimeValue(start);
+        if (kv.start == -1) return 0;
+        if (kv.start) kv.start %= (24 * 60 * 60);
+
+        kv.sector = parseFloat(sector);
+        if (isNaN(kv.sector)) return 1;
+        
+        kv.norm = getTimeValue(norm);
+        if (kv.norm == -1) return 2;
+        kv.norm %= (24 * 60 * 60);
+
+        kv.pause = (!pause || pause == '') ? null : getTimeValue(pause);
+        if (kv.pause == -1) return 3;
+        kv.pause %= (24 * 60 * 60);
+
+        kvs.push(kv);
+        localStorage.setItem("kvs", JSON.stringify(kvs));
+        return -1;
+    }
+
     function keyDown(e) {
         if (isModalShown) return;
         var keyCode = e.which || e.keyCode || e.key;
@@ -1922,78 +2103,125 @@
             keyCode = 27;
         }
 
-        if ($('#enterType').text() != '-' && (keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || (keyCode > 36 && keyCode < 41) || (keyCode > 47 && keyCode < 58))) {
+        $('#enterValue').css('color', '');
+        enterValue[enterTypeId][enterSubTypeId] = $('#enterValue').html();
+        if ($('#enterType').text() != 'Ввод' && (keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || (keyCode > 36 && keyCode < 41) || (keyCode > 47 && keyCode < 58))) {
             switch (keyCode) {
-                case 13: // no break!
-                //case 69: // e
+                case 13:
                     // replace decimal point
-                    var val = $('#enterValue').text();
-                    if (decimalPoint == '.') {
-                        val = val.replace(',', '.');
-                    } else {
-                        val = val.replace('.', ',');
-                    }
-
-                    var numberValue = parseFloat(val);
-                    //alert($('#enterValue').text());
-                    if (isNaN(numberValue)) {
-                        $("#alertNumber").show();
-                        break;
-                    }
+                    //var val = $('#enterValue').html();
+                    //if (decimalPoint == '.') {
+                    //    val = val.replace(',', '.');
+                    //} else {
+                    //    val = val.replace('.', ',');
+                    //}
+                    var result = 0;
                     switch ($('#enterType').text()) {
                         case 'Пройдено':
-                            distance = numberValue;
-                            intervalStart = distance;
-                            intervalDistance = 0;
-                            localStorage.setItem("distance", distance);
-                            localStorage.setItem("intervalDistance", intervalDistance);
+                            result = setPosition($('#enterValue').html());
                             break;
-                        case 'Интервал':
-                            intervalDistance = (keyCode == 69) ? numberValue - intervalStart : numberValue;
-                            localStorage.setItem("intervalDistance", intervalDistance);
+                        case 'Сектор':
+                            result = setSector($('#enterValue').html());
                             break;
+                        case 'Следующая':
+                            result = setNextPosition($('#enterValue').html(), $('#enterSubType').text() == 'Позиция');
+                            break;
+                        case 'Время':
+                            result = setTime($('#enterValue').html());
+                            break;
+                        case 'Старт':
+                            result = setStart($('#enterValue').html());
+                            break;
+                        case 'Норма':
+                            result = setNorm($('#enterValue').html());
+                            break;
+                        case 'Новая формула':
+                            result = addFromula(
+                                rdsItemCodes[rdsItemHtmlTypes.indexOf(enterValue[enterTypeId][1])],
+                                (enterValue[enterTypeId][2] == 'x') ? null : enterValue[enterTypeId][2],
+                                (enterValue[enterTypeId][3] == 'x') ? null : enterValue[enterTypeId][3],
+                                (enterValue[enterTypeId][4] == 'x') ? null : enterValue[enterTypeId][4],
+                                (enterValue[enterTypeId][5] == 'нет') ? null : enterValue[enterTypeId][5],
+                                (enterValue[enterTypeId][6] == 'x') ? null : enterValue[enterTypeId][6]
+                            );
+                            break;
+                        case 'Новое КВ':
+                            result = addKv(
+                                (enterValue[enterTypeId][1] == 'x') ? null : enterValue[enterTypeId][1],
+                                (enterValue[enterTypeId][2] == 'x') ? null : enterValue[enterTypeId][2],
+                                (enterValue[enterTypeId][3] == 'x') ? null : enterValue[enterTypeId][3],
+                                (enterValue[enterTypeId][4] == 'x') ? null : enterValue[enterTypeId][4]
+                            );
+                            break;
+                    }
+                    if (result != -1) {
+                        if (enterType[enterTypeId].length > 1) {
+                            enterSubTypeId = result + 1;
+                            $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
+                            $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+                        }
+                        $('#enterValue').css('color', 'red');
+                        break;
                     }
                     newMove();
                     // no break!
                 case 27:
-                    //$('#labelDistance').css('color', 'darkblue');
-                    //$('#labelInterval').css('color', 'darkblue');
-                    $('#enterType').text('-');
-                    $('#enterValue').text('-');
+                    $('#enterType').text('Ввод');
+                    $('#enterValue').html('x');
+                    $('#enterSubType').text('-');
+                break;
+                case 37: // arrow left
+                    if (enterType[enterTypeId].length > 1) {
+                        enterSubTypeId = (enterSubTypeId <= 1) ? enterType[enterTypeId].length - 1 : enterSubTypeId - 1;
+                        $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
+                        $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+                    }
+                break;
+                case 39: // arrow right
+                    if (enterType[enterTypeId].length > 1) {
+                        enterSubTypeId = (enterSubTypeId >= enterType[enterTypeId].length - 1) ? 1 : enterSubTypeId + 1;
+                        $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
+                        $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+                    }
+                break;
+                case 38: // arrow up
+                case 40: // arrow down
+                    switch ($('#enterSubType').text()) {
+                        case 'Тип':
+                            rollEnterOption(rdsItemHtmlTypes, keyCode == 40);
+                        break;
+                        case 'Vдс':
+                            rollEnterOption(vdsItemTypes, keyCode == 40);
+                        break;
+                        case 'Операция':
+                            rollEnterOption(operationsTypes, keyCode == 40);
+                        break;
+                        case 'Vпдд':
+                        case 'Операнд':
+                            rollEnterOption(pddSpeedTypes, keyCode == 40);
+                        break;
+                    }
+                break;
+                case 8: // backspace
+                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип'|| enterType[enterTypeId][enterSubTypeId] == 'Операция') {
+                        break;
+                    }
+                    var val = (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && enterValue[enterTypeId][enterSubTypeId] == vdsItemTypes[1]) ? '' : $('#enterValue').html();
+                    $('#enterValue').html((val.length < 2) ? 'x' : val.substr(0, val.length - 1));
                 break;
                 case 188: // ,
                 case 190: // .
-                    $('#enterValue').html(($('#enterValue').html() == '-') ? decimalPoint : $('#enterValue').html() + decimalPoint);
-                break;
-                case 37: // arrow left
-                    $('#enterValue').html(($('#enterValue').html() == '-') ? 'L' : $('#enterValue').html() + 'L');
-                break;
-                case 39: // arrow right
-                    $('#enterValue').html(($('#enterValue').html() == '-') ? 'R' : $('#enterValue').html() + 'R');
-                break;
-                case 38: // arrow up
-                    switch ($('#enterType').text()) {
-                        case 'Формула':
-                            selectedRdsItemType = (selectedRdsItemType <= 0) ? rdsItemHtmlTypes.length - 1 : selectedRdsItemType - 1;
-                            $('#enterValue').html(rdsItemHtmlTypes[selectedRdsItemType]);
+                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && $('#enterValue').html() == vdsItemTypes[1]) || enterType[enterTypeId][enterSubTypeId] == 'Операция') {
                         break;
                     }
-                break;
-                case 40: // arrow down
-                    switch ($('#enterType').text()) {
-                        case 'Формула':
-                            selectedRdsItemType = (selectedRdsItemType >= rdsItemHtmlTypes.length - 1) ? 0 : selectedRdsItemType + 1;
-                            $('#enterValue').html(rdsItemHtmlTypes[selectedRdsItemType]);
-                        break;
-                    }
-            break;
-                case 8: // backspace
-                    var val = $('#enterValue').text();
-                    $('#enterValue').text((val.length < 2) ? "-" : val.substr(0, val.length - 1));
+                    $('#enterValue').html(($('#enterValue').html() == 'x') ? decimalPoint : $('#enterValue').html() + decimalPoint);
                 break;
                 default:
+                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && $('#enterValue').html() == vdsItemTypes[1]) || enterType[enterTypeId][enterSubTypeId] == 'Операция') {
+                        break;
+                    }
                     if (keyCode > 47 && keyCode < 58) {
-                        $('#enterValue').text(($('#enterValue').text() == '-') ? String.fromCharCode(e.keyCode) : $('#enterValue').text() + String.fromCharCode(e.keyCode));
+                        $('#enterValue').html(($('#enterValue').html() == 'x') ? String.fromCharCode(e.keyCode) : $('#enterValue').html() + String.fromCharCode(e.keyCode));
                     }
                 break;
             }
@@ -2023,28 +2251,32 @@
                 case 73: // i interval
                     //$('#labelDistance').css('color', 'darkblue');
                     //$('#labelInterval').css('color', 'orange');
-                    lastEnterType = 3;
-                    $('#enterType').text(enterType[lastEnterType]);
+                    enterTypeId = 3;
+                    $('#enterType').text(enterType[enterTypeId]);
                     //showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');
                 break;
                 case 79: // o distance
                     //$('#labelInterval').css('color', 'darkblue');
                     //$('#labelDistance').css('color', 'orange');
-                    lastEnterType = 2;
-                    $('#enterType').text(enterType[lastEnterType]);
+                    enterTypeId = 2;
+                    $('#enterType').text(enterType[enterTypeId]);
                     //showModalNumber('Пройдено', getNumberString(distance, 1000));
                 break;
                 case 69: // e change enter type
-                    if ($('#enterType').text() != '-') {
-                        lastEnterType = (lastEnterType >= enterType.length - 1) ? 0 : lastEnterType + 1;
+                    if ($('#enterType').text() == 'Ввод') {
+                        for (var i = 0; i < enterType.length; ++i) {
+                            for (var j = 0; j < enterType[i].length; ++j) {
+                                enterValue[i][j] = getDefaultEnterValue(i, j);
+                            }
+                        }
+                    } else {
+                        enterValue[enterTypeId][enterSubTypeId] = $('#enterValue').html();
+                        enterTypeId = (enterTypeId >= enterType.length - 1) ? 0 : enterTypeId + 1;
                     }
-                    $('#enterType').text(enterType[lastEnterType]);
-                    switch (enterType[lastEnterType]) {
-                        case 'Формула':
-                            selectedRdsItemType = 1
-                            $('#enterValue').html(rdsItemHtmlTypes[selectedRdsItemType]);
-                        break;
-                    }
+                    $('#enterType').text(enterType[enterTypeId][0]);
+                    enterSubTypeId = 0;
+                    $('#enterSubType').text((enterType[enterTypeId].length > 1) ? enterType[enterTypeId][++enterSubTypeId] : '-');
+                    $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
                 break;
                 case 85: // u clear interval
                     resetInterval();
@@ -2304,7 +2536,7 @@
 
     $('#modalTime').on('submit', function (e) {
         var timeValue = $('#timeValue');
-        var result = getTimeValue(timeValue);
+        var result = getTimeValue(timeValue.val());
 
         if (result < 0) {
             timeValue.closest('.form-group').removeClass('has-success').addClass('has-error');
@@ -2753,7 +2985,7 @@
     $('#modalKv').on('submit', function (e) {
         var isGood = true;
         var startField = $('#fKvStart');
-        var startValue = getTimeValue(startField);
+        var startValue = getTimeValue(startField.val());
         if (startValue < 0 && startField.val() != "") {
             startField.closest('.form-group').removeClass('has-success').addClass('has-error');
             isGood = false;
@@ -2769,7 +3001,7 @@
             $('#fKvSector').closest('.form-group').removeClass('has-error').addClass('has-success');
         }
         var normField = $('#fKvNorm');
-        var normValue = getTimeValue(normField);
+        var normValue = getTimeValue(normField.val());
         if (normValue < 0) {
             normField.closest('.form-group').removeClass('has-success').addClass('has-error');
             isGood = false;
@@ -2778,7 +3010,7 @@
             normValue = normValue % (24 * 60 * 60);
         }
         var pauseField = $('#fKvPause');
-        var pauseValue = getTimeValue(pauseField);
+        var pauseValue = getTimeValue(pauseField.val());
         if (pauseValue < 0 && pauseField.val() != "") {
             pauseField.closest('.form-group').removeClass('has-success').addClass('has-error');
             isGood = false;
@@ -2810,10 +3042,10 @@
         return false;
     });
 
-    function getTimeValue(field) {
+    function getTimeValue(value) {
         var result = -1;
-        if (field.val()) {
-            var t = field.val().split(/[\D]/);
+        if (value) {
+            var t = value.split(/[\D]/);
             switch (t.length) {
                 case 1: 
                     result = 60 * parseInt(t[0]);
