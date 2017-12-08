@@ -2140,14 +2140,14 @@
         }
 
         if (isModalShown) {
-/*            switch (keyCode) {
+            switch (keyCode) {
                 case 27:
                     $('.modal').modal('hide');
                     break;
                 case 13:
 
                     break;
-            }*/
+            }
             return;
         }
 
@@ -2432,12 +2432,12 @@
 
     $('.modal').on('shown.bs.modal', function() {
         isModalShown = true;
-        document.removeEventListener("keydown", keyDown);
+        //document.removeEventListener("keydown", keyDown);
     })
 
     $('.modal').on('hidden.bs.modal', function() {
         isModalShown = false;
-        document.addEventListener("keydown", keyDown, false);
+        //document.addEventListener("keydown", keyDown, false);
     })
 
     function showModalNumber(title, value) {
