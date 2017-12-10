@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Rally 3k web - Rds</title>
+
+    <!-- Bootstrap -->
+    <link href="files/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="files/font-awesome/css/font-awesome.min.css">
+
+    <script src="https://api-maps.yandex.ru/2.1/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="files/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="files/bootstrap.min.js"></script>
+    <script type="text/ecmascript" src="files/NoSleep.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var t = '';
+            for (var i = 0; i < 999; ++i) {
+                var j = localStorage.getItem("rds" + i);
+                if (j) {
+                    t = t + 'РДС ' + i + '\r\n' + j + '\r\n';
+                }
+            }
+            $('#text').text(t);
+        });
+    </script>
+
+    <textarea id='text' rows=4 cols=50>
+    At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies.
+    </textarea>
+</body>
+</html>
