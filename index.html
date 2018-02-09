@@ -1784,7 +1784,8 @@
         }
         $("#intervalDistance").html(intervalDistance > 0 ? getNumberString(intervalDistance, 1000) : "-");
         $("#nextPosition").html(intervalDistance > 0 ? getNumberString(intervalStart + intervalDistance, 1000) : "-");
-        var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
+        //var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
+        var benefit = (getKvTime() > 60) ? 60 * Math.floor((getKvTime() + 9 * 60) / 600) : 60;
         $("#benefit").html(getTimeString(benefit, false));
         var lateness;
         if (sector > 0) {
@@ -1821,6 +1822,8 @@
         loadData();
 
         document.addEventListener("keydown", keyDown, false);
+
+        gpsClick();
 
         setInterval(function () {
             if (isDemo) {
