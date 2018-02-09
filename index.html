@@ -2218,7 +2218,7 @@
                     $('#enterValue').html('x');
                     $('#enterSubType').text('-');
                 break;
-                case 78: // o previous sub type
+                case 78: // n previous sub type
                     if (enterType[enterTypeId].length > 1) {
                         enterSubTypeId = (enterSubTypeId <= 1) ? enterType[enterTypeId].length - 1 : enterSubTypeId - 1;
                         $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
@@ -2321,7 +2321,9 @@
                     startKv(currentKvIndex + 1);
                 break;
                 case 188: // , previous SI
-                    applySpeedInstruction(currentSiIndex - 1);
+                    modalConfirm("Применить предыдущую формулу скорости?", function() {
+                        applySpeedInstruction(currentSiIndex - 1);
+                    });
                 break;
                 case 190: // . next SI
                     applySpeedInstruction(currentSiIndex + 1);
@@ -2786,8 +2788,6 @@
 
     function applySpeedInstruction(index) {
         if (index >= 0 && index < speedIns.length) {
-            currentSiIndex = index;
-            localStorage.setItem("currentSiIndex", currentSiIndex);
             var si = speedIns[index];
             var delta = 0;
             if (si.position != null && !isNaN(si.position)) {
@@ -2820,6 +2820,8 @@
         } else if (index != -1) {
             return;
         }
+        currentSiIndex = index;
+        localStorage.setItem("currentSiIndex", currentSiIndex);
         newMove();
         beep();
     }
