@@ -1,110 +1,281 @@
-<html>
-  <head>
-    <script type="text/javascript">
-      // Your Client ID can be retrieved from your project in the Google
-      // Developer Console, https://console.developers.google.com
-      var CLIENT_ID = '842540752256-ik2909gpppj59poi6htgea5qla7ilsu8.apps.googleusercontent.com';
+<!doctype html>
+<html lang="en">
 
-      var SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
-
-      /**
-       * Check if current user has authorized this application.
-       */
-      function checkAuth() {
-        gapi.auth.authorize(
-          {
-            'client_id': CLIENT_ID,
-            'scope': SCOPES.join(' '),
-            'immediate': true
-          }, handleAuthResult);
-      }
-
-      /**
-       * Handle response from authorization server.
-       *
-       * @param {Object} authResult Authorization result.
-       */
-      function handleAuthResult(authResult) {
-        var authorizeDiv = document.getElementById('authorize-div');
-        if (authResult && !authResult.error) {
-          // Hide auth UI, then load client library.
-          authorizeDiv.style.display = 'none';
-          loadGmailApi();
-        } else {
-          // Show auth UI, allowing the user to initiate authorization by
-          // clicking authorize button.
-          authorizeDiv.style.display = 'inline';
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy"
+        crossorigin="anonymous">
+    <link href="https://use.fontawesome.com/releases/v5.0.4/css/all.css" rel="stylesheet">
+    <style>
+        .alert {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
         }
-      }
 
-      /**
-       * Initiate auth flow in response to user clicking authorize button.
-       *
-       * @param {Event} event Button click event.
-       */
-      function handleAuthClick(event) {
-        gapi.auth.authorize(
-          {client_id: CLIENT_ID, scope: SCOPES, immediate: false},
-          handleAuthResult);
-        return false;
-      }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(255, 255, 255, .8);
+        }
 
-      /**
-       * Load Gmail API client library. List labels once client library
-       * is loaded.
-       */
-      function loadGmailApi() {
-        gapi.client.load('gmail', 'v1', listLabels);
-      }
+        body.loading {
+            overflow: hidden;
+        }
 
-      /**
-       * Print all Labels in the authorized user's inbox. If no labels
-       * are found an appropriate message is printed.
-       */
-      function listLabels() {
-        var request = gapi.client.gmail.users.labels.list({
-          'userId': 'me'
+        body.loading .modal {
+            display: block;
+        }
+
+        .no-connection {
+            background: lightcoral;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 0px solid black;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        td {
+            width: 25vw;
+            height: 25vw;
+            font-size: 4vw;
+            line-height: 5vw;
+        }
+
+        i {
+            font-size: 20vw;
+        }
+
+        td h4 {
+            font-size: 6vw;
+            line-height: 6vw;
+        }
+
+        td h5 {
+            font-size: 4vw;
+            line-height: 4vw;
+        }
+
+        h1 {
+            font-size: 13vw;
+        }
+
+        h2 {
+            font-size: 11vw;
+        }
+    </style>
+    <title>Remote Control</title>
+</head>
+
+<body>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4"
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $("#cmd-alert").hide();
+            $("#prepareRs-alert").hide();
         });
 
-        request.execute(function(resp) {
-          var labels = resp.labels;
-          appendPre('Labels:');
+        function getXhttp(t) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.timeout = t || 500;
+            return xhttp;
+        }
 
-          if (labels && labels.length > 0) {
-            for (i = 0; i < labels.length; i++) {
-              var label = labels[i];
-              appendPre(label.name)
+        var x = setInterval(function () { loadData("monitor.json", updateData) }, 1000);
+        function loadData(url, callback) {
+            var xhttp = getXhttp(1000);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    if (this.status == 200) {
+                        $("body").removeClass("no-connection")
+                        callback.apply(xhttp);
+                    } else {
+                        $("body").addClass("no-connection")
+                    }
+                }
+            };
+            try {
+                xhttp.open("GET", url, true);
+                xhttp.send();
+            } catch (Ex) {
+
             }
-          } else {
-            appendPre('No Labels found.');
-          }
-        });
-      }
+        }
 
-      /**
-       * Append a pre element to the body containing the given message
-       * as its text node.
-       *
-       * @param {string} message Text to be placed in pre element.
-       */
-      function appendPre(message) {
-        var pre = document.getElementById('output');
-        var textContent = document.createTextNode(message + '\n');
-        pre.appendChild(textContent);
-      }
+        function updateData() {
+            var r = JSON.parse(this.responseText);
+            updateCard("cardSpeed", r.s);
+            updateCard("cardRpm", r.r);
+            updateCard("cardDoors", r.d);
+            updateCard("cardHandbrake", r.h);
+            updateCard("cardBattery", r.b);
+            updateCard("cardWakeup", r.w);
+            if (r.l)
+                $("#data").html(r.l + $("#data").html());
+            if (r.p) {
+                $("#aIngition").css("color", (r.p.i == "High") ? "red" : "gray");
+                $("#aStarter").css("color", (r.p.s == "High") ? "green" : "gray");
+            }
+        }
 
+        function updateCard(card, data) {
+            if (!data) return;
+            $("#" + card + " h4").text(data.a);
+            if (data.c == "0") {
+                $("#" + card + " h4").removeClass("bg-warning");
+            } else {
+                $("#" + card + " h4").addClass("bg-warning");
+            }
+            $("#" + card + " div").text(data.v);
+        }
+
+        function sendCommand(cmd, val) {
+            $("body").addClass("loading")
+            $("#cmd-alert").html(cmd);
+            var url = cmd + "=" + val + "\r\n";
+            var xhttp = getXhttp(1000);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    $("body").removeClass("loading")
+                    if (this.status == 200) {
+                        $("#cmd-alert").removeClass("alert-danger");
+                        $("#cmd-alert").addClass("alert-success");
+                    } else {
+                        $("#cmd-alert").removeClass("alert-success");
+                        $("#cmd-alert").addClass("alert-danger");
+                    }
+                    $("#cmd-alert").show();
+                    setTimeout(() => {
+                        $("#cmd-alert").hide();
+                    }, 1000);
+                }
+            };
+            try {
+                xhttp.open("POST", url, true);
+                xhttp.send();
+            } catch (Ex) {
+
+            }
+        }
     </script>
-    <script src="https://apis.google.com/js/client.js?onload=checkAuth">
-    </script>
-  </head>
-  <body>
-    <div id="authorize-div" style="display: none">
-      <span>Authorize access to Gmail API</span>
-      <!--Button for the user to click to initiate auth sequence -->
-      <button id="authorize-button" onclick="handleAuthClick(event)">
-        Authorize
-      </button>
+    <div class="alert alert-danger" id="cmd-alert"></div>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert" id="prepareRs-alert">
+        <strong>Don't forget!</strong>
+        <ul>
+            <li>Key</li>
+            <li>Headlighths</li>
+            <li>Wiper</li>
+            <li>Heater</li>
+        </ul>
+        <button type="button" class="close" onclick="$('#prepareRs-alert').hide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-    <pre id="output"></pre>
-  </body>
+    <div class="modal"></div>
+    <h1>Remote Control</h1>
+    <table>
+        <tr>
+            <td id="cardSpeed">
+                <h5>Speed</h5>
+                <h4>999.99</h4>
+                <div>High</div>
+            </td>
+            <td id="cardDoors">
+                <h5>Doors</h5>
+                <h4>Closed</h4>
+                <div>High</div>
+            </td>
+            <td id="cardHandbrake">
+                <h5>Handbrake</h5>
+                <h4>On</h4>
+                <div>Low</div>
+            </td>
+            <td id="cardRpm">
+                <h5>RPM</h5>
+                <h4>999.99</h4>
+                <div>High</div>
+            </td>
+        </tr>
+        <tr>
+            <td id="cardBattery">
+                <h5>Battery</h5>
+                <h4>14.432</h4>
+                <div>Heap: 12345</div>
+            </td>
+            <td style="color:black;" onclick="sendCommand('RenameInit');return false;">
+                Rename init
+                <i class="fas fa-copy"></i>
+            </td>
+            <td style="color:red;" onclick="sendCommand('UartOff');return false;">
+                UART Off
+                <i class="fas fa-phone"></i>
+            </td>
+            <td id="cardWakeup">
+                <h5>Wake up</h5>
+                <h4>1234567</h4>
+                <div>RSSI -70</div>
+            </td>
+        </tr>
+        <tr>
+            <td style="color:green;" onclick="sendCommand('Lock');return false;">
+                Lock
+                <i class="fas fa-lock"></i>
+            </td>
+            <td style="color:orange;" onclick="sendCommand('Unlock');return false;">
+                Unlock
+                <i class="fas fa-unlock"></i>
+            </td>
+            <td style="color:brown;" onclick="sendCommand('UnlockAll');return false;">
+                Unlock All
+                <i class="fas fa-lock-open"></i>
+            </td>
+            <td style="color:darkblue;" onclick="$('#prepareRs-alert').show();sendCommand('PrepareRS');return false;">
+                Timer
+                <i class="fas fa-clock"></i>
+            </td>
+        </tr>
+        <tr>
+            <td style="color:darkorchid;" onclick="sendCommand('LockAndStop');return false;">
+                Lock&amp;Stop
+                <i class="fas fa-stop-circle"></i>
+            </td>
+            <td id="aIngition" onclick="sendCommand('Ignition');return false;">
+                Ignition
+                <i class="fas fa-bolt"></i>
+            </td>
+            <td id="aStarter" onclick="sendCommand('Starter');return false;">
+                Starter
+                <i class="fas fa-cog"></i>
+            </td>
+            <td style="color:deepskyblue;" onclick="sendCommand('Start');return false;">
+                Start
+                <i class="fas fa-car"></i>
+            </td>
+        </tr>
+    </table>
+    <h2>Results</h2>
+    <div id="data">...</div>
+</body>
+
 </html>
