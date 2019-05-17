@@ -1669,6 +1669,10 @@
                 // do not floor if it is PF or C
                 rds[index].norm = Math.floor(rds[index].norm);
                 rds[index].vPddNorm = Math.floor(rds[index].vPddNorm);
+            } else if (rds[index].type == 'C') {
+                // floor to 0.1
+                rds[index].norm = Math.floor(10.0 * rds[index].norm) / 10.0;
+                rds[index].vPddNorm = Math.floor(10.0 * rds[index].vPddNorm) / 10.0;
             }
             rds[index].lateness = rds[index].time - rds[index - 1].time - rds[index].norm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].lateness) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
             rds[index].vPddLateness = rds[index].time - rds[index - 1].time - rds[index].vPddNorm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].vPddLateness) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
@@ -1756,7 +1760,12 @@
         } else {
             $("#time").css("color", "rgb(0, 255, 0)");
         }
-        $("#sectorTime").html(getTimeString(sectorTime, true));
+        if (isRds()) {
+            $("#sectorTime").html(getTimeString(getRdsTime(), true));
+        } else {
+            $("#sectorTime").html(getTimeString(sectorTime, true));
+        }
+
         $("#sector").html(sector);
         $("#distance").html(getNumberString(distance, 1000));
         $("#sectorRest").html(getNumberString(sector - distance, 1000));
@@ -2389,6 +2398,24 @@
             }
         }
         return null;
+    }
+
+    function getRdsTime() {
+        if (rds.length < 1) {
+            return null;
+        }
+        var i = rds.length;
+        while (i-- > 0) {
+            if (rds[i].type == 'S') {
+                break;
+            }
+        }
+        if (i < 0) {
+            return null;
+        }
+        var ri = rds[i];
+        var t = getCurrentTime();
+        return t - ri.time;
     }
 
     function getRdsLateness() {
