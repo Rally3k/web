@@ -1670,9 +1670,9 @@
                 rds[index].norm = Math.floor(rds[index].norm);
                 rds[index].vPddNorm = Math.floor(rds[index].vPddNorm);
             } else if (rds[index].type == 'C') {
-                // floor to 0.1
-                rds[index].norm = Math.floor(10.0 * rds[index].norm) / 10.0;
-                rds[index].vPddNorm = Math.floor(10.0 * rds[index].vPddNorm) / 10.0;
+                // floor to 0.01
+                rds[index].norm = Math.floor(100.0 * rds[index].norm) / 100.0;
+                rds[index].vPddNorm = Math.floor(100.0 * rds[index].vPddNorm) / 100.0;
             }
             rds[index].lateness = rds[index].time - rds[index - 1].time - rds[index].norm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].lateness) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
             rds[index].vPddLateness = rds[index].time - rds[index - 1].time - rds[index].vPddNorm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].vPddLateness) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
