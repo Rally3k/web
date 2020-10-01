@@ -2328,12 +2328,12 @@
                     showModalAddFormula();
                 break;
                 case 78: // n previous KV
-					modalConfirm("Стартовать предыдущее КВ" + (currentKvIndex - 1) + "?", function() {
+					modalConfirm("Стартовать предыдущее КВ" + currentKvIndex + "?", function() {
                         startKv(currentKvIndex - 1);
                     });
                 break;
                 case 77: // m next KV
-					modalConfirm("Стартовать следующее КВ" + (currentKvIndex + 1) + "?", function() {
+					modalConfirm("Стартовать следующее КВ" + (currentKvIndex + 2) + "?", function() {
 						startKv(currentKvIndex + 1);
                     });
                 break;
