@@ -2328,10 +2328,14 @@
                     showModalAddFormula();
                 break;
                 case 78: // n previous KV
-                    startKv(currentKvIndex - 1);
+					modalConfirm("Стартовать предыдущее КВ" + (currentKvIndex - 1) + "?", function() {
+                        startKv(currentKvIndex - 1);
+                    });
                 break;
                 case 77: // m next KV
-                    startKv(currentKvIndex + 1);
+					modalConfirm("Стартовать следующее КВ" + (currentKvIndex + 1) + "?", function() {
+						startKv(currentKvIndex + 1);
+                    });
                 break;
                 case 188: // , previous SI
                     modalConfirm("Применить предыдущую формулу скорости?", function() {
