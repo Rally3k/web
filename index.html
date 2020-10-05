@@ -1613,13 +1613,13 @@
                 currentSiIndex = rds[i - 1].siIndex;
                 localStorage.setItem("currentSiIndex", currentSiIndex);
                 var f = currentSiIndex;
-                while (f >= 0 && !speedIns[f].isFormula()) {
-                    --f;
-                }
-                if (f >= 0) {
-                    currentSpeedInstruction = speedIns[f];
-                    localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
-                }
+				while (f >= 0 && !speedIns[f].isFormula()) {
+					--f;
+				}
+				if (f >= 0) {
+					currentSpeedInstruction = speedIns[f];
+					localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
+				}
             } else if (currentSiIndex >= 0 && speedIns[currentSiIndex].type == 'S') {
                 // removing last start item
                 localStorage.setItem("currentSiIndex", --currentSiIndex);
@@ -2822,7 +2822,10 @@
     })
 
     function applySpeedInstruction(index) {
-        if (index >= 0 && index < speedIns.length) {
+		if (index < 0 || index >= speedIns.length) return;
+        currentSiIndex = index;
+        localStorage.setItem("currentSiIndex", currentSiIndex);
+        if (index != -1) {
             var si = speedIns[index];
             var delta = 0;
             if (si.position != null && !isNaN(si.position)) {
@@ -2852,11 +2855,7 @@
                     rdsSpeedChange(si.vPdd, delta);
                     break;
             }
-        } else if (index != -1) {
-            return;
         }
-        currentSiIndex = index;
-        localStorage.setItem("currentSiIndex", currentSiIndex);
         newMove();
         beep();
     }
