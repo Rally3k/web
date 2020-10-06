@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <button id="pair">Pair device</button>
+  <p id="data">0</p>
+
+  <script>
+    window.onload = () => {
+      const button = document.getElementById('pair');
+	  const data = document.getElementById('data');
+
+      parseValue = (value) => {
+        // В Chrome 50+ используется DataView.
+        value = value.buffer ? value : new DataView(value);
+        let result = value.getUint32(0, true);
+
+        return result;
+      }
+	  
+      button.addEventListener('pointerup', function(event) {
+        navigator.bluetooth.requestDevice({
+            filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {"name":"UART Service"} ]
+          })
+          .then((device) => {
+            return device.gatt.connect();
+          })
+          .then(server => {
+            return server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+          })
+          .then(service => {
+            return service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+          })
+          .then(characteristic => characteristic.startNotifications())
+          .then(characteristic => {
+            characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+          })
+          .catch(error => { console.log(error); });
+
+          function handleCharacteristicValueChanged(event) {
+            var value = event.target.value;
+			//value = value.buffer ? value : new DataView(value);
+            //console.log(value.getUint8(0) + " " + value.getUint8(1) + " " + value.getUint8(2) + " " + value.getUint8(3));
+			console.log(parseValue(value));
+			data.innerHTML = parseValue(value);
+          }
+      });
+    }
+  </script>
+</body>
+</html>
