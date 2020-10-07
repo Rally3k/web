@@ -9,11 +9,16 @@
 <body>
   <button id="pair">Pair device</button>
   <p id="data">0</p>
+  <button id="send">Send</button>
 
   <script>
     window.onload = () => {
       const button = document.getElementById('pair');
 	  const data = document.getElementById('data');
+	  const send = document.getElementById('send');
+	  
+	  let distanceMeter = null;
+	  let distanceMeterTx = null;
 
       parseValue = (value) => {
         // В Chrome 50+ используется DataView.
@@ -28,10 +33,17 @@
             filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {"name":"UART Service"} ]
           })
           .then((device) => {
+		    distanceMeter = device;
             return device.gatt.connect();
           })
           .then(server => {
             return server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+          })
+          .then(service => {
+            service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e').then(characteristic => {
+				distanceMeterTx = characteristic;
+			});
+			return service;
           })
           .then(service => {
             return service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
@@ -46,10 +58,14 @@
             var value = event.target.value;
 			//value = value.buffer ? value : new DataView(value);
             //console.log(value.getUint8(0) + " " + value.getUint8(1) + " " + value.getUint8(2) + " " + value.getUint8(3));
-			console.log(parseValue(value));
+			//console.log(parseValue(value));
 			data.innerHTML = parseValue(value);
           }
       });
+	  
+      send.addEventListener('pointerup', function(event) {
+	    distanceMeterTx.writeValue(new TextEncoder().encode('Hello!'));
+	  });
     }
   </script>
 </body>
