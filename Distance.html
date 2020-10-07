@@ -7,32 +7,33 @@
   <title>Document</title>
 </head>
 <body>
-  <button id="pair">Pair device</button>
+  <button id="bluetooth">BT</button>
   <p id="data">0</p>
   <button id="send">Send</button>
 
   <script>
-    window.onload = () => {
-      const button = document.getElementById('pair');
+	function parseValue (value) {
+		// В Chrome 50+ используется DataView.
+		value = value.buffer ? value : new DataView(value);
+		let result = value.getUint32(0, true);
+
+		return result;
+	}
+
+	let distanceMeter = null;
+	let distanceMeterTx = null;
+    
+	window.onload = () => {
+      const btButton = document.getElementById('bluetooth');
 	  const data = document.getElementById('data');
 	  const send = document.getElementById('send');
 	  
-	  let distanceMeter = null;
-	  let distanceMeterTx = null;
-
-      parseValue = (value) => {
-        // В Chrome 50+ используется DataView.
-        value = value.buffer ? value : new DataView(value);
-        let result = value.getUint32(0, true);
-
-        return result;
-      }
-	  
-      button.addEventListener('pointerup', function(event) {
+      btButton.addEventListener('pointerup', function(event) {
         navigator.bluetooth.requestDevice({
             filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {'name': 'DM'} ]
           })
           .then((device) => {
+			device.addEventListener('gattserverdisconnected', handleDisconnection);
 		    distanceMeter = device;
             return device.gatt.connect();
           })
@@ -67,6 +68,15 @@
 	    distanceMeterTx.writeValue(new TextEncoder().encode('Hello!'));
 	  });
     }
+	
+	// Обработчик разъединения
+	function handleDisconnection(event) {
+		alert('Disconnected');
+		//let device = event.target;
+		//connectDeviceAndCacheCharacteristic(device).
+		//then(characteristic => startNotifications(characteristic)).
+		//catch(error => log(error));
+	}
   </script>
 </body>
 </html>
