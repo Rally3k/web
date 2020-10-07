@@ -7,6 +7,7 @@
   <title>Document</title>
 </head>
 <body>
+Version 0.1
   <button id="bluetooth">BT</button>
   <p id="data">0</p>
   <button id="send">Send</button>
@@ -29,39 +30,45 @@
 	  const send = document.getElementById('send');
 	  
       btButton.addEventListener('pointerup', function(event) {
-        navigator.bluetooth.requestDevice({
-            filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {'name': 'DM'} ]
-          })
-          .then((device) => {
-			device.addEventListener('gattserverdisconnected', handleDisconnection);
-		    distanceMeter = device;
-            return device.gatt.connect();
-          })
-          .then(server => {
-            return server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
-          })
-          .then(service => {
-            service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e').then(characteristic => {
-				distanceMeterTx = characteristic;
-			});
-			return service;
-          })
-          .then(service => {
-            return service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
-          })
-          .then(characteristic => characteristic.startNotifications())
-          .then(characteristic => {
-            characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-          })
-          .catch(error => { console.log(error); });
+		if (distanceMeter) {
+			distanceMeter.removeEventListener('gattserverdisconnected', handleDisconnection);
+			if (distanceMeter.gatt.connected) {
+				distanceMeter.gatt.disconnect();
+			}
 
-          function handleCharacteristicValueChanged(event) {
-            var value = event.target.value;
-			//value = value.buffer ? value : new DataView(value);
-            //console.log(value.getUint8(0) + " " + value.getUint8(1) + " " + value.getUint8(2) + " " + value.getUint8(3));
-			//console.log(parseValue(value));
-			data.innerHTML = parseValue(value);
-          }
+			if (distanceMeterTx) {
+				distanceMeterTx.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+				distanceMeterTx = null;
+			}
+
+			distanceMeter = null;
+		} else {
+			navigator.bluetooth.requestDevice({
+				filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {'name': 'DM'} ]
+			  })
+			  .then((device) => {
+				device.addEventListener('gattserverdisconnected', handleDisconnection);
+				distanceMeter = device;
+				return device.gatt.connect();
+			  })
+			  .then(server => {
+				return server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+			  })
+			  .then(service => {
+				service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e').then(characteristic => {
+					distanceMeterTx = characteristic;
+				});
+				return service;
+			  })
+			  .then(service => {
+				return service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+			  })
+			  .then(characteristic => characteristic.startNotifications())
+			  .then(characteristic => {
+				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+			  })
+			  .catch(error => { console.log(error); });
+		}
       });
 	  
       send.addEventListener('pointerup', function(event) {
@@ -76,6 +83,13 @@
 		//connectDeviceAndCacheCharacteristic(device).
 		//then(characteristic => startNotifications(characteristic)).
 		//catch(error => log(error));
+	}
+	function handleCharacteristicValueChanged(event) {
+		var value = event.target.value;
+		//value = value.buffer ? value : new DataView(value);
+		//console.log(value.getUint8(0) + " " + value.getUint8(1) + " " + value.getUint8(2) + " " + value.getUint8(3));
+		//console.log(parseValue(value));
+		data.innerHTML = parseValue(value);
 	}
   </script>
 </body>
