@@ -323,6 +323,9 @@
                 <i class="fa icon-small fa-globe" style="position: fixed; top: 0; left: 0;"></i>
             </div>
             <div class="square-content">
+                <i class="fa icon-small fa-bluetooth" style="position: fixed; top: 0; right: 0;"></i>
+            </div>
+            <div class="square-content">
                 <div class="split-vertical">
                     <a href="javascript:showModalTime('Время', getCurrentTime(), true);" class="line-height-small">
                         <span class="item-label" style="color:darkblue">Время</span>
@@ -352,7 +355,7 @@
             </div>
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:showModalNumber('Пройдено', getNumberString(distance, 1000));" oncontextmenu="javascript:resetDistance(); return false;" class="line-height-big">
+                    <a href="javascript:showModalNumber('Пройдено', getNumberString(getDistance(), 1000));" oncontextmenu="javascript:resetDistance(); return false;" class="line-height-big">
                         <span class="item-label-big" style="color:darkblue" id="labelDistance">Пройдено</span>
                         <span class="item-value-big" id="distance">999.999</span>
                         <span class="item-label-big" id="nextPosition">000.000</span>
@@ -423,15 +426,15 @@
                 <div class="split-vertical">
                     <a href="javascript:showModalNumber('Сектор', sector);" class="line-height-small">
                         <span class="item-label" style="color:darkblue">Сектор</span>
-                        <span class="item-value" id="sector">999.999</span>
-                        <span class="item-label" id="sectorRest">000.000</span>
+                        <span class="item-label" id="sector">000.000</span>
+                        <span class="item-value" id="sectorRest">999.999</span>
                     </a>
                 </div>
                 <div class="split-vertical">
                     <a href="javascript:showModalTime('Норма', norm, false);" class="line-height-small">
                         <span class="item-label" style="color:darkblue">Норма</span>
-                        <span class="item-value" id="norm">04:55</span>
-                        <span class="item-label" id="normRest">00:00</span>
+                        <span class="item-label" id="norm">00:00</span>
+                        <span class="item-value" id="normRest">04:55</span>
                     </a>
                 </div>
             </div>
@@ -439,7 +442,7 @@
         <div class="col-l-4 col-xs-8 border col-l-pull-2 nopadding rect-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:gpsLongClick();" class="line-height-big">
+                    <a href="javascript:demo();" class="line-height-big">
                         <span class="item-label-big" style="color:darkblue">Ср. скорость</span>
                         <span class="item-value-big" id="avgSpeed">90.0</span>
                         <span class="item-label-big" id="actualSpeed">0</span>
@@ -462,8 +465,8 @@
             <div class="col-l-1 col-xs-2 border nopadding square-box">
                 <div class="square-content">
                     <div class="no-split">
-                        <a href="javascript:test();">
-                            <i class="fa icon fa-hourglass-o"></i>
+                        <a href="javascript:hideActions();bluetoothClick();">
+                            <i class="fa icon fa-bluetooth"></i>
                         </a>
                     </div>
                 </div>
@@ -908,8 +911,19 @@
             <form class="form-horizontal" id="formCorrection">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="fCorrectionType">С колёс</label>
-                        <div class="col-sm-9">
+                        <label class="control-label col-sm-4" for="fCorrectionDefaultMeter">По умолчанию</label>
+                        <div class="col-sm-8">
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionDefaultMeter" value="GPS" checked>GPS
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionDefaultMeter" value="BT">Bluetooth (BT)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionType">С колёс</label>
+                        <div class="col-sm-8">
                             <label class="radio-inline">
                                 <input type="radio" name="fCorrectionType" value="I" checked>Интервал
                             </label>
@@ -919,27 +933,33 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="fCorrectionInterval">Пройдено</label>
-                        <div class="col-sm-9">
-                            <input type="number" class="form-control" id="fCorrectionInterval" step="any" disabled placeholder="Пройдено">
+                        <label class="control-label col-sm-4" for="fCorrectionIntervalGPS">Пройдено GPS/BT</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="fCorrectionIntervalGPS" step="any" disabled placeholder="GPS">
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="fCorrectionIntervalBT" step="any" disabled placeholder="Bluetooth">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="fCorrectionDistance">Дистанция</label>
-                        <div class="col-sm-9">
+                        <label class="control-label col-sm-4" for="fCorrectionDistance">Дистанция</label>
+                        <div class="col-sm-8">
                             <input type="number" class="form-control" id="fCorrectionDistance" step="any" placeholder="Дистанция">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="fCorrectionValue">Коэффициент</label>
-                        <div class="col-sm-9">
-                            <input type="number" class="form-control" id="fCorrectionValue" step="any" disabled placeholder="Коэффициент">
+                        <label class="control-label col-sm-4" for="fCorrectionValueGPS">Коэфф. GPS/BT</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="fCorrectionValueGPS" step="any" disabled placeholder="GPS">
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="fCorrectionValueBT" step="any" disabled placeholder="Bluetooth">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="fCorrectionMinMove">Погрешность</label>
-                        <div class="col-sm-9">
-                            <input type="number" class="form-control" id="fCorrectionMinMove" step="any" placeholder="Не учитывать сдвиг до (км)">
+                        <label class="control-label col-sm-4" for="fCorrectionMinMove">Погрешность GPS</label>
+                        <div class="col-sm-8">
+                            <input type="number" class="form-control" id="fCorrectionMinMove" step="any" placeholder="В километрах">
                         </div>
                     </div>
                 </div>
@@ -1170,10 +1190,14 @@
     var sector;
     var norm;
     var start;
-    var distance;
-    var correction;
-    var intervalStart;
-    var intervalDistance;
+    var distanceGPS;
+    var distanceBT;
+    var correctionGPS;
+    var correctionBT;
+    var intervalStartGPS;
+    var intervalStartBT;
+    var intervalDistanceGPS;
+    var intervalDistanceBT;
     var timeCorrection;
     var isPause = false;
     var isReverse = false;
@@ -1188,7 +1212,8 @@
     var noSleep = new NoSleep();
     var lastLatitude;
     var lastLongitude;
-    var lastTime;
+    var lastTimeGPS;
+    var lastTimeBT;
     var gpsOptions = {
         enableHighAccuracy: true,
         timeout: 5000,
@@ -1196,8 +1221,15 @@
     };
 
     var gpsWatch;
-    var wasUpdate = false;
+    var wasUpdateGPS = false;
+	var wasUpdateBT = false;
+	var speedGPS = 0;
+	var speedBT = 0;
     var isDemo = false;
+	var defaultMeter = 'GPS';
+	var isBT = false;
+	var distanceMeter = null;
+	var distanceMeterTx = null;
     var isIntervalPosition = false;
     var kvs = [];
     var currentKvIndex = -1;
@@ -1233,10 +1265,6 @@
     var pddSpeedTypes = ['x', '5', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '130']
     var operationsTypes = ['нет', '-', '*'];
     
-    function test() {
-        httpGetAsync('http://192.168.100.163/', function (a) { distance = distance + parseInt(a); });
-    }
-
     function httpGetAsync(theUrl, callback) {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = function() { 
@@ -1282,12 +1310,17 @@
             sector = parseFloat(localStorage.getItem("sector"));
             norm = parseFloat(localStorage.getItem("norm"));
             start = parseFloat(localStorage.getItem("start"));
-            distance = parseFloat(localStorage.getItem("distance"));
-            correction = parseFloat(localStorage.getItem("correction"));
+            distanceGPS = parseFloat(localStorage.getItem("distanceGPS"));
+            distanceBT = parseFloat(localStorage.getItem("distanceBT"));
+            correctionGPS = parseFloat(localStorage.getItem("correctionGPS"));
+            correctionBT = parseFloat(localStorage.getItem("correctionBT"));
             minMove = parseFloat(localStorage.getItem("minMove"));
-            intervalStart = parseFloat(localStorage.getItem("intervalStart"));
-            intervalDistance = parseFloat(localStorage.getItem("intervalDistance"));
+            intervalStartGPS = parseFloat(localStorage.getItem("intervalStartGPS"));
+            intervalStartBT = parseFloat(localStorage.getItem("intervalStartBT"));
+            intervalDistanceGPS = parseFloat(localStorage.getItem("intervalDistanceGPS"));
+            intervalDistanceBT = parseFloat(localStorage.getItem("intervalDistanceBT"));
             timeCorrection = parseFloat(localStorage.getItem("timeCorrection"));
+			defaultMeter = localStorage.getItem("defaultMeter");
             //isPause = localStorage.getItem("isPause") == "true";
             //isReverse = localStorage.getItem("isReverse") == "true";
             var ris = JSON.parse(localStorage.getItem("rds"));
@@ -1320,12 +1353,17 @@
         sector = sector ? sector : 10.0;
         norm = norm ? norm : 3600.0;
         start = start ? start : 0.0;
-        distance = distance ? distance : 0.0;
-        correction = correction ? correction : 1.0;
-        minMove = minMove ? minMove : 0.0;
-        intervalStart = intervalStart ? intervalStart : 0.0;
-        intervalDistance = intervalDistance ? intervalDistance : 0.0;
+        distanceGPS = distanceGPS ? distanceGPS : 0.0;
+        distanceBT = distanceBT ? distanceBT : 0.0;
+        correctionGPS = correctionGPS ? correctionGPS : 1.0;
+        correctionBT = correctionBT ? correctionBT : 1.0;
+        minMove = minMove ? minMove : 0.001;
+        intervalStartGPS = intervalStartGPS ? intervalStartGPS : 0.0;
+        intervalStartBT = intervalStartBT ? intervalStartBT : 0.0;
+        intervalDistanceGPS = intervalDistanceGPS ? intervalDistanceGPS : 0.0;
+        intervalDistanceBT = intervalDistanceBT ? intervalDistanceBT : 0.0;
         timeCorrection = timeCorrection ? timeCorrection : 0.0;
+		defaultMeter = defaultMeter ? defaultMeter : 'GPS';
         displayRdsItems = displayRdsItems ? displayRdsItems : 10;
         currentPddSpeed = currentPddSpeed ? currentPddSpeed : 60.0;
         currentSpeedInstruction = currentSpeedInstruction == "undefined" || currentSpeedInstruction == "" ? new SpeedInstruction(true) : currentSpeedInstruction;
@@ -1337,17 +1375,14 @@
 
     function gpsClick(e) {
         if (isDemo) {
-            gpsLongClick();
-            return;
+            demo();
         }
         if (gpsWatch) {
-            $(".fa-globe").removeClass("fa-spin");
             $(".fa-globe").css("color", "");
             navigator.geolocation.clearWatch(gpsWatch);
             gpsWatch = null;
             lastLatitude = null;
         } else {
-            $(".fa-globe").addClass("fa-spin");
             if (navigator.geolocation) {
                 gpsWatch = navigator.geolocation.watchPosition(newPosition, gpsError, gpsOptions);
                 $(".fa-globe").css("color", "red");
@@ -1358,11 +1393,81 @@
         }
     }
 
+    function bluetoothClick(e) {
+        if (isDemo) {
+            demo();
+        }
+        if (isBT) {
+            $(".fa-bluetooth").css("color", "");
+            isBT = false;
+			if (distanceMeter) {
+				distanceMeter.removeEventListener('gattserverdisconnected', handleDisconnection);
+				if (distanceMeter.gatt.connected) {
+					distanceMeter.gatt.disconnect();
+				}
+
+				if (distanceMeterTx) {
+					distanceMeterTx.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+					distanceMeterTx = null;
+				}
+
+				distanceMeter = null;
+			}
+        } else {
+            $(".fa-bluetooth").css("color", "red");
+			isBT = true;
+			navigator.bluetooth.requestDevice({
+				filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {'name': 'DM'} ]
+			  })
+			  .then((device) => {
+				device.addEventListener('gattserverdisconnected', handleDisconnection);
+				distanceMeter = device;
+				return device.gatt.connect();
+			  })
+			  .then(server => {
+				return server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+			  })
+			  .then(service => {
+				service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e').then(characteristic => {
+					distanceMeterTx = characteristic;
+				});
+				return service;
+			  })
+			  .then(service => {
+				return service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+			  })
+			  .then(characteristic => characteristic.startNotifications())
+			  .then(characteristic => {
+				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+			  })
+			  .catch(error => { console.log(error); });
+        }
+    }
+
+	// Bluetooth disconnetion
+	function handleDisconnection(event) {
+		beep();
+		alert('Bluetooth disconnected!');
+		bluetoothClick(); // close connections
+	}
+	function handleCharacteristicValueChanged(event) {
+		wasUpdateBT = true;
+		var d = event.target.value;
+		d = d.buffer ? d : new DataView(d);
+		d = correctionBT * d.getUint32(0, true);
+		moveBT(d);
+	}
+/*
+	send.addEventListener('pointerup', function(event) {
+		distanceMeterTx.writeValue(new TextEncoder().encode('Hello!'));
+	});
+*/
     function newPosition(position) {
+        wasUpdateGPS = true;
         var d = 0.0;
         if (lastLatitude) {
-            d = getDistance(lastLatitude, lastLongitude, position.coords.latitude, position.coords.longitude);
-            newMove((d >= minMove) ? d : 0);
+            d = correctionGPS * getGpsDistance(lastLatitude, lastLongitude, position.coords.latitude, position.coords.longitude);
+			moveGPS(d);
         }
         if (position.coords.accuracy > 10) {
             $(".fa-globe").css("color", "orange");
@@ -1371,7 +1476,7 @@
         }
         if (myMap != null && lastLatitude) {
             myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
-            if (myPolyline && (myPolyline.geometry.getLength() < 1 || getDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020)) {
+            if (myPolyline && (myPolyline.geometry.getLength() < 1 || getGpsDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020)) {
                 myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
             }
 
@@ -1393,7 +1498,7 @@
         return x * Math.PI / 180.0;
     };
 
-    function getDistance(lat1, long1, lat2, long2) {
+    function getGpsDistance(lat1, long1, lat2, long2) {
         var R = 6378.137; // Earth’s mean radius in km
         var dLat = rad(lat2 - lat1);
         var dLong = rad(long2 - long1);
@@ -1424,16 +1529,11 @@
         $("#alDanger").show();
     }
 
-    function gpsLongClick() {
-        if (gpsWatch != null) {
+    function demo() {
+        if (gpsWatch != null || isBT) {
             return;
         }
         isDemo = !isDemo;
-        if (isDemo) {
-            $(".fa-globe").addClass("fa-spin");
-        } else {
-            $(".fa-globe").removeClass("fa-spin");
-        }
     }
 
     function Kv(start, sector, norm, pause) {
@@ -1503,7 +1603,7 @@
         }
     }
 
-    function RdsItem(distance, type, speed, time, latitude, longitude, delta) {
+    function RdsItem(distance, type, speed, time, latitude, longitude, deltaGPS, deltaBT) {
         if (type === undefined && typeof(distance) === 'object') {
             for (var prop in distance) {
                 this[prop] = distance[prop];
@@ -1521,7 +1621,8 @@
             this.lateness = 0;
             this.norm = 0;
             this.siIndex = currentSiIndex;
-            this.delta = delta;
+            this.deltaGPS = deltaGPS;
+            this.deltaBT = deltaBT;
         }
 
         this.toString = function() {
@@ -1531,8 +1632,98 @@
                 + getTimeString(this.time, true);
         }
     }
+	
+	function getPrimaryMeter() {
+		return (isBT && gpsWatch) ? defaultMeter : (isBT ? 'BT' : 'GPS');
+	}
+	function getDistance() {
+		return getPrimaryMeter() == 'GPS' ? distanceGPS : distanceBT;
+	}
+	function getDistance2() {
+		return getPrimaryMeter() == 'GPS' ? distanceBT : distanceGPS;
+	}
+	function getIntervalStart() {
+		return getPrimaryMeter() == 'GPS' ? intervalStartGPS : intervalStartBT;
+	}
+	function getIntervalStart2() {
+		return getPrimaryMeter() == 'GPS' ? intervalStartBT : intervalStartGPS;
+	}
+	function getSpeed() {
+		return getPrimaryMeter() == 'GPS' ? speedGPS : speedBT;
+	}
+	function getIntervalDistance() {
+		return getPrimaryMeter() == 'GPS' ? intervalDistanceGPS : intervalDistanceBT;
+	}
+	function getIntervalDistance2() {
+		return getPrimaryMeter() == 'GPS' ? intervalDistanceBT : intervalDistanceGPS;
+	}
 
-    function rdsStart(pddSpeed, delta) {
+	function setDistanceGPS(d) {
+		distanceGPS = d;
+		localStorage.setItem("distanceGPS", d);
+	}
+	function moveGPS(d) {
+		if (!isPause && d >= minMove) {
+			setDistanceGPS(distanceGPS + (isReverse ? -d : d));
+		}
+		// calculate speed
+		var time = getCurrentTime();
+		if (lastTimeGPS != null) {
+			speedGPS = d / (time - lastTimeGPS) * 60 * 60;
+		}
+		lastTimeGPS = time;
+		newMove();
+	}
+	function setDistanceBT(d) {
+		distanceBT = d;
+		localStorage.setItem("distanceBT", d);
+	}
+	function moveBT(d) {
+		if (!isPause) {
+			setDistanceBT(distanceBT + (isReverse ? -d : d));
+		}
+		// calculate speed
+		var time = getCurrentTime();
+		if (lastTimeBT != null) {
+			speedBT = d / (time - lastTimeBT) * 60 * 60;
+		}
+		lastTimeBT = time;
+		newMove();
+	}
+	function setIntervalStartGPS(i) {
+		intervalStartGPS = i;
+		localStorage.setItem("intervalStartGPS", i);
+	}
+	function setIntervalStartBT(i) {
+		intervalStartBT = i;
+		localStorage.setItem("intervalStartBT", i);
+	}
+	function setIntervalDistanceGPS(i) {
+        intervalDistanceGPS = i;
+		localStorage.setItem("intervalDistanceGPS", i);
+	}
+	function setIntervalDistanceBT(i) {
+        intervalDistanceBT = i;
+		localStorage.setItem("intervalDistanceBT", i);
+	}
+	function setStart(s) {
+		start = s;
+		localStorage.setItem("start", s);
+	}
+	function setNorm(n) {
+		norm = n;
+		localStorage.setItem("norm", n);
+	}
+	function setSector(s) {
+		sector = s;
+		localStorage.setItem("sector", s);
+	}
+	function setCurrentKvIndex(i) {
+        currentKvIndex = i;
+        localStorage.setItem("currentKvIndex", i);
+	}
+
+    function rdsStart(pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
         if (!isRds()) {
             if (rds && rds.length > 0) {
@@ -1542,7 +1733,7 @@
             }
             rds = [];
         }
-        addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, delta));
+        addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#darkGreenCircleDotIcon'}));
         }
@@ -1560,30 +1751,30 @@
         }
     }
 
-    function rdsSpeedChange(pddSpeed, delta) {
+    function rdsSpeedChange(pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, delta));
+            addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
             }
         }
     }
 
-    function rdsPF(pddSpeed, delta) {
+    function rdsPF(pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, delta));
+            addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#yellowCircleDotIcon'}));
             }
         }
     }
 
-    function rdsFinish(pddSpeed, delta) {
+    function rdsFinish(pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * distance) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, delta));
+            addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
             }
@@ -1624,10 +1815,10 @@
                 // removing last start item
                 localStorage.setItem("currentSiIndex", --currentSiIndex);
             }
-            if (rds[i].delta) {
+            if (rds[i].deltaGPS) {
                 // update distance
-                distance -= rds[i].delta;
-                localStorage.setItem("distance", distance);
+				setDistanceGPS(distanceGPS - rds[i].deltaGPS);
+				setDistanceBT(distanceBT - rds[i].deltaBT);
             }
         }
         rds.splice(i, 1);
@@ -1715,35 +1906,15 @@
     }
 
     function newMove(d) {
-        wasUpdate = true;
-        if (!isPause && !isNaN(d)) {
-            distance = distance + correction * (isReverse ? -d : d);
-            localStorage.setItem("distance", distance);
-        }
         // Removing "future" RDS positions
         if (isRds()) {
-            //var needRdsRefresh = false;
             for (var i = rds.length - 1; i >= 0; --i) {
-                if (rds[i].distance > distance) {
+                if (rds[i] && rds[i].distance > getDistance()) {
                     removeRdsItem(i);
-                    //rds.splice(i, 1);
-                    //needRdsRefresh = true;
                 } else {
                     break;
                 }
             }
-            //if (needRdsRefresh) {
-            //    refreshRdsTable();
-            //    localStorage.setItem("rds", JSON.stringify(rds));
-            //}
-        }
-
-        if (!isNaN(d)) {
-            var time = getCurrentTime();
-            if (lastTime != null) {
-                $("#actualSpeed").html(getNumberString(d / (time - lastTime) * 60 * 60, 10));
-            }
-            lastTime = time;
         }
         $("#time").html(getTimeString(getCurrentTime(), true));
         var sectorTime = getCurrentTime() - start + ((getCurrentTime() > start) ? 0 : 24 * 60 * 60);
@@ -1767,21 +1938,23 @@
         }
 
         $("#sector").html(sector);
-        $("#distance").html(getNumberString(distance, 1000));
-        $("#sectorRest").html(getNumberString(sector - distance, 1000));
+        $("#distance").html(getNumberString(getDistance(), 1000));
+        $("#sectorRest").html(getNumberString(sector - getDistance(), 1000));
         $("#norm").html(getTimeString(norm, false));
         $("#normRest").html(getTimeString(norm - sectorTime, true));
         $("#start").html(getTimeString(start, true));
         $("#finish").html(getTimeString((start + norm) % (24 * 60 * 60), true));
-        if (intervalDistance > 0 && distance > intervalStart + intervalDistance) {
-            intervalStart = intervalStart + intervalDistance;
-            localStorage.setItem("intervalStart", intervalStart);
-            intervalDistance = 0;
-            localStorage.setItem("intervalDistance", 0);
+        if (intervalDistanceGPS > 0 && distanceGPS > intervalStartGPS + intervalDistanceGPS) {
+			setIntervalStartGPS(intervalStartGPS + intervalDistanceGPS);
+            setIntervalDistanceGPS(0);
         }
-        var interval = intervalDistance > 0 ? intervalStart + intervalDistance - distance : distance - intervalStart;
+        if (intervalDistanceBT > 0 && distanceBT > intervalStartBT + intervalDistanceBT) {
+			setIntervalStartBT(intervalStartBT + intervalDistanceBT);
+            setIntervalDistanceBT(0);
+        }
+        var interval = getIntervalDistance() > 0 ? getIntervalStart() + getIntervalDistance() - getDistance() : getDistance() - getIntervalStart();
         $("#interval").html(getNumberString(interval, 1000));
-        if (intervalDistance > 0 && interval < 0.5) {
+        if (getIntervalDistance() > 0 && interval < 0.5) {
             if ($("#interval").css("color") == "rgb(0, 0, 0)") {
                 $("#interval").css("color", "rgb(255, 0, 0)");
                 beep();
@@ -1791,14 +1964,15 @@
         } else {
             $("#interval").css("color", "rgb(0, 0, 0)");
         }
-        $("#intervalDistance").html(intervalDistance > 0 ? getNumberString(intervalDistance, 1000) : "-");
-        $("#nextPosition").html(intervalDistance > 0 ? getNumberString(intervalStart + intervalDistance, 1000) : "-");
+        var interval2 = getIntervalDistance2() > 0 ? getIntervalStart2() + getIntervalDistance2() - getDistance2() : getDistance2() - getIntervalStart2();
+        $("#intervalDistance").html((getIntervalDistance() > 0 ? getNumberString(getIntervalDistance(), 1000) : "-") + ((isDemo || (isBT && gpsWatch)) ? "/" + getNumberString(interval2, 1000) : ""));
+        $("#nextPosition").html((getIntervalDistance() > 0 ? getNumberString(getIntervalStart() + getIntervalDistance(), 1000) : "-") + ((isDemo || (isBT && gpsWatch)) ? "/" + getNumberString(getDistance2(), 1000) : ""));
         //var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
         var benefit = (getKvTime() > 60) ? 60 * Math.floor((getKvTime() + 9 * 60) / 600) : 60;
         $("#benefit").html(getTimeString(benefit, false));
         var lateness;
         if (sector > 0) {
-            lateness = getKvTime() - distance / sector * norm;
+            lateness = getKvTime() - getDistance() / sector * norm;
             $("#benefit").css("color", (benefit + lateness + 60 < 0) ? "red" : "black");
         } else {
             $("#benefit").css("color", "black");
@@ -1812,15 +1986,26 @@
             $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
             $("#latenessPdd").html("-");
         }
+		$("#actualSpeed").html(getNumberString(getSpeed(), 10));
         $("#speed").html(currentSpeedInstruction.toString(true));
         $("#vpdd").html(getNumberString(currentPddSpeed, 100));
 
         if ($('#modalCorrection').is(':visible') && $('input[name=fCorrectionType][value=I]').prop('checked'))
         {
-            var i = distance - intervalStart;
-            $('#fCorrectionInterval').val(getNumberString(i, 1000));
-            refreshCorrection(i);
+            var iGPS = distanceGPS - intervalStartGPS;
+            $('#fCorrectionIntervalGPS').val(getNumberString(iGPS, 1000));
+            var iBT = distanceBT - intervalStartBT;
+            $('#fCorrectionIntervalBT').val(getNumberString(iBT, 1000));
+            refreshCorrection(iGPS, iBT);
         }
+		
+		if (isBT) {
+			if (distanceMeter && distanceMeter.gatt.connected) {
+				$(".fa-bluetooth").css("color", "blue");
+			} else {
+				$(".fa-bluetooth").css("color", "red");
+			}
+		}
     }
 
     $(document).ready(function () {
@@ -1833,20 +2018,42 @@
         document.removeEventListener("keydown", keyDown);
         document.addEventListener("keydown", keyDown, false);
 
-        gpsClick();
-
+        //gpsClick();
+		
         setInterval(function () {
             if (isDemo) {
-                newMove(1/61.0);
-            } else if (!wasUpdate) {
-                $("#actualSpeed").html("0.0");
-                lastTime = getCurrentTime();
-                newMove();
-                if (gpsWatch) {
-                    $(".fa-globe").css("color", "red");
-                }
-            }
-            wasUpdate = false;
+				$(".fa-globe").addClass("fa-spin");
+				$(".fa-bluetooth").addClass("fa-spin");
+				if (!isPause) {
+					moveGPS(1/59.0);
+					moveBT(1/61.0);
+				}
+            } else {
+				if (getPrimaryMeter() == 'GPS' && gpsWatch)
+					$(".fa-globe").addClass("fa-spin");
+				else
+					$(".fa-globe").removeClass("fa-spin");
+				
+				if (getPrimaryMeter() == 'BT' && isBT)
+					$(".fa-bluetooth").addClass("fa-spin");
+				else
+					$(".fa-bluetooth").removeClass("fa-spin");
+					
+				if (!wasUpdateGPS) {
+					speedGPS = 0;
+					lastTimeGPS = getCurrentTime();
+					if (gpsWatch) {
+						$(".fa-globe").css("color", "red");
+					}
+				}
+				if (!wasUpdateBT) {
+					speedBT = 0;
+					lastTimeBT = getCurrentTime();
+				}
+			}
+			wasUpdateGPS = false;
+			wasUpdateBT = false;
+			newMove();
         }, 1000);
 
     });
@@ -1938,21 +2145,17 @@
                 for (var i = 0; i < index; ++i) {
                     nextStart = (kvs[i].start != null ? kvs[i].start : nextStart) + kvs[i].norm + (kvs[i].pause != null ? kvs[i].pause : 0);
                 }
-                start = nextStart % (24 * 60 * 60);
+                setStart(nextStart % (24 * 60 * 60));
             } else {
-                start = kvs[index].start;
+                setStart(kvs[index].start);
             }
-            sector = kvs[index].sector;
-            norm = kvs[index].norm;
-            localStorage.setItem("start", start);
-            localStorage.setItem("norm", norm);
-            localStorage.setItem("sector", sector);
+            setSector(kvs[index].sector);
+            setNorm(kvs[index].norm);
         } else if (index != -1) {
             return;
         }
 
-        currentKvIndex = index;
-        localStorage.setItem("currentKvIndex", currentKvIndex);
+        setCurrentKvIndex(index);
         newMove();
         beep();
     }
@@ -1992,11 +2195,12 @@
         if (isNaN(numberValue)) {
             return 0;
         } else {
-            distance = numberValue;
-            intervalStart = distance;
-            intervalDistance = 0;
-            localStorage.setItem("distance", distance);
-            localStorage.setItem("intervalDistance", intervalDistance);
+			setDistanceGPS(numberValue);
+			setDistanceBT(numberValue);
+			setIntervalStartGPS(numberValue);
+			setIntervalStartBT(numberValue);
+			setIntervalDistanceGPS(0);
+			setIntervalDistanceBT(0);
         }
         return -1;
     }
@@ -2006,8 +2210,7 @@
         if (isNaN(numberValue)) {
             return 0;
         } else {
-            sector = numberValue;
-            localStorage.setItem("sector", sector);
+            setSector(numberValue);
             if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
                 kvs[currentKvIndex].sector = sector;
                 localStorage.setItem("kvs", JSON.stringify(kvs));
@@ -2021,8 +2224,8 @@
         if (isNaN(numberValue)) {
             return 0;
         } else {
-            intervalDistance = isPosition ? numberValue - intervalStart : numberValue;
-            localStorage.setItem("intervalDistance", intervalDistance);
+            setIntervalDistanceGPS(isPosition ? numberValue - intervalStartGPS : numberValue);
+            setIntervalDistanceBT(isPosition ? numberValue - intervalStartBT : numberValue);
         }
         return -1;
     }
@@ -2046,8 +2249,7 @@
             return 0;
         } else {
             result = result % (24 * 60 * 60);
-            start = result;
-            localStorage.setItem("start", start);
+            setStart(result);
             if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
                 kvs[currentKvIndex].start = start;
                 localStorage.setItem("kvs", JSON.stringify(kvs));
@@ -2062,8 +2264,7 @@
             return 0;
         } else {
             result = result % (24 * 60 * 60);
-            norm = result;
-            localStorage.setItem("norm", norm);
+            setNorm(result);
             if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
                 kvs[currentKvIndex].norm = norm;
                 localStorage.setItem("kvs", JSON.stringify(kvs));
@@ -2397,7 +2598,7 @@
 
     function getCurrentRdsSpeed() {
         for (var i = rds.length - 1; i >= 0; --i) {
-            if (distance >= rds[i].distance) {
+            if (getDistance() >= rds[i].distance) {
                 return rds[i].speed;
             }
         }
@@ -2428,7 +2629,7 @@
         }
         var i = rds.length;
         while (i-- > 0) {
-            if (distance >= rds[i].distance) {
+            if (getDistance() >= rds[i].distance) {
                 break;
             }
         }
@@ -2437,7 +2638,7 @@
         }
         var ri = rds[i];
         var t = getCurrentTime();
-        return t - ri.time - 3600 * (distance - ri.distance) / ri.speed + (ri.type == 'S' ? 0 : ri.lateness) + (t < ri.time ? 24 * 60 * 60 : 0);
+        return t - ri.time - 3600 * (getDistance() - ri.distance) / ri.speed + (ri.type == 'S' ? 0 : ri.lateness) + (t < ri.time ? 24 * 60 * 60 : 0);
     }
 
     function getPddLateness() {
@@ -2446,7 +2647,7 @@
         }
         var i = rds.length;
         while (i-- > 0) {
-            if (distance >= rds[i].distance) {
+            if (getDistance() >= rds[i].distance) {
                 break;
             }
         }
@@ -2455,7 +2656,7 @@
         }
         var ri = rds[i];
         var t = getCurrentTime();
-        return t - ri.time - 3600 * (distance - ri.distance) / ri.vPdd + (ri.type == 'S' ? 0 : ri.vPddLateness) + (t < ri.time ? 24 * 60 * 60 : 0);
+        return t - ri.time - 3600 * (getDistance() - ri.distance) / ri.vPdd + (ri.type == 'S' ? 0 : ri.vPddLateness) + (t < ri.time ? 24 * 60 * 60 : 0);
     }
 
     function getCurrentTime() {
@@ -2516,20 +2717,20 @@
     })
 
     function resetDistance() {
-        distance = 0;
-        intervalStart = 0;
-        intervalDistance = 0;
-        localStorage.setItem('distance', 0);
-        localStorage.setItem('intervalStart', 0);
-        localStorage.setItem('intervalDistance', 0);
+        setDistanceGPS(0);
+        setDistanceBT(0);
+        setIntervalStartGPS(0);
+        setIntervalStartBT(0);
+        setIntervalDistanceGPS(0);
+		setIntervalDistanceBT(0);
         newMove();
     }
 
     function resetInterval() {
-        intervalStart = distance;
-        intervalDistance = 0;
-        localStorage.setItem('intervalStart', intervalStart);
-        localStorage.setItem('intervalDistance', 0);
+        setIntervalStartGPS(distanceGPS);
+		setIntervalStartBT(distanceBT);
+        setIntervalDistanceGPS(0);
+		setIntervalDistanceBT(0);
         newMove();
     }
 
@@ -2550,15 +2751,16 @@
                     }
                     break;
                 case 'Пройдено':
-                    distance = numberValue;
-                    intervalStart = distance;
-                    intervalDistance = 0;
-                    localStorage.setItem("distance", distance);
-                    localStorage.setItem("intervalDistance", intervalDistance);
+                    setDistanceGPS(numberValue);
+                    setDistanceBT(numberValue);
+                    setIntervalStartGPS(numberValue);
+                    setIntervalStartBT(numberValue);
+					setIntervalDistanceGPS(0);
+					setIntervalDistanceBT(0);
                     break;
                 case 'Интервал':
-                    intervalDistance = isIntervalPosition ? numberValue - intervalStart : numberValue;
-                    localStorage.setItem("intervalDistance", intervalDistance);
+                    setIntervalDistanceGPS(isIntervalPosition ? numberValue - intervalStartGPS : numberValue);
+                    setIntervalDistanceBT(isIntervalPosition ? numberValue - intervalStartBT : numberValue);
                     break;
             }
             newMove();
@@ -2730,9 +2932,11 @@
 
     function showModalCorrection() {
         $('#modalCorrection').modal('show');
-        $('#fCorrectionValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fCorrectionValueGPS').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fCorrectionValueBT').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fCorrectionMinMove').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fCorrectionMinMove').val(minMove);
+		$('input[name=fCorrectionDefaultMeter][value=' + defaultMeter + ']').prop('checked', true);
     }
 
     $('#modalCorrection').on('shown.bs.modal', function() {
@@ -2740,47 +2944,58 @@
     })
 
     $('#modalCorrection').on('submit', function (e) {
-        var c = parseFloat($('#fCorrectionValue').val());
+        var cGPS = parseFloat($('#fCorrectionValueGPS').val());
+        var cBT = parseFloat($('#fCorrectionValueBT').val());
         var m = parseFloat($('#fCorrectionMinMove').val());
-        if (!c) {
-            $('#fCorrectionValue').closest('.form-group').removeClass('has-success').addClass('has-error');
+        if (!cGPS) {
+            $('#fCorrectionValueGPS').closest('.form-group').removeClass('has-success').addClass('has-error');
+        }
+        if (!cBT) {
+            $('#fCorrectionValueBT').closest('.form-group').removeClass('has-success').addClass('has-error');
         }
         if (!m) {
             $('#fCorrectionMinMove').closest('.form-group').removeClass('has-success').addClass('has-error');
         }
-        if (c && m) {
+        if (cGPS && cBT && m) {
             $('#modalCorrection').modal('hide');
-            correction = c;
-            localStorage.setItem("correction", correction);
+            correctionGPS = cGPS;
+            correctionBT = cBT;
+            localStorage.setItem("correctionGPS", correctionGPS);
+            localStorage.setItem("correctionBT", correctionBT);
             minMove = m;
             localStorage.setItem("minMove", minMove);
+			defaultMeter = $('input[name=fCorrectionDefaultMeter]:checked').val();
+			localStorage.setItem("defaultMeter", defaultMeter);
         }
         return false;
     });
 
     $('input[name=fCorrectionType][value=I]').on('click', function () {
-        $('#fCorrectionInterval').prop('disabled', true);
-        $('#fCorrectionValue').prop('disabled', true);
+        $('#fCorrectionIntervalGPS').prop('disabled', true);
+        $('#fCorrectionIntervalBT').prop('disabled', true);
+        $('#fCorrectionValueGPS').prop('disabled', true);
+        $('#fCorrectionValueBT').prop('disabled', true);
     });
 
     $('input[name=fCorrectionType][value=V]').on('click', function () {
-        $('#fCorrectionInterval').prop('disabled', false);
-        $('#fCorrectionValue').prop('disabled', false);
-        $('#fCorrectionValue').val(correction);
+        $('#fCorrectionIntervalGPS').prop('disabled', false);
+        $('#fCorrectionIntervalBT').prop('disabled', false);
+        $('#fCorrectionValueGPS').prop('disabled', false);
+        $('#fCorrectionValueBT').prop('disabled', false);
+        $('#fCorrectionValueGPS').val(correctionGPS);
+        $('#fCorrectionValueBT').val(correctionBT);
     });
 
-    $('#fCorrectionInterval').on('change', function() { refreshCorrection(); });
+    $('#fCorrectionIntervalGPS').on('change', function() { refreshCorrection(); });
+    $('#fCorrectionIntervalBT').on('change', function() { refreshCorrection(); });
     $('#fCorrectionDistance').on('change', function() { refreshCorrection(); });
 
-    function refreshCorrection(i) {
-        i = i != null ? i : parseFloat($('#fCorrectionInterval').val());
+    function refreshCorrection(iGPS, iBT) {
+        iGPS = iGPS != null ? iGPS : parseFloat($('#fCorrectionIntervalGPS').val());
+        iBT = iBT != null ? iBT : parseFloat($('#fCorrectionIntervalBT').val());
         var d = parseFloat($('#fCorrectionDistance').val());
-        if (i && d) {
-            var k = correction * d / i;
-            $('#fCorrectionValue').val(k);
-        } else {
-            $('#fCorrectionValue').val(null);
-        }
+		$('#fCorrectionValueGPS').val((iGPS && d) ? correctionGPS * d / iGPS : null);
+		$('#fCorrectionValueBT').val((iBT && d) ? correctionBT * d / iBT : null);
     }
 
     function showModalSpeed() {
@@ -2827,36 +3042,38 @@
         localStorage.setItem("currentSiIndex", currentSiIndex);
         if (index != -1) {
             var si = speedIns[index];
-            var delta = 0;
+            var deltaGPS = 0;
+			var deltaBT = 0;
             if (si.position != null && !isNaN(si.position)) {
-                delta = si.position - distance;
-                distance = si.position;
-                localStorage.setItem("distance", distance);
+                deltaGPS = si.position - distanceGPS;
+				deltaBT = si.position - distanceBT;
+                setDistanceGPS(si.position);
+                setDistanceBT(si.position);
             }
-            intervalStart = distance;
-            intervalDistance = (index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStart : 0;
-            localStorage.setItem('intervalStart', intervalStart);
-            localStorage.setItem('intervalDistance', intervalDistance);
+            setIntervalStartGPS(distanceGPS);
+            setIntervalStartBT(distanceBT);
+            setIntervalDistanceGPS((index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStartGPS : 0);
+            setIntervalDistanceBT((index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStartBT : 0);
             if (si.isFormula()) {
                 currentSpeedInstruction = si;
                 localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
             }
             switch (si.type) {
                 case 'S':
-                    rdsStart(si.vPdd, delta);
+                    rdsStart(si.vPdd, deltaGPS, deltaBT);
                     break;
                 case 'P':
-                    rdsPF(si.vPdd, delta);
+                    rdsPF(si.vPdd, deltaGPS, deltaBT);
                     break;
                 case 'F':
-                    rdsFinish(si.vPdd, delta);
+                    rdsFinish(si.vPdd, deltaGPS, deltaBT);
                     break;
                 default:
-                    rdsSpeedChange(si.vPdd, delta);
+                    rdsSpeedChange(si.vPdd, deltaGPS, deltaBT);
                     break;
             }
         }
-        newMove();
+        //newMove();
         beep();
     }
 
@@ -2978,7 +3195,7 @@
         if (rds.length == 0) {
             return;
         }
-        var message = '<html><body><table><thead><tr><th>Тип</th><th>Дистанция</th><th>Скорость</th><th>Опоздание</th><th>Норма</th><th>Время</th><th>Координаты</th><th>SiIndex</th><th>Дельта</th></tr></thead><tbody>';
+        var message = '<html><body><table><thead><tr><th>Тип</th><th>Дистанция</th><th>Скорость</th><th>Опоздание</th><th>Норма</th><th>Время</th><th>Координаты</th><th>SiIndex</th><th>Дельта GPS</th><th>Дельта BT</th></tr></thead><tbody>';
         for (var i = 0; i < rds.length; ++i) {
             message = message + '<tr>'
                 + '<td>' + rds[i].type + '</td>'
@@ -2989,7 +3206,8 @@
                 + '<td>' + getTimeString(rds[i].time, true) + '</td>'
                 + '<td><a href="https://maps.yandex.ru/?text=' + rds[i].latitude + ', ' + rds[i].longitude + '">' + rds[i].latitude + ' ' + rds[i].longitude + '</a></td>'
                 + '<td>' + rds[i].siIndex + '</td>'
-                + '<td>' + getNumberString(rds[i].delta, 1000) + '</td>'
+                + '<td>' + getNumberString(rds[i].deltaGPS, 1000) + '</td>'
+                + '<td>' + getNumberString(rds[i].deltaBT, 1000) + '</td>'
                 + '</tr>';
         }
         message = message + '</tbody></table></body><html>';
