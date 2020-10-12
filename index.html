@@ -366,7 +366,7 @@
         <div class="col-l-4 col-xs-8 border nopadding rect-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:showModalNumber('Интервал', intervalDistance > 0 ? intervalDistance : '');" oncontextmenu="javascript:resetInterval(); return false;" class="line-height-big">
+                    <a href="javascript:showModalNumber('Интервал', getIntervalDistance() > 0 ? getIntervalDistance() : '');" oncontextmenu="javascript:resetInterval(); return false;" class="line-height-big">
                         <span class="item-label-big" style="color:darkblue" id="labelInterval">Интервал</span>
                         <span class="item-value-big" id="interval">99.999</span>
                         <span class="item-label-big" id="intervalDistance">(--.---)</span>
@@ -3195,20 +3195,24 @@
         if (rds.length == 0) {
             return;
         }
-        var message = '<html><body><table><thead><tr><th>Тип</th><th>Дистанция</th><th>Скорость</th><th>Опоздание</th><th>Норма</th><th>Время</th><th>Координаты</th><th>SiIndex</th><th>Дельта GPS</th><th>Дельта BT</th></tr></thead><tbody>';
+		var n = 0;
+        var message = '<html><body><table><thead><tr><th>Тип</th><th>Дистанция</th><th>Скорость</th><th>Опоздание</th><th>Норма</th><th>Норматив</th><th>Время</th><th>Координаты</th><th>SiIndex</th><th>Дельта GPS</th><th>Дельта BT</th></tr></thead><tbody>';
         for (var i = 0; i < rds.length; ++i) {
+			n += rds[i].norm;
             message = message + '<tr>'
                 + '<td>' + rds[i].type + '</td>'
                 + '<td>' + getNumberString(rds[i].distance, 1000) + '</td>'
                 + '<td>' + getNumberString(rds[i].speed, 100) + '</td>'
                 + '<td>' + getNumberString(rds[i].lateness, 10) + '</td>'
                 + '<td>' + getTimeString(rds[i].norm, true) + '</td>'
+                + '<td>' + getTimeString(n, true) + '</td>'
                 + '<td>' + getTimeString(rds[i].time, true) + '</td>'
                 + '<td><a href="https://maps.yandex.ru/?text=' + rds[i].latitude + ', ' + rds[i].longitude + '">' + rds[i].latitude + ' ' + rds[i].longitude + '</a></td>'
                 + '<td>' + rds[i].siIndex + '</td>'
                 + '<td>' + getNumberString(rds[i].deltaGPS, 1000) + '</td>'
                 + '<td>' + getNumberString(rds[i].deltaBT, 1000) + '</td>'
                 + '</tr>';
+			if (rds[i].type != 'P' && rds[i].type != 'C') n = 0;
         }
         message = message + '</tbody></table></body><html>';
         nw = window.open("");
