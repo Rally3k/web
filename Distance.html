@@ -18,7 +18,7 @@ Version 0.2
   <script>
 	function parseValue (v) {
 		// В Chrome 50+ используется DataView.
-		value = v.buffer ? v : new DataView(v);
+		var value = v.buffer ? v : new DataView(v);
 		let result = {};
 		result.distance = value.getUint32(0, true);
 		result.ap = value.getUint16(4, true);
@@ -95,12 +95,12 @@ Version 0.2
 		//catch(error => log(error));
 	}
 	function handleCharacteristicValueChanged(event) {
-		var value = event.target.value;
+		let value = event.target.value;
 		var d = parseValue(value);
-		data.innerHTML = d.distance;
-		dataAP.innerHTML = parseValue(d.ap);
-		dataAN.innerHTML = parseValue(d.an);
-		dataAO.innerHTML = parseValue(d.ao);
+		data.innerHTML = "D: " + d.distance;
+		dataAP.innerHTML = "A+: " + d.ap * 3.3 / 4095;
+		dataAN.innerHTML = "A-: " + d.an * 3.3 / 4095;
+		dataAO.innerHTML = "Aout: " + d.ao * 3.3 / 4095;
 	}
   </script>
 </body>
