@@ -7,16 +7,23 @@
   <title>Document</title>
 </head>
 <body>
-Version 0.1
   <button id="bluetooth">BT</button>
   <p id="data">0</p>
+  <p id="dataAP">0</p>
+  <p id="dataAN">0</p>
+  <p id="dataAO">0</p>
   <button id="send">Send</button>
-
+  <br>
+Version 0.2
   <script>
-	function parseValue (value) {
+	function parseValue (v) {
 		// В Chrome 50+ используется DataView.
-		value = value.buffer ? value : new DataView(value);
-		let result = value.getUint32(0, true);
+		value = v.buffer ? v : new DataView(v);
+		let result = {};
+		result.distance = value.getUint32(0, true);
+		result.ap = value.getUint16(4, true);
+		result.an = value.getUint16(6, true);
+		result.ao = value.getUint16(8, true);
 
 		return result;
 	}
@@ -27,6 +34,9 @@ Version 0.1
 	window.onload = () => {
       const btButton = document.getElementById('bluetooth');
 	  const data = document.getElementById('data');
+	  const dataAP = document.getElementById('dataAP');
+	  const dataAN = document.getElementById('dataAN');
+	  const dataAO = document.getElementById('dataAO');
 	  const send = document.getElementById('send');
 	  
       btButton.addEventListener('pointerup', function(event) {
@@ -86,10 +96,11 @@ Version 0.1
 	}
 	function handleCharacteristicValueChanged(event) {
 		var value = event.target.value;
-		//value = value.buffer ? value : new DataView(value);
-		//console.log(value.getUint8(0) + " " + value.getUint8(1) + " " + value.getUint8(2) + " " + value.getUint8(3));
-		//console.log(parseValue(value));
-		data.innerHTML = parseValue(value);
+		var d = parseValue(value);
+		data.innerHTML = d.distance;
+		dataAP.innerHTML = parseValue(d.ap);
+		dataAN.innerHTML = parseValue(d.an);
+		dataAO.innerHTML = parseValue(d.ao);
 	}
   </script>
 </body>
