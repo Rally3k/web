@@ -1368,6 +1368,7 @@
         currentPddSpeed = currentPddSpeed ? currentPddSpeed : 60.0;
         currentSpeedInstruction = currentSpeedInstruction == "undefined" || currentSpeedInstruction == "" ? new SpeedInstruction(true) : currentSpeedInstruction;
         speedIns = speedIns.length == 0 ? [new SpeedInstruction(true, 60), new SpeedInstruction(true, null, null, '-', 10.0), new SpeedInstruction(null, 77), new SpeedInstruction(false, null, 66)] : speedIns;
+		currentKvIndex = currentKvIndex ? currentKvIndex : -1;
         // TODO: apply actions if needed
         //localStorage.setItem("speedIns", null);
         refreshRdsTable();
@@ -2145,12 +2146,12 @@
                 for (var i = 0; i < index; ++i) {
                     nextStart = (kvs[i].start != null ? kvs[i].start : nextStart) + kvs[i].norm + (kvs[i].pause != null ? kvs[i].pause : 0);
                 }
-                setStart(nextStart % (24 * 60 * 60));
+                applyStart(nextStart % (24 * 60 * 60));
             } else {
-                setStart(kvs[index].start);
+                applyStart(kvs[index].start);
             }
-            setSector(kvs[index].sector);
-            setNorm(kvs[index].norm);
+            applySector(kvs[index].sector);
+            applyNorm(kvs[index].norm);
         } else if (index != -1) {
             return;
         }
@@ -2205,7 +2206,7 @@
         return -1;
     }
 
-    function setSector(value) {
+    function applySector(value) {
         var numberValue = parseFloat(value);
         if (isNaN(numberValue)) {
             return 0;
@@ -2243,7 +2244,7 @@
         return -1;
     }
 
-    function setStart(value) {
+    function applyStart(value) {
         var result = getTimeValue(value);
         if (result < 0) {
             return 0;
@@ -2258,7 +2259,7 @@
         return -1;
     }
 
-    function setNorm(value) {
+    function applyNorm(value) {
         var result = getTimeValue(value);
         if (result < 0) {
             return 0;
@@ -2383,7 +2384,7 @@
                             result = setPosition($('#enterValue').html());
                             break;
                         case 'Сектор':
-                            result = setSector($('#enterValue').html());
+                            result = applySector($('#enterValue').html());
                             break;
                         case 'Следующая':
                             result = setNextPosition($('#enterValue').html(), $('#enterSubType').text() == 'Позиция');
@@ -2392,10 +2393,10 @@
                             result = setTime($('#enterValue').html());
                             break;
                         case 'Старт':
-                            result = setStart($('#enterValue').html());
+                            result = applyStart($('#enterValue').html());
                             break;
                         case 'Норма':
-                            result = setNorm($('#enterValue').html());
+                            result = applyNorm($('#enterValue').html());
                             break;
                         case 'Новая формула':
                             result = addFromula(
@@ -3342,6 +3343,7 @@
     function getTimeValue(value) {
         var result = -1;
         if (value) {
+			value = value + '';
             var t = value.split(/[\D]/);
             switch (t.length) {
                 case 1: 
