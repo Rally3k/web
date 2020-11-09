@@ -1707,18 +1707,6 @@
         intervalDistanceBT = i;
 		localStorage.setItem("intervalDistanceBT", i);
 	}
-	function setStart(s) {
-		start = s;
-		localStorage.setItem("start", s);
-	}
-	function setNorm(n) {
-		norm = n;
-		localStorage.setItem("norm", n);
-	}
-	function setSector(s) {
-		sector = s;
-		localStorage.setItem("sector", s);
-	}
 	function setCurrentKvIndex(i) {
         currentKvIndex = i;
         localStorage.setItem("currentKvIndex", i);
@@ -2141,22 +2129,22 @@
 
     function applyKv(index) {
         if (index >= 0 && index < kvs.length) {
+			setCurrentKvIndex(index);
             if (kvs[index].start == null) {
                 var nextStart = start;
                 for (var i = 0; i < index; ++i) {
                     nextStart = (kvs[i].start != null ? kvs[i].start : nextStart) + kvs[i].norm + (kvs[i].pause != null ? kvs[i].pause : 0);
                 }
-                applyStart(nextStart % (24 * 60 * 60));
+                setStart(nextStart % (24 * 60 * 60));
             } else {
-                applyStart(kvs[index].start);
+                setStart(kvs[index].start);
             }
-            applySector(kvs[index].sector);
-            applyNorm(kvs[index].norm);
+            setSector(kvs[index].sector);
+            setNorm(kvs[index].norm);
         } else if (index != -1) {
             return;
         }
 
-        setCurrentKvIndex(index);
         newMove();
         beep();
     }
@@ -2192,26 +2180,25 @@
     }
 
     function setPosition(value) {
-        var numberValue = parseFloat(value);
-        if (isNaN(numberValue)) {
+        if (isNaN(value)) {
             return 0;
         } else {
-			setDistanceGPS(numberValue);
-			setDistanceBT(numberValue);
-			setIntervalStartGPS(numberValue);
-			setIntervalStartBT(numberValue);
+			setDistanceGPS(value);
+			setDistanceBT(value);
+			setIntervalStartGPS(value);
+			setIntervalStartBT(value);
 			setIntervalDistanceGPS(0);
 			setIntervalDistanceBT(0);
         }
         return -1;
     }
 
-    function applySector(value) {
-        var numberValue = parseFloat(value);
-        if (isNaN(numberValue)) {
+    function setSector(value) {
+        if (isNaN(value)) {
             return 0;
         } else {
-            setSector(numberValue);
+			sector = value;
+			localStorage.setItem("sector", sector);
             if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
                 kvs[currentKvIndex].sector = sector;
                 localStorage.setItem("kvs", JSON.stringify(kvs));
@@ -2221,36 +2208,33 @@
     }
 
     function setNextPosition(value, isPosition) {
-        var numberValue = parseFloat(value);
-        if (isNaN(numberValue)) {
+        if (isNaN(value)) {
             return 0;
         } else {
-            setIntervalDistanceGPS(isPosition ? numberValue - intervalStartGPS : numberValue);
-            setIntervalDistanceBT(isPosition ? numberValue - intervalStartBT : numberValue);
+            setIntervalDistanceGPS(isPosition ? value - intervalStartGPS : value);
+            setIntervalDistanceBT(isPosition ? value - intervalStartBT : value);
         }
         return -1;
     }
 
     function setTime(value) {
-        var result = getTimeValue(value);
-        if (result < 0) {
+        if (value < 0) {
             return 0;
         } else {
-            result = result % (24 * 60 * 60);
+            value = value % (24 * 60 * 60);
             timeCorrection = 0;
-            timeCorrection = result - getCurrentTime();
+            timeCorrection = value - getCurrentTime();
             localStorage.setItem("timeCorrection", timeCorrection);
         }
         return -1;
     }
 
-    function applyStart(value) {
-        var result = getTimeValue(value);
-        if (result < 0) {
+	function setStart(value) {
+        if (value < 0) {
             return 0;
         } else {
-            result = result % (24 * 60 * 60);
-            setStart(result);
+			start = value;
+			localStorage.setItem("start", start);
             if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
                 kvs[currentKvIndex].start = start;
                 localStorage.setItem("kvs", JSON.stringify(kvs));
@@ -2259,13 +2243,12 @@
         return -1;
     }
 
-    function applyNorm(value) {
-        var result = getTimeValue(value);
-        if (result < 0) {
+    function setNorm(value) {
+        if (value < 0) {
             return 0;
         } else {
-            result = result % (24 * 60 * 60);
-            setNorm(result);
+			norm = value;
+			localStorage.setItem("norm", norm);
             if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
                 kvs[currentKvIndex].norm = norm;
                 localStorage.setItem("kvs", JSON.stringify(kvs));
@@ -2381,22 +2364,22 @@
                     var result = 0;
                     switch ($('#enterType').text()) {
                         case 'Пройдено':
-                            result = setPosition($('#enterValue').html());
+                            result = setPosition(parseFloat($('#enterValue').html()));
                             break;
                         case 'Сектор':
-                            result = applySector($('#enterValue').html());
+                            result = setSector(parseFlot($('#enterValue').html()));
                             break;
                         case 'Следующая':
-                            result = setNextPosition($('#enterValue').html(), $('#enterSubType').text() == 'Позиция');
+                            result = setNextPosition(parseFlot($('#enterValue').html()), $('#enterSubType').text() == 'Позиция');
                             break;
                         case 'Время':
-                            result = setTime($('#enterValue').html());
+                            result = setTime(getTimeValue($('#enterValue').html()));
                             break;
                         case 'Старт':
-                            result = applyStart($('#enterValue').html());
+                            result = setStart(getTimeValue($('#enterValue').html()));
                             break;
                         case 'Норма':
-                            result = applyNorm($('#enterValue').html());
+                            result = setNorm(getTimeValue($('#enterValue').html()));
                             break;
                         case 'Новая формула':
                             result = addFromula(
@@ -2705,7 +2688,7 @@
     $('#fNumberReset').on('click', function (e) {
         switch ($('#modalNumber .modal-title').html()) {
             case 'Сектор':
-                sector = 0;
+                setSector(0);
                 newMove();
                 break;
             case 'Пройдено':
@@ -2744,12 +2727,7 @@
             $('#modalNumber').modal('hide');
             switch ($('#modalNumber .modal-title').html()) {
                 case 'Сектор':
-                    sector = numberValue;
-                    localStorage.setItem("sector", sector);
-                    if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
-                        kvs[currentKvIndex].sector = sector;
-                        localStorage.setItem("kvs", JSON.stringify(kvs));
-                    }
+                    setSector(numberValue);
                     break;
                 case 'Пройдено':
                     setDistanceGPS(numberValue);
@@ -2783,20 +2761,10 @@
     $('#fTimeReset').on('click', function () {
         switch ($('#modalTime .modal-title').html()) {
             case 'Норма':
-                norm = 3600;
-                localStorage.setItem("norm", norm);
-                if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
-                    kvs[currentKvIndex].norm = norm;
-                    localStorage.setItem("kvs", JSON.stringify(kvs));
-                }
+                setNorm(3600);
                 break;
             case 'Старт':
-                start = Math.floor(getCurrentTime() / 60) * 60 + 60; // next minute
-                localStorage.setItem("start", start);
-                if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
-                    kvs[currentKvIndex].start = start;
-                    localStorage.setItem("kvs", JSON.stringify(kvs));
-                }
+                setStart(Math.floor(getCurrentTime() / 60) * 60); // current minute
                 break;
             case 'Время':
                 timeCorrection = 0;
@@ -2818,20 +2786,10 @@
             result = result % (24 * 60 * 60);
             switch ($('#modalTime .modal-title').html()) {
                 case 'Норма':
-                    norm = result;
-                    localStorage.setItem("norm", norm);
-                    if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
-                        kvs[currentKvIndex].norm = norm;
-                        localStorage.setItem("kvs", JSON.stringify(kvs));
-                    }
+					setNorm(result);
                     break;
                 case 'Старт':
-                    start = result;
-                    localStorage.setItem("start", start);
-                    if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
-                        kvs[currentKvIndex].start = start;
-                        localStorage.setItem("kvs", JSON.stringify(kvs));
-                    }
+					setStart(result);
                     break;
                 case 'Время':
                     timeCorrection = 0;
