@@ -98,9 +98,9 @@ Version 0.2
 		let value = event.target.value;
 		var d = parseValue(value);
 		data.innerHTML = "D: " + d.distance;
-		dataAP.innerHTML = "A+: " + Math.round(100 * d.ap * 3.3 / 4095) / 100;
-		dataAN.innerHTML = "A-: " + Math.round(100 * d.an * 3.3 / 4095) / 100;
-		dataAO.innerHTML = "Aout: " + Math.round(100 * d.ao * 3.3 / 4095) / 100;
+		dataAP.innerHTML = "A+: " + Math.round(1000 * d.ap * 3.3 / 4095) / 1000;
+		dataAN.innerHTML = "A-: " + Math.round(1000 * d.an * 3.3 / 4095) / 1000;
+		dataAO.innerHTML = "Aout: " + Math.round(1000 * d.ao * 3.3 / 4095) / 1000;
 	}
   </script>
 </body>
