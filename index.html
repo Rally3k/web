@@ -2337,7 +2337,7 @@
             keyCode = 27;
         }
 		
-		if (keyCode == 8 || keyCode == 27) {
+		if (keyCode == 27) {
 			e.preventDefault();
 		}
 
@@ -2453,6 +2453,7 @@
                     }
                 break;
                 case 8: // backspace
+					e.preventDefault();
                     if (enterType[enterTypeId][enterSubTypeId] == 'Тип'|| enterType[enterTypeId][enterSubTypeId] == 'Операция') {
                         break;
                     }
