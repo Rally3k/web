@@ -2341,6 +2341,7 @@
             switch (keyCode) {
                 case 27:
                     $('.modal').modal('hide');
+					e.preventDefault();
                     break;
                 case 13:
 
@@ -2415,6 +2416,7 @@
                     $('#enterType').text('Ввод');
                     $('#enterValue').html('x');
                     $('#enterSubType').text('-');
+					e.preventDefault();
                 break;
                 case 78: // n previous sub type
                     if (enterType[enterTypeId].length > 1) {
@@ -2449,6 +2451,7 @@
                     }
                 break;
                 case 8: // backspace
+					e.preventDefault();
                     if (enterType[enterTypeId][enterSubTypeId] == 'Тип'|| enterType[enterTypeId][enterSubTypeId] == 'Операция') {
                         break;
                     }
@@ -2546,6 +2549,7 @@
                     plus();
                 break;
                 case 8: // backspace
+					e.preventDefault();
                     if (rds && rds.length) {
                         var r = rds[rds.length - 1];
                         modalConfirm("Удалить последнюю запись РДС?<br>" + r, function() {
