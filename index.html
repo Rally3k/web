@@ -2005,7 +2005,7 @@
         loadData();
 
         document.removeEventListener("keydown", keyDown);
-        document.addEventListener("keydown", keyDown, true);
+        document.addEventListener("keydown", keyDown, false);
 
         //gpsClick();
 		
@@ -2344,6 +2344,7 @@
         if (isModalShown) {
             switch (keyCode) {
                 case 27:
+                case 71: // Samsung browser
                     $('.modal').modal('hide');
                     break;
                 case 13:
@@ -2355,7 +2356,7 @@
 
         $('#enterValue').css('color', '');
         enterValue[enterTypeId][enterSubTypeId] = $('#enterValue').html();
-        if ($('#enterType').text() != 'Ввод' && (keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || keyCode == 73 || (keyCode > 76 && keyCode < 80) || (keyCode > 47 && keyCode < 58))) {
+        if ($('#enterType').text() != 'Ввод' && (keyCode == 71 || keyCode == 84  /*Samsung browser*/ || keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || keyCode == 73 || (keyCode > 76 && keyCode < 80) || (keyCode > 47 && keyCode < 58))) {
             switch (keyCode) {
                 case 13:
                     // replace decimal point
@@ -2416,6 +2417,7 @@
                     newMove();
                     // no break!
                 case 27:
+                case 71: // Samsung browser
                     $('#enterType').text('Ввод');
                     $('#enterValue').html('x');
                     $('#enterSubType').text('-');
@@ -2453,6 +2455,7 @@
                     }
                 break;
                 case 8: // backspace
+                case 84: // Samsung browser
 					e.preventDefault();
                     if (enterType[enterTypeId][enterSubTypeId] == 'Тип'|| enterType[enterTypeId][enterSubTypeId] == 'Операция') {
                         break;
@@ -2544,13 +2547,16 @@
                 //case 69: // e start time
                 //    showModalTime('Старт', start, true);
                 //break;
-                case 84: // t minus
+                /* for Samsung browser
+				case 84: // t minus
                     minus();
                 break;
                 case 71: // g plus
                     plus();
                 break;
+				*/
                 case 8: // backspace
+				case 84: // Samsung browser
                     if (rds && rds.length) {
                         var r = rds[rds.length - 1];
                         modalConfirm("Удалить последнюю запись РДС?<br>" + r, function() {
