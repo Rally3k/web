@@ -87,7 +87,8 @@
         </div>
     </div>
     <div id="map"></div>
-    <p id="json"></p>
+	<button onclick="copyToClipboard()">Copy json</button><br>
+	<textarea readonly id="json" style="width: 100%; max-width: 100%;" rows="40"></textarea>
     <script type="text/javascript">
         var myMap = null;
 
@@ -242,6 +243,18 @@
             }
             return (n ? "-" : "") + s;
         }
+		
+		function copyToClipboard() {
+			/* Get the text field */
+			var copyText = document.getElementById("json");
+
+			/* Select the text field */
+			copyText.select();
+			copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+			/* Copy the text inside the text field */
+			document.execCommand("copy");
+		}
 
     </script>
 </body>
