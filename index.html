@@ -2372,10 +2372,10 @@
                             result = setPosition(parseFloat($('#enterValue').html()));
                             break;
                         case 'Сектор':
-                            result = setSector(parseFlot($('#enterValue').html()));
+                            result = setSector(parseFloat($('#enterValue').html()));
                             break;
                         case 'Следующая':
-                            result = setNextPosition(parseFlot($('#enterValue').html()), $('#enterSubType').text() == 'Позиция');
+                            result = setNextPosition(parseFloat($('#enterValue').html()), $('#enterSubType').text() == 'Позиция');
                             break;
                         case 'Время':
                             result = setTime(getTimeValue($('#enterValue').html()));
