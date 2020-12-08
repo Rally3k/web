@@ -2576,7 +2576,7 @@
     }
 
     $('#modalConfirm').on('shown.bs.modal', function() {
-        setTimeout(function () { $('#modalConfirm .btn-success').focus().select(); }, 100);
+        $('#modalConfirm .btn-success').focus().select();
     })
 
     function modalConfirm(text, callback) {
@@ -2765,7 +2765,7 @@
     }
 
     $('#modalTime').on('shown.bs.modal', function() {
-        $('#timeValue').focus().select();
+		setTimeout(function () { $('#timeValue').focus().select(); }, 100);
         $('#timeValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
     })
 
@@ -2831,7 +2831,7 @@
     }
 
     $('#modalRdsItem').on('shown.bs.modal', function() {
-        $('#fRdsItemDistance').focus().select();
+        setTimeout(function () { $('#fRdsItemDistance').focus().select(); }, 100);
     })
 
     $('#modalRdsItem').on('submit', function (e) {
@@ -2910,7 +2910,7 @@
     }
 
     $('#modalCorrection').on('shown.bs.modal', function() {
-        $('#fCorrectionDistance').focus().select();
+        setTimeout(function () { $('#fCorrectionDistance').focus().select(); }, 100);
     })
 
     $('#modalCorrection').on('submit', function (e) {
@@ -3235,7 +3235,7 @@
     }
 
     $('#modalKv').on('shown.bs.modal', function() {
-        $('#modalKv #fKvSector').focus().select();
+        setTimeout(function () { $('#modalKv #fKvSector').focus().select(); }, 100);
     })
 
     $('#modalKv #fKvDelete').on('click', function (e) {
