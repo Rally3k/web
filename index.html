@@ -1835,7 +1835,7 @@
         }
         return result;
     }
-
+    
     function calculateRdsItem(index) {
         if (index < 0 || index >= rds.length) {
             return;
@@ -1847,8 +1847,8 @@
             rds[0].vPddLateness = 0.0;
         } else {
             // other item
-            rds[index].norm = 3600.0 * (rds[index].distance - rds[index - 1].distance) / rds[index - 1].speed;
-            rds[index].vPddNorm = 3600.0 * (rds[index].distance - rds[index - 1].distance) / rds[index - 1].vPdd;
+            rds[index].norm = 3600.0 * (1000 * rds[index].distance - 1000 * rds[index - 1].distance) / rds[index - 1].speed / 1000;
+            rds[index].vPddNorm = 3600.0 * (1000 * rds[index].distance - 1000 * rds[index - 1].distance) / rds[index - 1].vPdd / 1000;
             if (rds[index].type != 'P' && rds[index].type != 'C') {
                 // do not floor if it is PF or C
                 rds[index].norm = Math.floor(rds[index].norm);
