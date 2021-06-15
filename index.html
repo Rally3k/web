@@ -2930,13 +2930,13 @@
         if (!m) {
             $('#fCorrectionMinMove').closest('.form-group').removeClass('has-success').addClass('has-error');
         }
-        if (cGPS && cBT && m) {
+        if (cBT || (cGPS && m)) {
             $('#modalCorrection').modal('hide');
-            correctionGPS = cGPS;
-            correctionBT = cBT;
+            correctionGPS = cGPS ? cGPS : correctionGPS;
+            correctionBT = cBT ? cBT : correctionBT;
             localStorage.setItem("correctionGPS", correctionGPS);
             localStorage.setItem("correctionBT", correctionBT);
-            minMove = m;
+            minMove = m ? m : minMove;
             localStorage.setItem("minMove", minMove);
 			defaultMeter = $('input[name=fCorrectionDefaultMeter]:checked').val();
 			localStorage.setItem("defaultMeter", defaultMeter);
