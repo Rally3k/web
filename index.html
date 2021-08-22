@@ -2348,7 +2348,7 @@
         if (isModalShown) {
             switch (keyCode) {
                 case 27:
-                case 71: // Samsung browser
+                //case 71: // Samsung browser
                     $('.modal').modal('hide');
                     break;
                 case 13:
@@ -2421,12 +2421,13 @@
                     newMove();
                     // no break!
                 case 27:
-                case 71: // Samsung browser
+                //case 71: // Samsung browser
                     $('#enterType').text('Ввод');
                     $('#enterValue').html('x');
                     $('#enterSubType').text('-');
                 break;
                 case 78: // n previous sub type
+				case 37: // left arrow
                     if (enterType[enterTypeId].length > 1) {
                         enterSubTypeId = (enterSubTypeId <= 1) ? enterType[enterTypeId].length - 1 : enterSubTypeId - 1;
                         $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
@@ -2434,6 +2435,7 @@
                     }
                 break;
                 case 77: // m next sub type
+				case 39: // right arrow
                     if (enterType[enterTypeId].length > 1) {
                         enterSubTypeId = (enterSubTypeId >= enterType[enterTypeId].length - 1) ? 1 : enterSubTypeId + 1;
                         $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
@@ -2441,25 +2443,27 @@
                     }
                 break;
                 case 73: // i next option value
+				case 40: // down arrow
                 case 79: // o previous option value
+				case 38: // up arrow
                     switch ($('#enterSubType').text()) {
                         case 'Тип':
-                            rollEnterOption(rdsItemHtmlTypes, keyCode == 73);
+                            rollEnterOption(rdsItemHtmlTypes, keyCode == 73 || keyCode == 40);
                         break;
                         case 'Vдс':
-                            rollEnterOption(vdsItemTypes, keyCode == 73);
+                            rollEnterOption(vdsItemTypes, keyCode == 73 || keyCode == 40);
                         break;
                         case 'Операция':
-                            rollEnterOption(operationsTypes, keyCode == 73);
+                            rollEnterOption(operationsTypes, keyCode == 73 || keyCode == 40);
                         break;
                         case 'Vпдд':
                         case 'Операнд':
-                            rollEnterOption(pddSpeedTypes, keyCode == 73);
+                            rollEnterOption(pddSpeedTypes, keyCode == 73 || keyCode == 40);
                         break;
                     }
                 break;
                 case 8: // backspace
-                case 84: // Samsung browser
+                //case 84: // Samsung browser
 					e.preventDefault();
                     if (enterType[enterTypeId][enterSubTypeId] == 'Тип'|| enterType[enterTypeId][enterSubTypeId] == 'Операция') {
                         break;
@@ -2551,16 +2555,14 @@
                 //case 69: // e start time
                 //    showModalTime('Старт', start, true);
                 //break;
-                /* for Samsung browser
+                /* comment for Samsung browser */
 				case 84: // t minus
                     minus();
                 break;
                 case 71: // g plus
                     plus();
                 break;
-				*/
-                case 8: // backspace
-				case 84: // Samsung browser
+                case 76: // l remove last rds item
                     if (rds && rds.length) {
                         var r = rds[rds.length - 1];
                         modalConfirm("Удалить последнюю запись РДС?<br>" + r, function() {
