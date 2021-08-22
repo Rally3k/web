@@ -2360,7 +2360,7 @@
 
         $('#enterValue').css('color', '');
         enterValue[enterTypeId][enterSubTypeId] = $('#enterValue').html();
-        if ($('#enterType').text() != 'Ввод' && (keyCode == 71 || keyCode == 84  /*Samsung browser*/ || keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || keyCode == 73 || (keyCode > 76 && keyCode < 80) || (keyCode > 47 && keyCode < 58))) {
+        if ($('#enterType').text() != 'Ввод' && (keyCode == 71 || /*keyCode == 84 Samsung browser*/ || keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || keyCode == 73 || (keyCode > 76 && keyCode < 80) || (keyCode > 47 && keyCode < 58) || (keyCode > 36 && keyCode < 41))) {
             switch (keyCode) {
                 case 13:
                     // replace decimal point
