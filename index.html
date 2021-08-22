@@ -2426,26 +2426,29 @@
                     $('#enterValue').html('x');
                     $('#enterSubType').text('-');
                 break;
-                case 78: // n previous sub type
 				case 37: // left arrow
+					e.preventDefault();
+                case 78: // n previous sub type
                     if (enterType[enterTypeId].length > 1) {
                         enterSubTypeId = (enterSubTypeId <= 1) ? enterType[enterTypeId].length - 1 : enterSubTypeId - 1;
                         $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
                         $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
                     }
                 break;
-                case 77: // m next sub type
 				case 39: // right arrow
+					e.preventDefault();
+                case 77: // m next sub type
                     if (enterType[enterTypeId].length > 1) {
                         enterSubTypeId = (enterSubTypeId >= enterType[enterTypeId].length - 1) ? 1 : enterSubTypeId + 1;
                         $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
                         $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
                     }
                 break;
-                case 73: // i next option value
 				case 40: // down arrow
-                case 79: // o previous option value
 				case 38: // up arrow
+					e.preventDefault();
+                case 73: // i next option value
+                case 79: // o previous option value
                     switch ($('#enterSubType').text()) {
                         case 'Тип':
                             rollEnterOption(rdsItemHtmlTypes, keyCode == 73 || keyCode == 40);
@@ -2519,7 +2522,9 @@
                 case 69: // e change enter type
                     setEnterType();
                 break;
-                case 85: // u clear interval
+                //case 85: // u clear interval
+				case 8: // backspace
+					//e.preventDefault();
                     resetInterval();
                 break;
                 case 75: // k add KV
