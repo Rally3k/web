@@ -1259,8 +1259,9 @@
         , ['Следующая', 'Интервал', 'Позиция']
         , ['Новый сектор', 'Старт', 'Сектор', 'Норма', 'Пауза']
         , ['Новая формула', 'Тип', 'Позиция', 'Vпдд', 'Vдс', 'Операция', 'Операнд']
+		, ['Тарировка']
     ];
-    var enterValue = [[], [], [], [], [], [], [], []];
+    var enterValue = [[], [], [], [], [], [], [], [], []];
     var enterTypeId = 2;
     var enterSubTypeId;
     var rdsItemHtmlTypes = ['<i class="fa fa-play"></i>', '<i class="fa fa-tachometer"></i>', '<i class="fa fa-flag-checkered"></i>', '<i class="fa fa-stop"></i>'];
@@ -2316,6 +2317,20 @@
         return -1;
     }
 
+    function setCorrection(value) {
+        if (isNaN(value)) {
+            return 0;
+        } else {
+            var iGPS = distanceGPS - intervalStartGPS;
+            var iBT = distanceBT - intervalStartBT;
+			correctionGPS =(iGPS && value) ? correctionGPS * value / iGPS : correctionGPS;
+			correctionBT = (iBT && value) ? correctionBT * value / iBT : correctionBT;
+            localStorage.setItem("correctionGPS", correctionGPS);
+            localStorage.setItem("correctionBT", correctionBT);
+        }
+        return -1;
+    }
+
     function setEnterType(value) {
         if (value || $('#enterType').text() == 'Ввод') {
             for (var i = 0; i < enterType.length; ++i) {
@@ -2407,6 +2422,9 @@
                                 (enterValue[enterTypeId][3] == 'x') ? null : enterValue[enterTypeId][3],
                                 (enterValue[enterTypeId][4] == 'x') ? null : enterValue[enterTypeId][4]
                             );
+                            break;
+                        case 'Тарировка':
+                            result = setCorrection(parseFloat($('#enterValue').html()));
                             break;
                     }
                     if (result != -1) {
@@ -2561,11 +2579,11 @@
                 //    showModalTime('Старт', start, true);
                 //break;
                 /* comment for Samsung browser */
-				case 84: // t minus
-                    minus();
+				case 84: // t lamp // minus
+                    noSleep.enable(); // minus();
                 break;
-                case 71: // g plus
-                    plus();
+                case 71: // g globe // plus
+                    gpsClick(); // plus();
                 break;
                 case 76: // l remove last rds item
                     if (rds && rds.length) {
