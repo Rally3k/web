@@ -2327,6 +2327,9 @@
 			correctionBT = (iBT && value) ? correctionBT * value / iBT : correctionBT;
             localStorage.setItem("correctionGPS", correctionGPS);
             localStorage.setItem("correctionBT", correctionBT);
+            if (iGPS) setDistanceGPS(intervalStartGPS + value);
+            if (iBT) setDistanceBT(intervalStartBT + value);
+            resetInterval();
         }
         return -1;
     }
