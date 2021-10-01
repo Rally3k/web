@@ -1260,8 +1260,9 @@
         , ['Новый сектор', 'Старт', 'Сектор', 'Норма', 'Пауза']
         , ['Новая формула', 'Тип', 'Позиция', 'Vпдд', 'Vдс', 'Операция', 'Операнд']
 		, ['Тарировка']
+        , ['Скорость']
     ];
-    var enterValue = [[], [], [], [], [], [], [], [], []];
+    var enterValue = [[], [], [], [], [], [], [], [], [], []];
     var enterTypeId = 2;
     var enterSubTypeId;
     var rdsItemHtmlTypes = ['<i class="fa fa-play"></i>', '<i class="fa fa-tachometer"></i>', '<i class="fa fa-flag-checkered"></i>', '<i class="fa fa-stop"></i>'];
@@ -2334,6 +2335,15 @@
         return -1;
     }
 
+    function setSpeed(value) {
+        if (isNaN(value)) {
+            return 0;
+        } else {
+            rdsSpeedChange(value);
+        }
+        return -1;
+    }
+
     function setEnterType(value) {
         if (value || $('#enterType').text() == 'Ввод') {
             for (var i = 0; i < enterType.length; ++i) {
@@ -2428,6 +2438,9 @@
                             break;
                         case 'Тарировка':
                             result = setCorrection(parseFloat($('#enterValue').html()));
+                            break;
+                        case 'Скорость':
+                            result = setSpeed(parseFloat($('#enterValue').html()));
                             break;
                     }
                     if (result != -1) {
@@ -2539,6 +2552,9 @@
                 break;
                 case 79: // o distance
                     setEnterType(4);
+                break;
+                case 13: // enter
+                    setEnterType(9); // Speed
                 break;
                 case 69: // e change enter type
                     setEnterType();
