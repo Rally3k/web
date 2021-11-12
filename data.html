@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Rally 3k web - data</title>
+
+    <!-- Bootstrap -->
+    <link href="files/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="files/font-awesome/css/font-awesome.min.css">
+</head>
+
+<body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="files/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="files/bootstrap.min.js"></script>
+
+   	<button onclick="copySI()">Copy SI</button><button onclick="saveSI()">Save SI</button><br>
+	<textarea id="speedIns" style="width: 100%; max-width: 100%;" rows="20"></textarea>
+   	<button onclick="copyKVS()">Copy KVS</button><button onclick="saveKVS()">Save KVS</button><br>
+	<textarea id="kvs" style="width: 100%; max-width: 100%;" rows="20"></textarea>
+    <script type="text/javascript">
+        $(document).ready(function () {
+			$("#speedIns").text(localStorage.getItem("speedIns"));
+			$("#kvs").text(localStorage.getItem("kvs"));
+        });
+		
+		function copySI() {
+			var copyText = $("#speedIns");
+			copyText.select();
+			copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+			document.execCommand("copy");
+		}
+		
+		function saveSI() {
+			localStorage.setItem("speedIns", $("#speedIns").val());
+		}
+
+		function copyKVS() {
+			var copyText = $("#kvs");
+			copyText.select();
+			copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+			document.execCommand("copy");
+		}
+
+		function saveKVS() {
+			localStorage.setItem("kvs", $("#kvs").val());
+		}
+    </script>
+</body>
+</html>
