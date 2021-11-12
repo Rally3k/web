@@ -104,6 +104,12 @@
                 }
             }
             $('#selectRds').val('');
+			$("#json").text('');
+			$("#rdsTable > tbody tr").remove();
+			$("#normTable > tbody tr").remove();
+			if (myMap) {
+				myMap.geoObjects.removeAll();
+			}
 		}
 		
         $(document).ready(function () {
