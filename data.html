@@ -30,7 +30,7 @@
         });
 		
 		function copySI() {
-			var copyText = $("#speedIns");
+			var copyText = document.getElementById("speedIns");
 			copyText.select();
 			copyText.setSelectionRange(0, 99999); /*For mobile devices*/
 			document.execCommand("copy");
@@ -41,7 +41,7 @@
 		}
 
 		function copyKVS() {
-			var copyText = $("#kvs");
+			var copyText = document.getElementById("kvs");
 			copyText.select();
 			copyText.setSelectionRange(0, 99999); /*For mobile devices*/
 			document.execCommand("copy");
