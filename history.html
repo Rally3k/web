@@ -42,6 +42,7 @@
         </select>
         <button class="btn btn-warning" onclick="deleteItem(); return false;"><i class="fa fa-trash"></i></button>
         <button class="btn btn-danger" onclick="deleteAll(); return false;"><i class="fa fa-trash"></i></button>
+        <button class="btn btn-info" onclick="load(); return false;"><i class="fa fa-rotate-right"></i></button>
     </form>
     Смены скоростей:
     <div class="content grid container-fluid">
@@ -92,7 +93,19 @@
 	<textarea readonly id="json" style="width: 100%; max-width: 100%;" rows="40"></textarea>
     <script type="text/javascript">
         var myMap = null;
-
+		
+		function load() {
+            $('#selectRds > option').remove();
+            for (var i = 0; i < 999; ++i) {
+                var j = localStorage.getItem("rds" + i);
+                if (j) {
+                    var rds = JSON.parse(j);
+                    $('#selectRds').prepend($('<option>', { value: i, text: "РДС " + i + " (" + getTimeString(rds[0].time, true) + ")"}));
+                }
+            }
+            $('#selectRds').val('');
+		}
+		
         $(document).ready(function () {
             ymaps.ready(initMap);
 
@@ -162,15 +175,7 @@
                 }
             });
 
-            $('#selectRds > option').remove();
-            for (var i = 0; i < 999; ++i) {
-                var j = localStorage.getItem("rds" + i);
-                if (j) {
-                    var rds = JSON.parse(j);
-                    $('#selectRds').prepend($('<option>', { value: i, text: "РДС " + i + " (" + getTimeString(rds[0].time, true) + ")"}));
-                }
-            }
-            $('#selectRds').val('');
+			load();
         });
 
         function deleteItem() {
