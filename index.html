@@ -1339,6 +1339,7 @@
             //isPause = localStorage.getItem("isPause") == "true";
             //isReverse = localStorage.getItem("isReverse") == "true";
             var ris = JSON.parse(localStorage.getItem("rds"));
+			rds = [];
             if (ris) {
                 for (var i = 0; i < ris.length; ++i) {
                     rds.push(new RdsItem(ris[i]));
@@ -1348,6 +1349,7 @@
             currentPddSpeed = parseFloat(localStorage.getItem("currentPddSpeed"));
             currentSpeedInstruction = new SpeedInstruction(JSON.parse(localStorage.getItem("currentSpeedInstruction")));
             var sis = JSON.parse(localStorage.getItem("speedIns"));
+			speedIns = [];
             if (sis) {
                 for (var i = 0; i < sis.length; ++i) {
                     speedIns.push(new SpeedInstruction((sis[i])));
@@ -1358,6 +1360,7 @@
             //lastLongitude = parseFloat(localStorage.getItem("lastLongitude"));
             //isDemo = localStorage.getItem("isDemo") == "true";
             var kvis = JSON.parse(localStorage.getItem("kvs"));
+			kvs = [];
             if (kvis) {
                 for (var i = 0; i < kvis.length; ++i) {
                     kvs.push(new Kv(kvis[i]));
