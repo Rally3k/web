@@ -18,16 +18,21 @@
     <script src="files/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="files/bootstrap.min.js"></script>
-
+	
+	<button class="btn btn-info" onclick="load(); return false;"><i class="fa fa-rotate-right"></i></button><br>
    	<button onclick="copySI()">Copy SI</button><button onclick="saveSI()">Save SI</button><br>
 	<textarea id="speedIns" style="width: 100%; max-width: 100%;" rows="20"></textarea>
    	<button onclick="copyKVS()">Copy KVS</button><button onclick="saveKVS()">Save KVS</button><br>
 	<textarea id="kvs" style="width: 100%; max-width: 100%;" rows="20"></textarea>
     <script type="text/javascript">
         $(document).ready(function () {
+			load();
+        });
+		
+		function load() {
 			$("#speedIns").text(localStorage.getItem("speedIns"));
 			$("#kvs").text(localStorage.getItem("kvs"));
-        });
+		}
 		
 		function copySI() {
 			var copyText = document.getElementById("speedIns");
