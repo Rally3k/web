@@ -104,7 +104,7 @@
                 }
             }
             $('#selectRds').val('');
-			$("#json").text('');
+			$("#json").val('');
 			$("#rdsTable > tbody tr").remove();
 			$("#normTable > tbody tr").remove();
 			if (myMap) {
@@ -118,7 +118,7 @@
             $('#selectRds').change(function() {
                 var j = localStorage.getItem("rds" + $('#selectRds').val());
                 var rds = JSON.parse(j);
-                $("#json").text(j);
+                $("#json").val(j);
                 $("#rdsTable > tbody tr").remove();
                 $("#normTable > tbody tr").remove();
                 if (myMap) {
