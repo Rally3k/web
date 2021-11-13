@@ -1286,7 +1286,8 @@
 	  document.getElementById("viewport").setAttribute("content", "width=" + window.innerWidth + ", height=" + window.innerHeight + ", initial-scale=1.0, maximum-scale=1.0, user-scalable=0");
 	})
 	function windowSizeChanged() {
-		alert("width=" + window.innerWidth + ", height=" + window.innerHeight);
+		$("#alDanger").text("width=" + window.innerWidth + ", height=" + window.innerHeight);
+        $("#alDanger").show();
 		document.getElementById("viewport").setAttribute("content", "width=" + window.innerWidth + ", height=" + window.innerHeight + ", initial-scale=1.0, maximum-scale=1.0, user-scalable=0");
 	}
 
