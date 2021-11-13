@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
 
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Rally 3k web</title>
 
@@ -13,39 +12,139 @@
     <link href="files/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="files/font-awesome/css/font-awesome.min.css">
 
+    <script src="https://api-maps.yandex.ru/2.1/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
     <style>
-
-        .square {
-            float:left;
-            position: relative;
-            margin:0;
-            overflow:hidden;
+        .border {
+            border: 0px dotted #C0C0C0;
         }
 
-        .square:before{
-            content: "";
+        .road-sign {
             display: block;
-            padding-top: 50%;
+            width: 100%;
+            height: 100%;
+            border: 0.5rem solid #C0C0C0;
+            border-radius: 50%;
+            text-decoration: none;
         }
 
-        .content {
-            position:absolute;
-            height:100%; /* = 100% - 2*10% padding */
-            width:100%; /* = 100% - 2*5% padding */
-            padding:0;
-        }
-        .table{
-            display:table;
-            height:100%;
-            width:100%;
-        }
-        .table-cell{
-            display:table-cell;
-            vertical-align:middle;
-            height:100%;
-            width:100%;
+        .speed-limit {
+            color: #FFFFFF;
+            font-family: Trebuchet MS;
+            font-size: 2rem;
+            font-weight: bold;
         }
 
+        .item-label {
+            margin: 0;
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 1.3rem;
+            font-weight: bold;
+            display: block;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .item-value {
+            margin: 0;
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .line-height-small {
+            line-height: 1.9rem;
+        }
+
+        .item-label-big {
+            margin: 0;
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 2.6rem;
+            font-weight: bold;
+            display: block;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .item-value-big {
+            margin: 0;
+            color: #000000;
+            font-family: Trebuchet MS;
+            font-size: 5rem;
+            font-weight: bold;
+            display: block;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .line-height-big {
+            line-height: 3.8rem;
+        }
+
+        .icon {
+            color: #000000;
+            font-size: 4rem;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .icon-small {
+            color: #000000;
+            font-size: 2rem;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .icon-big {
+            color: #000000;
+            opacity: .5;
+            font-size: 11rem;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .rdsIcon {
+            color: #000000;
+            font-size: 2rem;
+        }
+
+        .nopadding {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
 
         .square-box{
             position: relative;
@@ -63,17 +162,26 @@
             bottom: 0;
             right: 0;
         }
-        .square-content div {
+        .no-split {
             display: table;
             width: 100%;
             height: 100%;
         }
+
+        .split-vertical {
+            margin: 0;
+            display: table;
+            width: 100%;
+            height: 50%;
+        }
+
         .square-content a {
             display: table-cell;
             text-align: center;
             vertical-align: middle;
             text-decoration: none;
         }
+
         .rect-box{
             position: relative;
             overflow: hidden;
@@ -83,6 +191,82 @@
             content: "";
             display: block;
             padding-top: 50%;
+        }
+
+        .rds-item-header {
+            font-size: 1rem;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .rds-item-data {
+            font-size: 2rem;
+            text-shadow:
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+
+        .si-item {
+            font-size: 2rem;
+            color: black;
+            padding-right: 0px;
+        }
+
+        .kv-item {
+            font-size: 1.5rem;
+        }
+
+        .visible-l {
+            display: none !important;
+        }
+
+		.modal {
+			opacity: 0.8;
+		}
+		
+        .modal-body {
+            max-height: calc(100vh - 212px);
+            overflow-y: auto;
+        }
+
+        input[type="text"] {
+            font-size:2.5rem;
+            height:5rem;
+        }
+        
+        input[type="number"] {
+            font-size:2.5rem;
+            height:5rem;
+        }
+
+        .actions {
+            height: 100%; /* 100% Full-height */
+            width: 100%;
+            display: none;
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Stay on top */
+            top: 0;
+            left: 0;
+            padding-left: 15px;
+            padding-right: 15px;
+            background-color: #111; /* Black*/
+            overflow-x: hidden; /* Disable horizontal scroll */
+            opacity: 0.7;
+        }
+
+        #map{
+            height:100%;
+            width: 100%;
+            position: fixed; top: 0; left: 0;
+        }
+
+        .content{
+            position: relative;
         }
 
         @media only screen and (min-aspect-ratio: 7/8) {
@@ -111,6 +295,11 @@
             .col-l-push-4 {left: 33.33%;}
             .col-l-push-5 {left: 41.66%;}
             .col-l-push-6 {left: 50%;}
+            .col-l-push-7 {left: 58.33%;}
+            .col-l-push-8 {left: 66.66%;}
+            .col-l-push-9 {left: 75%;}
+            .col-l-push-10 {left: 83.33%;}
+            .col-l-push-11 {left: 91.66%;}
 
             th.visible-l,
             td.visible-l {
@@ -127,134 +316,3135 @@
     <script src="files/bootstrap.min.js"></script>
     <script type="text/ecmascript" src="files/NoSleep.min.js"></script>
 
+<div id="map"></div>
+<div class="content alert alert-warning alert-dismissable fade in" id="alertSpeed" onclick="$(this).hide();" style="display: none">Скорость должна быть положительной!</div>
+<div class="content alert alert-warning alert-dismissable fade in" id="alertNumber" onclick="$(this).hide();" style="display: none">Введено не число!</div>
+<div class="content alert alert-danger alert-dismissable fade in" id="alDanger" onclick="$(this).hide();" style="display: none"></div>
 <div class="content grid container-fluid">
     <div class="row">
-        <div class="col-l-2 col-xs-4 square">
-            <div class="content">
-                <div class="table">
-                    <div class="table-cell">
-                        ... CONTENT HERE ...
-                    </div>
+        <div class="col-l-2 col-xs-4 border nopadding square-box">
+            <div class="square-content">
+                <i class="fa icon-small fa-globe" style="position: fixed; top: 0; left: 0;"></i>
+            </div>
+            <div class="square-content">
+                <i class="fa icon-small fa-bluetooth" style="position: fixed; top: 0; right: 0;"></i>
+            </div>
+            <div class="square-content">
+                <div class="split-vertical">
+                    <a href="javascript:showModalTime('Время', getCurrentTime(), true);" class="line-height-small">
+                        <span class="item-label" style="color:darkblue">Время</span>
+                        <span class="item-value" id="time">23:55:55</span>
+                        <span class="item-label" id="sectorTime">00:00:00</span>
+                    </a>
+                </div>
+                <div class="split-vertical">
+                    <a href="javascript:showModalTime('Старт', start, true);" class="line-height-small">
+                        <span class="item-label" style="color:darkblue">Старт</span>
+                        <span class="item-value" id="start">10:00:00</span>
+                        <span class="item-label" id="finish">11:00:00</span>
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="col-l-2 col-xs-4 square">
-            <div class="content">
-                <div class="table">
-                    <div class="table-cell">
-                        ... CONTENT HERE ...
-                    </div>
+        <div class="col-l-4 col-xs-8 border nopadding rect-box">
+            <div class="square-content" style="display: none" id="movePause">
+                <div class="no-split">
+                    <a class="fa icon-big fa-pause"></a>
+                </div>
+            </div>
+            <div class="square-content" style="display: none" id="moveReverse">
+                <div class="no-split">
+                    <a class="fa icon-big fa-retweet"></a>
+                </div>
+            </div>
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:showModalNumber('Пройдено', getNumberString(getDistance(), 1000));" oncontextmenu="javascript:resetDistance(); return false;" class="line-height-big">
+                        <span class="item-label-big" style="color:darkblue" id="labelDistance">Пройдено</span>
+                        <span class="item-value-big" id="distance">999.999</span>
+                        <span class="item-label-big" id="nextPosition">000.000</span>
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="col-l-2 col-xs-4 square">
-            <div class="content">
-                <div class="table">
-                    <div class="table-cell">
-                        ... CONTENT HERE ...
-                    </div>
+        <div class="col-l-4 col-xs-8 border nopadding rect-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:showModalNumber('Интервал', getIntervalDistance() > 0 ? getIntervalDistance() : '');" oncontextmenu="javascript:resetInterval(); return false;" class="line-height-big">
+                        <span class="item-label-big" style="color:darkblue" id="labelInterval">Интервал</span>
+                        <span class="item-value-big" id="interval">99.999</span>
+                        <span class="item-label-big" id="intervalDistance">(--.---)</span>
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="col-l-2 col-xs-4 square">
-            <div class="content">
-                <div class="table">
-                    <div class="table-cell">
-                        ... CONTENT HERE ...
-                    </div>
+        <div class="col-l-2 col-xs-4 border nopadding square-box">
+            <div class="square-content">
+                <div class="split-vertical">
+                    <a href="javascript:showModalKvList();" class="line-height-small">
+                        <span class="item-label" style="color:darkblue">Льгота</span>
+                        <span class="item-value" id="benefit">00:05</span>
+                        <span class="item-label" id="key">-</span>
+                    </a>
                 </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 square">
-            <div class="content">
-                <div class="table">
-                    <div class="table-cell">
-                        ... CONTENT HERE ...
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 square">
-            <div class="content">
-                <div class="table">
-                    <div class="table-cell">
-                        ... CONTENT HERE ...
-                    </div>
+                <div class="split-vertical">
+                    <a href="javascript:showModalSpeed();" class="line-height-small">
+                        <span class="item-label" style="color:darkblue">Скорость</span>
+                        <span class="item-value" id="speed">V - 5</span>
+                        <span class="item-label" id="vpdd">60</span>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="row">
-        <div class="col-l-2 col-xs-4 nopadding rect-box">
+        <div class="col-l-4 col-xs-8 border col-l-push-2 nopadding rect-box">
             <div class="square-content">
-                <div>
-                    <a href="#" onclick="gpsClick();">
-                        <i class="fa fa-globe icon"></i>
-                    </a>
-                    <a href="javascript:pause();">
-                        <i class="fa icon fa-pause"></i>
+                <div class="no-split">
+                    <a href="javascript:viewRds();" class="line-height-big">
+                        <span class="item-label-big" style="color:darkblue">Опоздание</span>
+                        <span class="item-value-big" id="lateness">-10:00</span>
+                        <span class="item-label-big" id="latenessPdd">10:00</span>
                     </a>
                 </div>
             </div>
         </div>
-        <div class="col-l-2 col-xs-4 border nopadding rect-box">
+        <div class="col-l-2 col-xs-4 border col-l-push-6 nopadding square-box">
             <div class="square-content">
-                <div>
-                    <a href="javascript:showModalTime('Время', getCurrentTime(), true);">
-                        <span class="item-label">Время</snap><br>
-                        <span class="item-value" id="time">23:55:55</span><br>
-                        <span class="item-label" id="sectorTime">00:00:00</snap>
+                <div class="split-vertical">
+                    <a href="#" onclick="showActions();">
+                        <i class="fa fa-keyboard-o icon"></i>
+                    </a>
+                </div>
+                <div class="split-vertical">
+                    <a href="javascript:;" class="line-height-small">
+                        <span class="item-label" id="enterType" style="color:darkblue">Ввод</span>
+                        <span class="item-value" id="enterValue">x</span>
+                        <span class="item-label" id="enterSubType">-</span>
                     </a>
                 </div>
             </div>
         </div>
-        <div class="col-l-2 col-xs-4 col-l-push-6 border nopadding rect-box">
+        <div class="col-l-2 col-xs-4 border col-l-pull-6 nopadding square-box">
             <div class="square-content">
-                <div>
-                    <a href="javascript:reverse();">
-                        <i class="fa fa-retweet icon"></i>
+                <div class="split-vertical">
+                    <a href="javascript:showModalNumber('Сектор', sector);" class="line-height-small">
+                        <span class="item-label" style="color:darkblue">Сектор</span>
+                        <span class="item-label" id="sector">000.000</span>
+                        <span class="item-value" id="sectorRest">999.999</span>
                     </a>
-                    <a href="javascript:showModalCorrection();">
-                        <i class="fa icon fa-car"></i>
+                </div>
+                <div class="split-vertical">
+                    <a href="javascript:showModalTime('Норма', norm, false);" class="line-height-small">
+                        <span class="item-label" style="color:darkblue">Норма</span>
+                        <span class="item-label" id="norm">00:00</span>
+                        <span class="item-value" id="normRest">04:55</span>
                     </a>
                 </div>
             </div>
         </div>
-        <div class="col-l-2 col-xs-4 col-l-pull-2 border nopadding rect-box">
+        <div class="col-l-4 col-xs-8 border col-l-pull-2 nopadding rect-box">
             <div class="square-content">
-                <div>
-                    <a href="javascript:showModalNumber('Сектор', sector);">
-                        <span class="item-label">Сектор</snap><br>
-                        <span class="item-value" id="sector">999.999</span><br>
-                        <span class="item-label" id="sectorRest">000.000</snap>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 col-l-pull-2 border nopadding rect-box">
-            <div class="square-content">
-                <div>
-                    <a href="javascript:showModalTime('Норма', norm, false);">
-                        <span class="item-label">Норма</snap><br>
-                        <span class="item-value" id="norm">04:55</span><br>
-                        <span class="item-label" id="normRest">00:00</snap>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-l-2 col-xs-4 col-l-pull-2 border nopadding rect-box">
-            <div class="square-content">
-                <div>
-                    <a href="javascript:showModalTime('Старт', start, true);">
-                        <span class="item-label">Старт</snap><br>
-                        <span class="item-value" id="start">10:00:00</span><br>
-                        <span class="item-label" id="finish">11:00:00</snap>
+                <div class="no-split">
+                    <a href="javascript:demo();" class="line-height-big">
+                        <span class="item-label-big" style="color:darkblue">Ср. скорость</span>
+                        <span class="item-value-big" id="avgSpeed">90.0</span>
+                        <span class="item-label-big" id="actualSpeed">0</span>
                     </a>
                 </div>
             </div>
         </div>
     </div>
+    <div id="actions" class="actions">
+        <div class="row">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();gpsClick();">
+                            <i class="fa icon fa-globe"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();bluetoothClick();">
+                            <i class="fa icon fa-bluetooth"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:map();">
+                            <i class="fa icon fa-map"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:mapType();">
+                            <i class="fa icon fa-rocket"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:mapTrack();">
+                            <i class="fa icon fa-plane"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 col-l-push-6 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();">
+                            <i class="fa fa-times icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="speedButtons">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(10);" class="road-sign">
+                            <span class="speed-limit">10</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(20);" class="road-sign">
+                            <span class="speed-limit">20</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(30);" class="road-sign">
+                            <span class="speed-limit">30</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(40);" class="road-sign">
+                            <span class="speed-limit">40</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(50);" class="road-sign">
+                            <span class="speed-limit">50</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(60);" class="road-sign">
+                            <span class="speed-limit">60</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(70);" class="road-sign">
+                            <span class="speed-limit">70</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(80);" class="road-sign">
+                            <span class="speed-limit">80</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(90);" class="road-sign">
+                            <span class="speed-limit">90</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(100);" class="road-sign">
+                            <span class="speed-limit">100</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(110);" class="road-sign">
+                            <span class="speed-limit">110</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsSpeedChange(130);" class="road-sign">
+                            <span class="speed-limit">130</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="actionButtons">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();pause();">
+                            <i class="fa icon fa-pause"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();reverse();">
+                            <i class="fa fa-retweet icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();startKv(currentKvIndex - 1);">
+                            <i class="fa fa-chevron-left icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();startKv(currentKvIndex + 1);">
+                            <i class="fa icon fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:plus();">
+                            <i class="fa icon fa-search-plus"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:minus();">
+                            <i class="fa icon fa-search-minus"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsStart();">
+                            <i class="fa fa-play icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsPF();">
+                            <i class="fa icon fa-flag-checkered"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();rdsFinish();">
+                            <i class="fa fa-stop icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();applySpeedInstruction(currentSiIndex - 1);">
+                            <i class="fa fa-chevron-up icon"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();applySpeedInstruction(currentSiIndex + 1);">
+                            <i class="fa icon fa-chevron-down"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();resetInterval();">
+                            <i class="fa icon fa-recycle"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();showModalCorrection();">
+                            <i class="fa icon fa-car"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();noSleep.enable();">
+                            <i class="fa icon fa-lightbulb-o"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:plusFont();">
+                            <i class="fa icon fa-font"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:minusFont();">
+                            <i class="fa icon-small fa-font"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();loadData();">
+                            <i class="fa icon fa-rotate-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="rdsTable" class="content table">
+    <thead>
+        <tr class="rds-item-header">
+            <th>Тип</th>
+            <th>Дистанция</th>
+            <th>Скорость</th>
+            <th>Опоздание</th>
+            <th class="visible-l">Норма</th>
+            <th class="visible-l">Время</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<!-- Modal Number -->
+<div class="modal" id="modalNumber" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Число</h4>
+            </div>
+            <form class="form-horizontal" id="formNumber">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <input type="number" step="any" class="form-control big-input" id="numberValue">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success" onclick="isIntervalPosition=false;"><i class="fa fa-check-circle"></i></button>
+                        <button type="submit" id="fNumberPosition" class="btn btn-info" onclick="isIntervalPosition=true;"><i class="fa fa-map-marker"></i></button>
+                        <button type="button" id="fNumberReset" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-circle-o"></i></button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Time -->
+<div class="modal" id="modalTime" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Время</h4>
+            </div>
+            <form class="form-horizontal" id="formTime">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <input type="text" class="form-control big-input" id="timeValue">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-4"><i class="fa fa-check-circle"></i></button>
+                        <button type="button" id="fTimeReset" class="btn btn-warning col-xs-4" data-dismiss="modal"><i class="fa fa-clock-o"></i></button>
+                        <button type="button" class="btn btn-default col-xs-4" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal RDS item -->
+<div class="modal" id="modalRdsItem" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">РДС строка</h4>
+            </div>
+            <form class="form-horizontal" id="formRdsItem">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemType">Тип</label>
+                        <div class="col-sm-10">
+                            <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-default" id="testLabel">
+                                    <input type="radio" name="fRdsItemType" value="S"><i class="fa fa-play"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fRdsItemType" value="C"><i class="fa fa-tachometer"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fRdsItemType" value="P"><i class="fa fa-flag-checkered"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fRdsItemType" value="F"><i class="fa fa-stop"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemDistance">Дистанция</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control big-input" id="fRdsItemDistance" step="any" placeholder="Дистанция">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemSpeed">Скорость</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control big-input" id="fRdsItemSpeed" step="any" placeholder="Скорость">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemTime">Время</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="fRdsItemTime" placeholder="Время отметки">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-4"><i class="fa fa-check-circle"></i></button>
+                        <button type="button" class="btn btn-danger col-xs-4" data-dismiss="modal" id="fRdsItemDelete"><i class="fa fa-trash"></i></button>
+                        <button type="button" class="btn btn-default  col-xs-4" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal correction -->
+<div class="modal" id="modalCorrection" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Тарировка</h4>
+            </div>
+            <form class="form-horizontal" id="formCorrection">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionDefaultMeter">По умолчанию</label>
+                        <div class="col-sm-8">
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionDefaultMeter" value="GPS" checked>GPS
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionDefaultMeter" value="BT">Bluetooth (BT)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionType">С колёс</label>
+                        <div class="col-sm-8">
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionType" value="I" checked>Интервал
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionType" value="V">Значение
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionIntervalGPS">Пройдено GPS/BT</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="fCorrectionIntervalGPS" step="any" disabled placeholder="GPS">
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="fCorrectionIntervalBT" step="any" disabled placeholder="Bluetooth">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionDistance">Дистанция</label>
+                        <div class="col-sm-8">
+                            <input type="number" class="form-control" id="fCorrectionDistance" step="any" placeholder="Дистанция">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionValueGPS">Коэфф. GPS/BT</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="fCorrectionValueGPS" step="any" disabled placeholder="GPS">
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="fCorrectionValueBT" step="any" disabled placeholder="Bluetooth">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionMinMove">Погрешность GPS</label>
+                        <div class="col-sm-8">
+                            <input type="number" class="form-control" id="fCorrectionMinMove" step="any" placeholder="В километрах">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal speed formula -->
+<div class="modal" id="modalSpeed" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Формула скорости</h4>
+            </div>
+            <form class="form-horizontal" id="formFormula">
+                <div class="modal-body">
+                        <ul class="list-group">
+                            <a href="#" class="list-group-item">First item</a>
+                        </ul>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="button" class="btn btn-info col-xs-6" id="btnAdd"><i class="fa fa-plus-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal add speed formula -->
+<div class="modal" id="modalAddFormula" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Добавить формулу</h4>
+            </div>
+            <form class="form-horizontal" id="formAddFormula">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label col-xs-3" for="fFormulaItemType">Тип</label>
+                        <div class="col-xs-9">
+                            <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fFormulaItemType" value="S"><i class="fa fa-play"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fFormulaItemType" value="C"><i class="fa fa-tachometer"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fFormulaItemType" value="P"><i class="fa fa-flag-checkered"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fFormulaItemType" value="F"><i class="fa fa-stop"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Позиция
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="number" class="form-control" id="fPosition" step="any" placeholder="Позиция">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Vпдд
+                        </label>
+                        <div class="col-xs-3">
+                            <input type="number" class="form-control" id="fVpdd" step="any" placeholder="Vпдд">
+                        </div>
+                        <div class="col-xs-3">
+                            <label>
+                                <input type="checkbox" id="chbUseVpdd" checked>Vдс
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Vдс
+                        </label>
+                        <div class="col-xs-3">
+                            <input type="number" class="form-control" id="fVds" step="any" style="display:none;" placeholder="Vдс">
+                            <label id="lVpdd">Vпдд</label>
+                        </div>
+                        <div class="col-xs-3">
+                            <select class="form-control" id="fSign">
+                                <option></option>
+                                <option>-</option>
+                                <option>*</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-3">
+                            <input type="number" class="form-control" id="fOperand" step="any" value="0" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-4" onclick="isApply=false;"><i class="fa fa-check-circle"></i></button>
+                        <button type="submit" class="btn btn-warning col-xs-4" onclick="isApply=true;"><i class="fa fa-play-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-4" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal KV list -->
+<div class="modal" id="modalKvList" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Список КВ</h4>
+            </div>
+            <form class="form-horizontal" id="formKvList">
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Старт</th>
+                                <th>Сектор</th>
+                                <th>Норма</th>
+                                <th>Пауза</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="button" class="btn btn-info col-xs-6" id="btnAddKv"><i class="fa fa-plus-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal KV -->
+<div class="modal" id="modalKv" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">КВ</h4>
+            </div>
+            <form class="form-horizontal" id="formKv">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="fKvStart">Старт</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="fKvStart" placeholder="Старт">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="fKvSector">Сектор</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="fKvSector" step="any" placeholder="Сектор">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="fKvNorm">Норма</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="fKvNorm" placeholder="Норма">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="fKvPause">Пауза</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="fKvPause" placeholder="Пауза">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-3" onclick="isKvStart = false;"><i class="fa fa-check-circle"></i></button>
+                        <button type="submit" class="btn btn-warning col-xs-3" onclick="isKvStart = true;"><i class="fa fa-play-circle"></i></button>
+                        <button type="button" class="btn btn-danger col-xs-3" data-dismiss="modal" id="fKvDelete"><i class="fa fa-trash"></i></button>
+                        <button type="button" class="btn btn-default col-xs-3" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Confirm -->
+<div class="modal" id="modalConfirm" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Подтвердите действие</h4>
+            </div>
+            <div class="modal-body">
+                <span class="item-value" id="confirmationMessage">Подтверждаете действие?</span>
+            </div>
+            <form class="form-horizontal">
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-lg col-xs-12">
+                        <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var sector;
+    var norm;
+    var start;
+    var distanceGPS;
+    var distanceBT;
+    var correctionGPS;
+    var correctionBT;
+    var intervalStartGPS;
+    var intervalStartBT;
+    var intervalDistanceGPS;
+    var intervalDistanceBT;
+    var timeCorrection;
+    var isPause = false;
+    var isReverse = false;
+    var rds = [];
+    var displayRdsItems;
+    var currentPddSpeed;
+    var currentSpeedInstruction;
+    var editRdsItemIndex = 0;
+    var speedIns = [];
+    var addSiIndex = -1;
+    var currentSiIndex = -1;
+    var noSleep = new NoSleep();
+    var lastLatitude;
+    var lastLongitude;
+    var lastTimeGPS;
+    var lastTimeBT;
+    var gpsOptions = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+    };
+
+    var gpsWatch;
+    var wasUpdateGPS = false;
+	var wasUpdateBT = false;
+	var speedGPS = 0;
+	var speedBT = 0;
+    var isDemo = false;
+	var defaultMeter = 'GPS';
+	var isBT = false;
+	var distanceMeter = null;
+	var distanceMeterTx = null;
+    var isIntervalPosition = false;
+    var kvs = [];
+    var currentKvIndex = -1;
+    var editKvIndex = -1;
+    var isKvStart = false;
+    var isModalShown = false;
+    var myMap = null;
+    var myPolyline = null;
+    var myPosition = null;
+    var isApply = false;
+    var fontSize = null;
+    var minMove = 0;
+
+    var decimalPoint = 1.1 + '';
+    decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
+
+    var enterType = [
+          ['Время']
+        , ['Старт']
+        , ['Сектор']
+        , ['Норма']
+        , ['Пройдено']
+        , ['Следующая', 'Интервал', 'Позиция']
+        , ['Новый сектор', 'Старт', 'Сектор', 'Норма', 'Пауза']
+        , ['Новая формула', 'Тип', 'Позиция', 'Vпдд', 'Vдс', 'Операция', 'Операнд']
+		, ['Тарировка']
+        , ['Скорость']
+    ];
+    var enterValue = [[], [], [], [], [], [], [], [], [], []];
+    var enterTypeId = 2;
+    var enterSubTypeId;
+    var rdsItemHtmlTypes = ['<i class="fa fa-play"></i>', '<i class="fa fa-tachometer"></i>', '<i class="fa fa-flag-checkered"></i>', '<i class="fa fa-stop"></i>'];
+    var rdsItemCodes = ['S', 'C', 'P', 'F'];
+    var vdsItemTypes = ['x', 'Vпдд', '5', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '130'];
+    var pddSpeedTypes = ['x', '5', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '130']
+    var operationsTypes = ['нет', '-', '*'];
+    
+    function httpGetAsync(theUrl, callback) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() { 
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                callback(xmlHttp.responseText);
+        }
+        xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+        xmlHttp.send(null);
+    }
+
+    function plus() {
+        if (myMap != null) {
+            myMap.setZoom(myMap.getZoom() + 1);
+        }
+    }
+    function minus() {
+        if (myMap != null) {
+            myMap.setZoom(myMap.getZoom() - 1);
+        }
+    }
+
+    function plusFont() {
+        var html = document.documentElement;
+        html.style.fontSize = ++fontSize + 'px';
+        localStorage.setItem("fontSize", fontSize);
+    }
+
+    function minusFont() {
+        var html = document.documentElement;
+        html.style.fontSize = --fontSize + 'px';
+        localStorage.setItem("fontSize", fontSize);
+    }
+
+    function loadData() {
+        if (typeof(Storage) !== "undefined") {
+            fontSize = parseInt(localStorage.getItem("fontSize"));
+            if (isNaN(fontSize)) {
+                fontSize = 12;//parseInt(getComputedStyle(document.documentElement.html, '').fontSize);
+            } else {
+                var html = document.documentElement;
+                html.style.fontSize = fontSize + 'px';
+            }
+            sector = parseFloat(localStorage.getItem("sector"));
+            norm = parseFloat(localStorage.getItem("norm"));
+            start = parseFloat(localStorage.getItem("start"));
+            distanceGPS = parseFloat(localStorage.getItem("distanceGPS"));
+            distanceBT = parseFloat(localStorage.getItem("distanceBT"));
+            correctionGPS = parseFloat(localStorage.getItem("correctionGPS"));
+            correctionBT = parseFloat(localStorage.getItem("correctionBT"));
+            minMove = parseFloat(localStorage.getItem("minMove"));
+            intervalStartGPS = parseFloat(localStorage.getItem("intervalStartGPS"));
+            intervalStartBT = parseFloat(localStorage.getItem("intervalStartBT"));
+            intervalDistanceGPS = parseFloat(localStorage.getItem("intervalDistanceGPS"));
+            intervalDistanceBT = parseFloat(localStorage.getItem("intervalDistanceBT"));
+            timeCorrection = parseFloat(localStorage.getItem("timeCorrection"));
+			defaultMeter = localStorage.getItem("defaultMeter");
+            //isPause = localStorage.getItem("isPause") == "true";
+            //isReverse = localStorage.getItem("isReverse") == "true";
+            var ris = JSON.parse(localStorage.getItem("rds"));
+			rds = [];
+            if (ris) {
+                for (var i = 0; i < ris.length; ++i) {
+                    rds.push(new RdsItem(ris[i]));
+                }
+            }
+            displayRdsItems = parseInt(localStorage.getItem("displayRdsItems"));
+            currentPddSpeed = parseFloat(localStorage.getItem("currentPddSpeed"));
+            currentSpeedInstruction = new SpeedInstruction(JSON.parse(localStorage.getItem("currentSpeedInstruction")));
+            var sis = JSON.parse(localStorage.getItem("speedIns"));
+			speedIns = [];
+            if (sis) {
+                for (var i = 0; i < sis.length; ++i) {
+                    speedIns.push(new SpeedInstruction((sis[i])));
+                }
+            }
+            currentSiIndex = parseInt(localStorage.getItem("currentSiIndex"));
+            //lastLatitude = parseFloat(localStorage.getItem("lastLatitude"));
+            //lastLongitude = parseFloat(localStorage.getItem("lastLongitude"));
+            //isDemo = localStorage.getItem("isDemo") == "true";
+            var kvis = JSON.parse(localStorage.getItem("kvs"));
+			kvs = [];
+            if (kvis) {
+                for (var i = 0; i < kvis.length; ++i) {
+                    kvs.push(new Kv(kvis[i]));
+                }
+            }
+            currentKvIndex = parseInt(localStorage.getItem("currentKvIndex"));
+        }
+        sector = sector ? sector : 10.0;
+        norm = norm ? norm : 3600.0;
+        start = start ? start : 0.0;
+        distanceGPS = distanceGPS ? distanceGPS : 0.0;
+        distanceBT = distanceBT ? distanceBT : 0.0;
+        correctionGPS = correctionGPS ? correctionGPS : 1.0;
+        correctionBT = correctionBT ? correctionBT : 1.0;
+        minMove = minMove ? minMove : 0.001;
+        intervalStartGPS = intervalStartGPS ? intervalStartGPS : 0.0;
+        intervalStartBT = intervalStartBT ? intervalStartBT : 0.0;
+        intervalDistanceGPS = intervalDistanceGPS ? intervalDistanceGPS : 0.0;
+        intervalDistanceBT = intervalDistanceBT ? intervalDistanceBT : 0.0;
+        timeCorrection = timeCorrection ? timeCorrection : 0.0;
+		defaultMeter = defaultMeter ? defaultMeter : 'GPS';
+        displayRdsItems = displayRdsItems ? displayRdsItems : 10;
+        currentPddSpeed = currentPddSpeed ? currentPddSpeed : 60.0;
+        currentSpeedInstruction = currentSpeedInstruction == "undefined" || currentSpeedInstruction == "" ? new SpeedInstruction(true) : currentSpeedInstruction;
+        speedIns = speedIns.length == 0 ? [new SpeedInstruction(true, 60), new SpeedInstruction(true, null, null, '-', 10.0), new SpeedInstruction(null, 77), new SpeedInstruction(false, null, 66)] : speedIns;
+		currentKvIndex = currentKvIndex ? currentKvIndex : -1;
+        // TODO: apply actions if needed
+        //localStorage.setItem("speedIns", null);
+        refreshRdsTable();
+    }
+
+    function gpsClick(e) {
+        if (isDemo) {
+            demo();
+        }
+        if (gpsWatch) {
+            $(".fa-globe").css("color", "");
+            navigator.geolocation.clearWatch(gpsWatch);
+            gpsWatch = null;
+            lastLatitude = null;
+        } else {
+            if (navigator.geolocation) {
+                gpsWatch = navigator.geolocation.watchPosition(newPosition, gpsError, gpsOptions);
+                $(".fa-globe").css("color", "red");
+            } else {
+                $("#alDanger").text("GPS не поддерживается браузером!");
+                $("#alDanger").show();
+            }
+        }
+    }
+
+    function bluetoothClick(e) {
+        if (isDemo) {
+            demo();
+        }
+        if (isBT) {
+            $(".fa-bluetooth").css("color", "");
+            isBT = false;
+			if (distanceMeter) {
+				distanceMeter.removeEventListener('gattserverdisconnected', handleDisconnection);
+				if (distanceMeter.gatt.connected) {
+					distanceMeter.gatt.disconnect();
+				}
+
+				if (distanceMeterTx) {
+					distanceMeterTx.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+					distanceMeterTx = null;
+				}
+
+				distanceMeter = null;
+			}
+        } else {
+            $(".fa-bluetooth").css("color", "red");
+			isBT = true;
+			navigator.bluetooth.requestDevice({
+				filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {'name': 'DM'} ]
+			  })
+			  .then((device) => {
+				device.addEventListener('gattserverdisconnected', handleDisconnection);
+				distanceMeter = device;
+				return device.gatt.connect();
+			  })
+			  .then(server => {
+				return server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+			  })
+			  .then(service => {
+				service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e').then(characteristic => {
+					distanceMeterTx = characteristic;
+				});
+				return service;
+			  })
+			  .then(service => {
+				return service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+			  })
+			  .then(characteristic => characteristic.startNotifications())
+			  .then(characteristic => {
+				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+			  })
+			  .catch(error => { console.log(error); });
+        }
+    }
+
+	// Bluetooth disconnetion
+	function handleDisconnection(event) {
+		beep();
+		alert('Bluetooth disconnected!');
+		bluetoothClick(); // close connections
+	}
+	function handleCharacteristicValueChanged(event) {
+		wasUpdateBT = true;
+		var d = event.target.value;
+		d = d.buffer ? d : new DataView(d);
+		d = correctionBT * d.getUint32(0, true);
+		moveBT(d);
+	}
+/*
+	send.addEventListener('pointerup', function(event) {
+		distanceMeterTx.writeValue(new TextEncoder().encode('Hello!'));
+	});
+*/
+    function newPosition(position) {
+        wasUpdateGPS = true;
+        var d = 0.0;
+        if (lastLatitude) {
+            d = correctionGPS * getGpsDistance(lastLatitude, lastLongitude, position.coords.latitude, position.coords.longitude);
+			moveGPS(d);
+        }
+        if (position.coords.accuracy > 10) {
+            $(".fa-globe").css("color", "orange");
+        } else {
+            $(".fa-globe").css("color", "green");
+        }
+        if (myMap != null && lastLatitude) {
+            myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
+            if (myPolyline && (myPolyline.geometry.getLength() < 1 || getGpsDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020)) {
+                myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
+            }
+
+            if (!myPosition) {
+                myPosition = new ymaps.Circle([[position.coords.latitude, position.coords.longitude], position.coords.accuracy], {}, {});
+                myMap.geoObjects.add(myPosition);
+            } else {
+                myPosition.geometry.setCoordinates([position.coords.latitude, position.coords.longitude]);
+                myPosition.geometry.setRadius(position.coords.accuracy);
+            }
+        }
+        if (!lastLatitude || d >= minMove) {
+            lastLatitude = position.coords.latitude;
+            lastLongitude = position.coords.longitude;
+        }
+    }
+        
+    function rad(x) {
+        return x * Math.PI / 180.0;
+    };
+
+    function getGpsDistance(lat1, long1, lat2, long2) {
+        var R = 6378.137; // Earth’s mean radius in km
+        var dLat = rad(lat2 - lat1);
+        var dLong = rad(long2 - long1);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return d; // returns the distance in km
+    };
+
+    function gpsError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                $("#alDanger").text("Пользователь не разрешает использовать GPS.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                $("#alDanger").text("GPS не доступен.");
+                break;
+            case error.TIMEOUT:
+                $("#alDanger").text("Время ожидания GPS вышло.");
+                break;
+            case error.UNKNOWN_ERROR:
+                $("#alDanger").text("Неизвестная ошибка GPS.");
+                break;
+            default:
+                $("#alDanger").text("Не получается подключится к GPS.");
+
+        }
+        $("#alDanger").show();
+    }
+
+    function demo() {
+        if (gpsWatch != null || isBT) {
+            return;
+        }
+        isDemo = !isDemo;
+    }
+
+    function Kv(start, sector, norm, pause) {
+        if (sector === undefined && typeof(start) === 'object') {
+            for (var prop in start) {
+                this[prop] = start[prop];
+            }
+        } else {
+            this.start = start;
+            this.sector = sector;
+            this.norm = norm;
+            this.pause = pause;
+        }
+
+        this.getSpeed = function () {
+            return this.sector / this.norm;
+        }
+
+        this.toString = function () {
+            return getTimeString(this.start, true) + " " + sector + " " + getTimeString(this.norm, false) + " " + getTimeString(this.pause, false);
+        }
+    }
+
+    function SpeedInstruction(isVpdd, vPdd, speed, sign, operand, position, type) {
+        if (vPdd === undefined && typeof(isVpdd) === 'object') {
+            for (var prop in isVpdd) {
+                this[prop] = isVpdd[prop];
+            }
+        } else {
+            this.type = type;
+            this.vPdd = vPdd;
+            this.isVpdd = isVpdd;
+            this.speed = speed;
+            this.sign = sign;
+            this.operand = operand;
+            this.position = position;
+        }
+
+        this.isFormula = function () {
+            return this.isVpdd || (this.speed != null && !isNaN(this.speed));
+        }
+        
+        this.getSpeed = function (v) {
+            if (!this.isFormula() && this != currentSpeedInstruction) {
+                return currentSpeedInstruction.getSpeed(v);
+            }
+
+            var s = this.isVpdd ? (v ? v : currentPddSpeed) : (this.speed != null && !isNaN(this.speed) ? this.speed : 0.0);
+            switch (this.sign) {
+                case '-':
+                    s = s - this.operand;
+                    break;
+                case '*':
+                    s = s * this.operand;
+                    break;
+            }
+            return Math.round(100 * s) / 100;
+        }
+
+        this.toString = function (f) {
+            return f ?
+                (this.isVpdd ? "V" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") :
+                (this.position != null && !isNaN(this.position) ? this.position + " " : "")
+                    + (this.vPdd ? "Vпдд = " + this.vPdd + " " : "")
+                    + (this.isVpdd ? "Vдс = Vпдд" : (this.speed != null && !isNaN(this.speed) ? "Vдс = " + this.speed : ""))
+                    + (this.sign ? " " + this.sign + " " + this.operand : "");
+        }
+    }
+
+    function RdsItem(distance, type, speed, time, latitude, longitude, deltaGPS, deltaBT) {
+        if (type === undefined && typeof(distance) === 'object') {
+            for (var prop in distance) {
+                this[prop] = distance[prop];
+            }
+        } else {
+            this.type = type;
+            this.distance = distance;
+            this.speed = speed;
+            this.time = time;
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.vPdd = currentPddSpeed;
+            this.vPddLateness = 0;
+            this.vPddNorm = 0;
+            this.lateness = 0;
+            this.norm = 0;
+            this.siIndex = currentSiIndex;
+            this.deltaGPS = deltaGPS;
+            this.deltaBT = deltaBT;
+        }
+
+        this.toString = function() {
+            return rdsItemHtmlTypes[rdsItemCodes.indexOf(this.type)] + "<br>"
+                + getNumberString(this.distance, 1000) + " км<br>"
+                + getNumberString(this.speed, 100) + " км/ч<br>"
+                + getTimeString(this.time, true);
+        }
+    }
+	
+	function getPrimaryMeter() {
+		return (isBT && gpsWatch) ? defaultMeter : (isBT ? 'BT' : 'GPS');
+	}
+	function getDistance() {
+		return getPrimaryMeter() == 'GPS' ? distanceGPS : distanceBT;
+	}
+	function getDistance2() {
+		return getPrimaryMeter() == 'GPS' ? distanceBT : distanceGPS;
+	}
+	function getIntervalStart() {
+		return getPrimaryMeter() == 'GPS' ? intervalStartGPS : intervalStartBT;
+	}
+	function getIntervalStart2() {
+		return getPrimaryMeter() == 'GPS' ? intervalStartBT : intervalStartGPS;
+	}
+	function getSpeed() {
+		return getPrimaryMeter() == 'GPS' ? speedGPS : speedBT;
+	}
+	function getIntervalDistance() {
+		return getPrimaryMeter() == 'GPS' ? intervalDistanceGPS : intervalDistanceBT;
+	}
+	function getIntervalDistance2() {
+		return getPrimaryMeter() == 'GPS' ? intervalDistanceBT : intervalDistanceGPS;
+	}
+
+	function setDistanceGPS(d) {
+		distanceGPS = d;
+		localStorage.setItem("distanceGPS", d);
+	}
+	function moveGPS(d) {
+		if (!isPause && d >= minMove) {
+			setDistanceGPS(distanceGPS + (isReverse ? -d : d));
+		}
+		// calculate speed
+		var time = getCurrentTime();
+		if (lastTimeGPS != null) {
+			speedGPS = d / (time - lastTimeGPS) * 60 * 60;
+		}
+		lastTimeGPS = time;
+		newMove();
+	}
+	function setDistanceBT(d) {
+		distanceBT = d;
+		localStorage.setItem("distanceBT", d);
+	}
+	function moveBT(d) {
+		if (!isPause) {
+			setDistanceBT(distanceBT + (isReverse ? -d : d));
+		}
+		// calculate speed
+		var time = getCurrentTime();
+		if (lastTimeBT != null) {
+			speedBT = d / (time - lastTimeBT) * 60 * 60;
+		}
+		lastTimeBT = time;
+		newMove();
+	}
+	function setIntervalStartGPS(i) {
+		intervalStartGPS = i;
+		localStorage.setItem("intervalStartGPS", i);
+	}
+	function setIntervalStartBT(i) {
+		intervalStartBT = i;
+		localStorage.setItem("intervalStartBT", i);
+	}
+	function setIntervalDistanceGPS(i) {
+        intervalDistanceGPS = i;
+		localStorage.setItem("intervalDistanceGPS", i);
+	}
+	function setIntervalDistanceBT(i) {
+        intervalDistanceBT = i;
+		localStorage.setItem("intervalDistanceBT", i);
+	}
+	function setCurrentKvIndex(i) {
+        currentKvIndex = i;
+        localStorage.setItem("currentKvIndex", i);
+	}
+
+    function rdsStart(pddSpeed, deltaGPS, deltaBT) {
+        changePddSpeed(pddSpeed);
+        if (!isRds()) {
+            if (rds && rds.length > 0) {
+                var i = 0;
+                while (localStorage.getItem("rds" + i)) { ++i; }
+                localStorage.setItem("rds" + i, JSON.stringify(rds));
+            }
+            rds = [];
+        }
+        addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+        if (myMap != null) {
+            myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#darkGreenCircleDotIcon'}));
+        }
+    }
+
+    function changePddSpeed(pddSpeed) {
+        if (pddSpeed == null || isNaN(pddSpeed)) {
+            return;
+        }
+        if (currentSpeedInstruction.getSpeed(pddSpeed) <= 0) {
+            $("#alertSpeed").show();
+        } else {
+            currentPddSpeed = pddSpeed;
+            localStorage.setItem("currentPddSpeed", currentPddSpeed);
+        }
+    }
+
+    function rdsSpeedChange(pddSpeed, deltaGPS, deltaBT) {
+        changePddSpeed(pddSpeed);
+        if (isRds()) {
+            addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+            if (myMap != null) {
+                myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
+            }
+        }
+    }
+
+    function rdsPF(pddSpeed, deltaGPS, deltaBT) {
+        changePddSpeed(pddSpeed);
+        if (isRds()) {
+            addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+            if (myMap != null) {
+                myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#yellowCircleDotIcon'}));
+            }
+        }
+    }
+
+    function rdsFinish(pddSpeed, deltaGPS, deltaBT) {
+        changePddSpeed(pddSpeed);
+        if (isRds()) {
+            addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+            if (myMap != null) {
+                myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
+            }
+        }
+    }
+
+    function addRdsItem(item) {
+        rds.push(item);
+        rds.sort(compareRdsItems);
+        recalculateRds();
+        refreshRdsTable();
+        localStorage.setItem("rds", JSON.stringify(rds));
+        newMove();
+        beep();
+    }
+
+    function removeRdsItem(i) {
+        if (i < 0 || i >= rds.length) {
+            return;
+        }
+        if (i == rds.length - 1) {
+            // removing last item
+            if (i > 0) {
+                // has previous item
+                currentPddSpeed = rds[i - 1].vPdd;
+                localStorage.setItem("currentPddSpeed", currentPddSpeed);
+                currentSiIndex = rds[i - 1].siIndex;
+                localStorage.setItem("currentSiIndex", currentSiIndex);
+                var f = currentSiIndex;
+				while (f >= 0 && !speedIns[f].isFormula()) {
+					--f;
+				}
+				if (f >= 0) {
+					currentSpeedInstruction = speedIns[f];
+					localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
+				}
+            } else if (currentSiIndex >= 0 && speedIns[currentSiIndex].type == 'S') {
+                // removing last start item
+                localStorage.setItem("currentSiIndex", --currentSiIndex);
+            }
+            if (rds[i].deltaGPS) {
+                // update distance
+				setDistanceGPS(distanceGPS - rds[i].deltaGPS);
+				setDistanceBT(distanceBT - rds[i].deltaBT);
+            }
+        }
+        rds.splice(i, 1);
+        recalculateRds(i);
+        refreshRdsTable();
+        localStorage.setItem("rds", JSON.stringify(rds));
+        newMove();
+    }
+
+    function isRds() {
+        var result = false;
+        for (var i = 0; i < rds.length; ++i) {
+            switch (rds[i].type) {
+                case 'S':
+                    result = true;
+                    break;
+                case 'F':
+                    return false;
+                    break;
+            }
+        }
+        return result;
+    }
+    
+    function calculateRdsItem(index) {
+        if (index < 0 || index >= rds.length) {
+            return;
+        } else if (index == 0) {
+            // first item
+            rds[0].norm = 0.0;
+            rds[0].lateness = 0.0;
+            rds[0].vPddNorm = 0.0;
+            rds[0].vPddLateness = 0.0;
+        } else {
+            // other item
+            rds[index].norm = 3600.0 * (1000 * rds[index].distance - 1000 * rds[index - 1].distance) / rds[index - 1].speed / 1000;
+            rds[index].vPddNorm = 3600.0 * (1000 * rds[index].distance - 1000 * rds[index - 1].distance) / rds[index - 1].vPdd / 1000;
+            if (rds[index].type != 'P' && rds[index].type != 'C') {
+                // do not floor if it is PF or C
+                rds[index].norm = Math.floor(rds[index].norm);
+                rds[index].vPddNorm = Math.floor(rds[index].vPddNorm);
+            } else if (rds[index].type == 'C') {
+                // floor to 0.01
+                rds[index].norm = Math.floor(100.0 * rds[index].norm) / 100.0;
+                rds[index].vPddNorm = Math.floor(100.0 * rds[index].vPddNorm) / 100.0;
+            }
+            rds[index].lateness = rds[index].time - rds[index - 1].time - rds[index].norm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].lateness) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
+            rds[index].vPddLateness = rds[index].time - rds[index - 1].time - rds[index].vPddNorm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].vPddLateness) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
+        }
+    }
+
+    function recalculateRds(startIndex) {
+        for (var i = (startIndex != null) ? startIndex : 0; i < rds.length; ++i) {
+            calculateRdsItem(i);
+        }
+    }
+
+    function refreshRdsTable() {
+        $("#rdsTable > tbody tr").remove();
+        for (i = rds.length > displayRdsItems ? rds.length - displayRdsItems : 0; i < rds.length; ++i) {
+            var t = '';
+            switch (rds[i].type) {
+                case 'S':
+                    t = '<i class="fa fa-play rdsIcon"></i>';
+                    break;
+                case 'C':
+                    t = '<i class="fa fa-tachometer rdsIcon"></i>';
+                    break;
+                case 'P':
+                    t = '<i class="fa fa-flag-checkered rdsIcon"></i>';
+                    break;
+                case 'F':
+                    t = '<i class="fa fa-stop rdsIcon"></i>';
+                    break;
+            }
+            $("#rdsTable > tbody").prepend($('<tr class="rds-item-data" onclick="showModalRdsItem(' + i + ');">')
+                .append($('<td>').html(t))
+                .append($('<td>').text(getNumberString(rds[i].distance, 1000)))
+                .append($('<td>').text(getNumberString(rds[i].speed, 100)))
+                .append($('<td>').text(getNumberString(rds[i].lateness, 10)))
+                .append($('<td class="visible-l">').text(getTimeString(rds[i].norm, true)))
+                .append($('<td class="visible-l">').text(getTimeString(rds[i].time, true)))
+            );
+        }
+    }
+
+    function newMove(d) {
+        // Removing "future" RDS positions
+        if (isRds()) {
+            for (var i = rds.length - 1; i >= 0; --i) {
+                if (rds[i] && rds[i].distance > getDistance()) {
+                    removeRdsItem(i);
+                } else {
+                    break;
+                }
+            }
+        }
+        $("#time").html(getTimeString(getCurrentTime(), true));
+        var sectorTime = getCurrentTime() - start + ((getCurrentTime() > start) ? 0 : 24 * 60 * 60);
+        if (norm - sectorTime > 60) {
+            $("#time").css("color", "rgb(0, 0, 0)");
+        } else if (norm - sectorTime > 0) {
+            if ($("#time").css("color") == "rgb(0, 0, 0)") {
+                $("#time").css("color", "rgb(255, 200, 0)");
+                beep();
+            }
+        } else if (norm - sectorTime > -60) {
+            $("#time").css("color", "rgb(0, 255, 0)");
+            beep();
+        } else {
+            $("#time").css("color", "rgb(0, 255, 0)");
+        }
+        if (isRds()) {
+            $("#sectorTime").html(getTimeString(getRdsTime(), true));
+        } else {
+            $("#sectorTime").html(getTimeString(sectorTime, true));
+        }
+
+        $("#sector").html(sector);
+        $("#distance").html(getNumberString(getDistance(), 1000));
+        $("#sectorRest").html(getNumberString(sector - getDistance(), 1000));
+        $("#norm").html(getTimeString(norm, false));
+        $("#normRest").html(getTimeString(norm - sectorTime, true));
+        $("#start").html(getTimeString(start, true));
+        $("#finish").html(getTimeString((start + norm) % (24 * 60 * 60), true));
+        if (intervalDistanceGPS > 0 && distanceGPS > intervalStartGPS + intervalDistanceGPS) {
+			setIntervalStartGPS(intervalStartGPS + intervalDistanceGPS);
+            setIntervalDistanceGPS(0);
+        }
+        if (intervalDistanceBT > 0 && distanceBT > intervalStartBT + intervalDistanceBT) {
+			setIntervalStartBT(intervalStartBT + intervalDistanceBT);
+            setIntervalDistanceBT(0);
+        }
+        var interval = getIntervalDistance() > 0 ? getIntervalStart() + getIntervalDistance() - getDistance() : getDistance() - getIntervalStart();
+        $("#interval").html(getNumberString(interval, 1000));
+        if (getIntervalDistance() > 0 && interval < 0.5) {
+            if ($("#interval").css("color") == "rgb(0, 0, 0)") {
+                $("#interval").css("color", "rgb(255, 0, 0)");
+                beep();
+            } else if (interval < 0.1) {
+                beep();
+            }
+        } else {
+            $("#interval").css("color", "rgb(0, 0, 0)");
+        }
+        var interval2 = getIntervalDistance2() > 0 ? getIntervalStart2() + getIntervalDistance2() - getDistance2() : getDistance2() - getIntervalStart2();
+        $("#intervalDistance").html((getIntervalDistance() > 0 ? getNumberString(getIntervalDistance(), 1000) : "-") + ((isDemo || (isBT && gpsWatch)) ? "/" + getNumberString(interval2, 1000) : ""));
+        $("#nextPosition").html((getIntervalDistance() > 0 ? getNumberString(getIntervalStart() + getIntervalDistance(), 1000) : "-") + ((isDemo || (isBT && gpsWatch)) ? "/" + getNumberString(getDistance2(), 1000) : ""));
+        //var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
+        var benefit = (getKvTime() > 60) ? 60 * Math.floor((getKvTime() + 9 * 60) / 600) : 60;
+        $("#benefit").html(getTimeString(benefit, false));
+        var lateness;
+        if (sector > 0) {
+            lateness = getKvTime() - getDistance() / sector * norm;
+            $("#benefit").css("color", (benefit + lateness + 60 < 0) ? "red" : "black");
+        } else {
+            $("#benefit").css("color", "black");
+        }
+        if (isRds()) {
+            $("#avgSpeed").html(getNumberString(getCurrentRdsSpeed(), 100));
+            $("#lateness").html(getTimeString(getRdsLateness(), true));
+            $("#latenessPdd").html(getTimeString(getPddLateness(), true));
+        } else {
+            $("#avgSpeed").html(norm > 0 ? getNumberString(3600 * sector / norm, 100) : "--.--");
+            $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
+            $("#latenessPdd").html("-");
+        }
+		$("#actualSpeed").html(getNumberString(getSpeed(), 10));
+        $("#speed").html(currentSpeedInstruction.toString(true));
+        $("#vpdd").html(getNumberString(currentPddSpeed, 100));
+
+        if ($('#modalCorrection').is(':visible') && $('input[name=fCorrectionType][value=I]').prop('checked'))
+        {
+            var iGPS = distanceGPS - intervalStartGPS;
+            $('#fCorrectionIntervalGPS').val(getNumberString(iGPS, 1000));
+            var iBT = distanceBT - intervalStartBT;
+            $('#fCorrectionIntervalBT').val(getNumberString(iBT, 1000));
+            refreshCorrection(iGPS, iBT);
+        }
+		
+		if (isBT) {
+			if (distanceMeter && distanceMeter.gatt.connected) {
+				$(".fa-bluetooth").css("color", "blue");
+			} else {
+				$(".fa-bluetooth").css("color", "red");
+			}
+		}
+    }
+
+    $(document).ready(function () {
+        window.onbeforeunload = function() {
+            return "Data will be lost if you leave the page, are you sure?";
+        };
+
+        loadData();
+
+        document.removeEventListener("keydown", keyDown);
+        document.addEventListener("keydown", keyDown, false);
+
+        //gpsClick();
+		
+        setInterval(function () {
+            if (isDemo) {
+				$(".fa-globe").addClass("fa-spin");
+				$(".fa-bluetooth").addClass("fa-spin");
+				if (!isPause) {
+					moveGPS(1/59.0);
+					moveBT(1/61.0);
+				}
+            } else {
+				if (getPrimaryMeter() == 'GPS' && gpsWatch)
+					$(".fa-globe").addClass("fa-spin");
+				else
+					$(".fa-globe").removeClass("fa-spin");
+				
+				if (getPrimaryMeter() == 'BT' && isBT)
+					$(".fa-bluetooth").addClass("fa-spin");
+				else
+					$(".fa-bluetooth").removeClass("fa-spin");
+					
+				if (!wasUpdateGPS) {
+					speedGPS = 0;
+					lastTimeGPS = getCurrentTime();
+					if (gpsWatch) {
+						$(".fa-globe").css("color", "red");
+					}
+				}
+				if (!wasUpdateBT) {
+					speedBT = 0;
+					lastTimeBT = getCurrentTime();
+				}
+			}
+			wasUpdateGPS = false;
+			wasUpdateBT = false;
+			newMove();
+        }, 1000);
+
+    });
+
+    function map() {
+        if (myMap == null) {
+            ymaps.ready(initMap);
+        } else {
+            myMap.destroy();
+            myMap = null;
+            myPolyline = null;
+            myPosition = null;
+            $('.fa-plane').css('color', '');
+        }
+
+    }
+
+    function mapType() {
+        if (myMap == null) return;
+
+        switch(myMap.getType()) {
+            case 'yandex#map':
+                myMap.setType('yandex#satellite');
+                break;
+            case 'yandex#satellite':
+                myMap.setType('yandex#hybrid');
+                break;
+            case 'yandex#hybrid':
+                myMap.setType('yandex#map');
+                break;
+        }
+    }
+
+    function mapTrack() {
+        if (myMap == null) return;
+
+        if (!myPolyline) {
+            // Создаем ломаную с помощью вспомогательного класса Polyline.
+            myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
+                    // Цвет линии.
+                    strokeColor: "#0000FF",
+                    // Ширина линии.
+                    strokeWidth: 4,
+                    // Коэффициент прозрачности.
+                    strokeOpacity: 0.5
+                });
+            myMap.geoObjects.add(myPolyline);
+        } else {
+            myMap.geoObjects.remove(myPolyline);
+            myPolyline = null;
+        }
+        $('.fa-plane').css('color', myPolyline ? 'blue' : '');
+    }
+
+    function initMap () {
+        myMap = new ymaps.Map('map', {
+                center: (lastLatitude) ? [lastLatitude, lastLongitude] : [55.751286, 37.616516],
+                zoom: 16,
+                controls: []
+            });
+    }
+
+    function pause() {
+        isPause = !isPause;
+        $('.fa-pause').css('color', isPause ? 'red' : '');
+        if (isPause) {
+            $('#movePause').show();
+        } else {
+            $('#movePause').hide();
+        }
+        beep();
+    }
+
+    function reverse() {
+        isReverse = !isReverse;
+        $('.fa-retweet').css('color', isReverse ? 'red' : '');
+        if (isReverse) {
+            $('#moveReverse').show();
+        } else {
+            $('#moveReverse').hide();
+        }
+        beep();
+    }
+
+    function applyKv(index) {
+        if (index >= 0 && index < kvs.length) {
+			setCurrentKvIndex(index);
+            if (kvs[index].start == null) {
+                var nextStart = start;
+                for (var i = 0; i < index; ++i) {
+                    nextStart = (kvs[i].start != null ? kvs[i].start : nextStart) + kvs[i].norm + (kvs[i].pause != null ? kvs[i].pause : 0);
+                }
+                setStart(nextStart % (24 * 60 * 60));
+            } else {
+                setStart(kvs[index].start);
+            }
+            setSector(kvs[index].sector);
+            setNorm(kvs[index].norm);
+        } else if (index != -1) {
+            return;
+        }
+
+        newMove();
+        beep();
+    }
+
+    function startKv(index) {
+        if (index < -1 || index >= kvs.length) return;
+        resetDistance();
+        applyKv(index);
+    }
+
+    function getDefaultEnterValue(typeId, subTypeId) {
+        switch (enterType[typeId][subTypeId]) {
+            case 'Тип':
+                return rdsItemHtmlTypes[1];
+            case 'Операция':
+                return operationsTypes[0];
+            default:
+                return 'x';
+        }
+    }
+
+    function rollEnterOption(array, direction) {
+        var i = array.indexOf(enterValue[enterTypeId][enterSubTypeId]);
+        if (i == -1) {
+            i = 0;
+        } else if (direction) {
+            i = (i >= array.length - 1) ? 0 : i + 1;
+        } else {
+            i = (i == 0) ? array.length - 1 : i - 1;
+        }
+        enterValue[enterTypeId][enterSubTypeId] = array[i];
+        $('#enterValue').html(array[i]);
+    }
+
+    function setPosition(value) {
+        if (isNaN(value)) {
+            return 0;
+        } else {
+			setDistanceGPS(value);
+			setDistanceBT(value);
+			setIntervalStartGPS(value);
+			setIntervalStartBT(value);
+			setIntervalDistanceGPS(0);
+			setIntervalDistanceBT(0);
+        }
+        return -1;
+    }
+
+    function setSector(value) {
+        if (isNaN(value)) {
+            return 0;
+        } else {
+			sector = value;
+			localStorage.setItem("sector", sector);
+            if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                kvs[currentKvIndex].sector = sector;
+                localStorage.setItem("kvs", JSON.stringify(kvs));
+            }
+        }
+        return -1;
+    }
+
+    function setNextPosition(value, isPosition) {
+        if (isNaN(value)) {
+            return 0;
+        } else {
+            setIntervalDistanceGPS(isPosition ? value - intervalStartGPS : value);
+            setIntervalDistanceBT(isPosition ? value - intervalStartBT : value);
+        }
+        return -1;
+    }
+
+    function setTime(value) {
+        if (value < 0) {
+            return 0;
+        } else {
+            value = value % (24 * 60 * 60);
+            timeCorrection = 0;
+            timeCorrection = value - getCurrentTime();
+            localStorage.setItem("timeCorrection", timeCorrection);
+        }
+        return -1;
+    }
+
+	function setStart(value) {
+        if (value < 0) {
+            return 0;
+        } else {
+			start = value;
+			localStorage.setItem("start", start);
+            if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                kvs[currentKvIndex].start = start;
+                localStorage.setItem("kvs", JSON.stringify(kvs));
+            }
+        }
+        return -1;
+    }
+
+    function setNorm(value) {
+        if (value < 0) {
+            return 0;
+        } else {
+			norm = value;
+			localStorage.setItem("norm", norm);
+            if (currentKvIndex >= 0 && currentKvIndex < kvs.length) {
+                kvs[currentKvIndex].norm = norm;
+                localStorage.setItem("kvs", JSON.stringify(kvs));
+            }
+        }
+        return -1;
+    }
+
+    function addFromula(type, position, vPdd, vDs, sign, operand) {
+        var si = new SpeedInstruction();
+        si.type = type;
+        si.position = (!position || position == '') ? null : parseFloat(position);
+        if (isNaN(si.position)) return 1;
+        si.vPdd = (!vPdd || vPdd == '') ? null : parseFloat(vPdd);
+        if (isNaN(si.vPdd)) return 2;
+        si.isVpdd = (vDs == vdsItemTypes[1]);
+        if (!si.isVpdd) {
+            si.speed = (!vDs || vDs == '') ? null : parseFloat(vDs);
+            if (isNaN(si.speed)) return 3;
+        }
+        si.sign = sign;
+        if (si.sign) {
+            si.operand = parseFloat(operand);
+            if (!si.operand) return 5;
+        }
+        if (si.type != 'C' || (si.position && !isNaN(si.position)) || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed))) {
+            //speedIns.splice(addSiIndex, 0, si);
+            speedIns.push(si);
+            localStorage.setItem("speedIns", JSON.stringify(speedIns));
+            //if (isApply) {
+            //    applySpeedInstruction(addSiIndex);
+            //} else {
+            //    showModalSpeed();
+            //}
+        } else {
+            return 0;
+        }
+        return -1;
+    }
+
+    function addKv(start, sector, norm, pause) {
+        var kv = new Kv();
+
+        kv.start = (!start || start == '') ? null : getTimeValue(start);
+        if (kv.start == -1) return 0;
+        if (kv.start) kv.start %= (24 * 60 * 60);
+
+        kv.sector = parseFloat(sector);
+        if (isNaN(kv.sector)) return 1;
+        
+        kv.norm = getTimeValue(norm);
+        if (kv.norm == -1) return 2;
+        kv.norm %= (24 * 60 * 60);
+
+        kv.pause = (!pause || pause == '') ? null : getTimeValue(pause);
+        if (kv.pause == -1) return 3;
+        kv.pause %= (24 * 60 * 60);
+
+        kvs.push(kv);
+        localStorage.setItem("kvs", JSON.stringify(kvs));
+        return -1;
+    }
+
+    function setCorrection(value) {
+        if (isNaN(value)) {
+            return 0;
+        } else {
+            var iGPS = distanceGPS - intervalStartGPS;
+            var iBT = distanceBT - intervalStartBT;
+			correctionGPS =(iGPS && value) ? correctionGPS * value / iGPS : correctionGPS;
+			correctionBT = (iBT && value) ? correctionBT * value / iBT : correctionBT;
+            localStorage.setItem("correctionGPS", correctionGPS);
+            localStorage.setItem("correctionBT", correctionBT);
+            if (iGPS) setDistanceGPS(intervalStartGPS + value);
+            if (iBT) setDistanceBT(intervalStartBT + value);
+            resetInterval();
+        }
+        return -1;
+    }
+
+    function setSpeed(value) {
+        if (isNaN(value)) {
+            return 0;
+        } else {
+            rdsSpeedChange(value);
+        }
+        return -1;
+    }
+
+    function setEnterType(value) {
+        if (value || $('#enterType').text() == 'Ввод') {
+            for (var i = 0; i < enterType.length; ++i) {
+                for (var j = 0; j < enterType[i].length; ++j) {
+                    enterValue[i][j] = getDefaultEnterValue(i, j);
+                }
+            }
+            if (value) enterTypeId = value;
+        } else {
+            enterValue[enterTypeId][enterSubTypeId] = $('#enterValue').html();
+            enterTypeId = (enterTypeId >= enterType.length - 1) ? 0 : enterTypeId + 1;
+        }
+        $('#enterType').text(enterType[enterTypeId][0]);
+        enterSubTypeId = 0;
+        $('#enterSubType').text((enterType[enterTypeId].length > 1) ? enterType[enterTypeId][++enterSubTypeId] : '-');
+        $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+    }
+
+    function keyDown(e) {
+        var keyCode = e.which || e.keyCode || e.key;
+        $("#key").html(keyCode);
+        if (keyCode == 'UIKeyInputEscape' || keyCode == null) {
+            keyCode = 27;
+        }
+		
+		if (keyCode == 27) {
+			e.preventDefault();
+		}
+
+        if (isModalShown) {
+            switch (keyCode) {
+                case 27:
+                //case 71: // Samsung browser
+                    $('.modal').modal('hide');
+                    break;
+                case 13:
+
+                    break;
+            }
+            return;
+        }
+
+        $('#enterValue').css('color', '');
+        enterValue[enterTypeId][enterSubTypeId] = $('#enterValue').html();
+        if ($('#enterType').text() != 'Ввод' && (keyCode == 71 /*|| keyCode == 84 Samsung browser*/ || keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || keyCode == 73 || (keyCode > 76 && keyCode < 80) || (keyCode > 47 && keyCode < 58) || (keyCode > 36 && keyCode < 41))) {
+            switch (keyCode) {
+                case 13:
+                    // replace decimal point
+                    //var val = $('#enterValue').html();
+                    //if (decimalPoint == '.') {
+                    //    val = val.replace(',', '.');
+                    //} else {
+                    //    val = val.replace('.', ',');
+                    //}
+                    var result = 0;
+                    switch ($('#enterType').text()) {
+                        case 'Пройдено':
+                            result = setPosition(parseFloat($('#enterValue').html()));
+                            break;
+                        case 'Сектор':
+                            result = setSector(parseFloat($('#enterValue').html()));
+                            break;
+                        case 'Следующая':
+                            result = setNextPosition(parseFloat($('#enterValue').html()), $('#enterSubType').text() == 'Позиция');
+                            break;
+                        case 'Время':
+                            result = setTime(getTimeValue($('#enterValue').html()));
+                            break;
+                        case 'Старт':
+                            result = setStart(getTimeValue($('#enterValue').html()));
+                            break;
+                        case 'Норма':
+                            result = setNorm(getTimeValue($('#enterValue').html()));
+                            break;
+                        case 'Новая формула':
+                            result = addFromula(
+                                rdsItemCodes[rdsItemHtmlTypes.indexOf(enterValue[enterTypeId][1])],
+                                (enterValue[enterTypeId][2] == 'x') ? null : enterValue[enterTypeId][2],
+                                (enterValue[enterTypeId][3] == 'x') ? null : enterValue[enterTypeId][3],
+                                (enterValue[enterTypeId][4] == 'x') ? null : enterValue[enterTypeId][4],
+                                (enterValue[enterTypeId][5] == 'нет') ? null : enterValue[enterTypeId][5],
+                                (enterValue[enterTypeId][6] == 'x') ? null : enterValue[enterTypeId][6]
+                            );
+                            break;
+                        case 'Новый сектор':
+                            result = addKv(
+                                (enterValue[enterTypeId][1] == 'x') ? null : enterValue[enterTypeId][1],
+                                (enterValue[enterTypeId][2] == 'x') ? null : enterValue[enterTypeId][2],
+                                (enterValue[enterTypeId][3] == 'x') ? null : enterValue[enterTypeId][3],
+                                (enterValue[enterTypeId][4] == 'x') ? null : enterValue[enterTypeId][4]
+                            );
+                            break;
+                        case 'Тарировка':
+                            result = setCorrection(parseFloat($('#enterValue').html()));
+                            break;
+                        case 'Скорость':
+                            result = setSpeed(parseFloat($('#enterValue').html()));
+                            break;
+                    }
+                    if (result != -1) {
+                        if (enterType[enterTypeId].length > 1) {
+                            enterSubTypeId = result + 1;
+                            $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
+                            $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+                        }
+                        $('#enterValue').css('color', 'red');
+                        break;
+                    }
+                    newMove();
+                    // no break!
+                case 27:
+                //case 71: // Samsung browser
+                    $('#enterType').text('Ввод');
+                    $('#enterValue').html('x');
+                    $('#enterSubType').text('-');
+                break;
+				case 37: // left arrow
+					e.preventDefault();
+                case 78: // n previous sub type
+                    if (enterType[enterTypeId].length > 1) {
+                        enterSubTypeId = (enterSubTypeId <= 1) ? enterType[enterTypeId].length - 1 : enterSubTypeId - 1;
+                        $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
+                        $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+                    }
+                break;
+				case 39: // right arrow
+					e.preventDefault();
+                case 77: // m next sub type
+                    if (enterType[enterTypeId].length > 1) {
+                        enterSubTypeId = (enterSubTypeId >= enterType[enterTypeId].length - 1) ? 1 : enterSubTypeId + 1;
+                        $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
+                        $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+                    }
+                break;
+				case 40: // down arrow
+				case 38: // up arrow
+					e.preventDefault();
+                case 73: // i next option value
+                case 79: // o previous option value
+                    switch ($('#enterSubType').text()) {
+                        case 'Тип':
+                            rollEnterOption(rdsItemHtmlTypes, keyCode == 73 || keyCode == 40);
+                        break;
+                        case 'Vдс':
+                            rollEnterOption(vdsItemTypes, keyCode == 73 || keyCode == 40);
+                        break;
+                        case 'Операция':
+                            rollEnterOption(operationsTypes, keyCode == 73 || keyCode == 40);
+                        break;
+                        case 'Vпдд':
+                        case 'Операнд':
+                            rollEnterOption(pddSpeedTypes, keyCode == 73 || keyCode == 40);
+                        break;
+                    }
+                break;
+                case 8: // backspace
+                //case 84: // Samsung browser
+					e.preventDefault();
+                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип'|| enterType[enterTypeId][enterSubTypeId] == 'Операция') {
+                        break;
+                    }
+                    var val = (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && enterValue[enterTypeId][enterSubTypeId] == vdsItemTypes[1]) ? '' : $('#enterValue').html();
+                    $('#enterValue').html((val.length < 2) ? 'x' : val.substr(0, val.length - 1));
+                break;
+                case 188: // ,
+                case 190: // .
+                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && $('#enterValue').html() == vdsItemTypes[1]) || enterType[enterTypeId][enterSubTypeId] == 'Операция') {
+                        break;
+                    }
+                    $('#enterValue').html(($('#enterValue').html() == 'x') ? decimalPoint : $('#enterValue').html() + decimalPoint);
+                break;
+                default:
+                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && $('#enterValue').html() == vdsItemTypes[1]) || enterType[enterTypeId][enterSubTypeId] == 'Операция') {
+                        break;
+                    }
+                    if (keyCode > 47 && keyCode < 58) {
+                        $('#enterValue').html(($('#enterValue').html() == 'x') ? String.fromCharCode(e.keyCode) : $('#enterValue').html() + String.fromCharCode(e.keyCode));
+                    }
+                break;
+            }
+        } else {
+            switch (keyCode) {
+                case 83: // s start DS
+                    rdsStart();
+                break;
+                case 68: // d intermidiate finish
+                    rdsPF();
+                break;
+                case 70: // f finish
+                    rdsFinish();
+                break;
+                case 192: // ` speed 5
+                    rdsSpeedChange(5);
+                break;
+                case 189: // - speed 110
+                    rdsSpeedChange(110);
+                break;
+                case 82: // r reverse
+                    reverse();
+                break;
+                case 80: // p pause
+                    pause();
+                break;
+                case 73: // i interval
+                    setEnterType(5);
+                break;
+                case 79: // o distance
+                    setEnterType(4);
+                break;
+                case 13: // enter
+                    setEnterType(9); // Speed
+                break;
+                case 69: // e change enter type
+                    setEnterType();
+                break;
+                //case 85: // u clear interval
+				case 8: // backspace
+					//e.preventDefault();
+                    resetInterval();
+                break;
+                case 75: // k add KV
+                    showModalKv(-1);
+                break;
+                case 187: // + add SI
+                    showModalAddFormula();
+                break;
+                case 78: // n previous KV
+					modalConfirm("Стартовать предыдущее КВ" + currentKvIndex + "?", function() {
+                        startKv(currentKvIndex - 1);
+                    });
+                break;
+                case 77: // m next KV
+					modalConfirm("Стартовать следующее КВ" + (currentKvIndex + 2) + "?", function() {
+						startKv(currentKvIndex + 1);
+                    });
+                break;
+                case 188: // , previous SI
+                    modalConfirm("Применить предыдущую формулу скорости?", function() {
+                        applySpeedInstruction(currentSiIndex - 1);
+                    });
+                break;
+                case 190: // . next SI
+                    applySpeedInstruction(currentSiIndex + 1);
+                break;
+                case 81: // q sector
+                    showModalNumber('Сектор', sector);
+                break;
+                case 87: // w norm
+                    showModalTime('Норма', norm, false);
+                break;
+                //case 69: // e start time
+                //    showModalTime('Старт', start, true);
+                //break;
+                /* comment for Samsung browser */
+				case 84: // t lamp // minus
+                    noSleep.enable(); // minus();
+                break;
+                case 71: // g globe // plus
+                    gpsClick(); // plus();
+                break;
+                case 76: // l remove last rds item
+                    if (rds && rds.length) {
+                        var r = rds[rds.length - 1];
+                        modalConfirm("Удалить последнюю запись РДС?<br>" + r, function() {
+                            removeRdsItem(rds.length - 1);
+                            newMove();
+                        });
+                    }
+                break;
+                default:
+                    //alert(keyCode);
+                    if (keyCode > 47 && keyCode < 58) {
+                        rdsSpeedChange((keyCode == 48) ? 100 : 10 * (keyCode - 48));
+                    }
+                break;
+            }
+        }
+    }
+
+    $('#modalConfirm').on('shown.bs.modal', function() {
+        $('#modalConfirm .btn-success').focus().select();
+    })
+
+    function modalConfirm(text, callback) {
+        $("#modalConfirm #confirmationMessage").html(text);
+        $("#modalConfirm").modal('show');
+
+        $("#modalConfirm").off("submit");
+        $("#modalConfirm").on("submit", function() {
+            $("#modalConfirm").modal('hide');
+            callback();
+            return false;
+        });
+    };
+
+    function getCurrentRdsSpeed() {
+        for (var i = rds.length - 1; i >= 0; --i) {
+            if (getDistance() >= rds[i].distance) {
+                return rds[i].speed;
+            }
+        }
+        return null;
+    }
+
+    function getRdsTime() {
+        if (rds.length < 1) {
+            return null;
+        }
+        var i = rds.length;
+        while (i-- > 0) {
+            if (rds[i].type == 'S') {
+                break;
+            }
+        }
+        if (i < 0) {
+            return null;
+        }
+        var ri = rds[i];
+        var t = getCurrentTime();
+        return t - ri.time;
+    }
+
+    function getRdsLateness() {
+        if (rds.length < 1) {
+            return null;
+        }
+        var i = rds.length;
+        while (i-- > 0) {
+            if (getDistance() >= rds[i].distance) {
+                break;
+            }
+        }
+        if (i < 0) {
+            return null;
+        }
+        var ri = rds[i];
+        var t = getCurrentTime();
+        return t - ri.time - 3600 * (getDistance() - ri.distance) / ri.speed + (ri.type == 'S' ? 0 : ri.lateness) + (t < ri.time ? 24 * 60 * 60 : 0);
+    }
+
+    function getPddLateness() {
+        if (rds.length < 1) {
+            return null;
+        }
+        var i = rds.length;
+        while (i-- > 0) {
+            if (getDistance() >= rds[i].distance) {
+                break;
+            }
+        }
+        if (i < 0) {
+            return null;
+        }
+        var ri = rds[i];
+        var t = getCurrentTime();
+        return t - ri.time - 3600 * (getDistance() - ri.distance) / ri.vPdd + (ri.type == 'S' ? 0 : ri.vPddLateness) + (t < ri.time ? 24 * 60 * 60 : 0);
+    }
+
+    function getCurrentTime() {
+        return (Date.now() / 1000 - 60 * (new Date()).getTimezoneOffset() + timeCorrection) % (24 * 60 * 60);
+    }
+
+    function getKvTime() {
+        var t = getCurrentTime();
+        return t - start + (t < start ? 24 * 60 * 60 : 0);
+    }
+
+    $('.modal').on('shown.bs.modal', function() {
+        isModalShown = true;
+        //document.removeEventListener("keydown", keyDown);
+    })
+
+    $('.modal').on('hidden.bs.modal', function() {
+        isModalShown = false;
+        //document.addEventListener("keydown", keyDown, false);
+    })
+
+    function showModalNumber(title, value) {
+        $('#numberValue').val(value);
+        $('#modalNumber .modal-title').html(title);
+        switch (title) {
+            case 'Интервал':
+                $('#fNumberPosition').show();
+                $('#modalNumber .btn-group > .btn').removeClass("col-xs-4");
+                $('#modalNumber .btn-group > .btn').addClass("col-xs-3");
+                break;
+            default:
+                $('#fNumberPosition').hide();
+                $('#modalNumber .btn-group > .btn').removeClass("col-xs-3");
+                $('#modalNumber .btn-group > .btn').addClass("col-xs-4");
+                break;
+        }
+        $('#modalNumber').modal('show');
+    }
+
+    $('#modalNumber').on('shown.bs.modal', function() {
+        setTimeout(function () { $('#numberValue').focus().select(); }, 100);
+        $('#numberValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
+    })
+
+    $('#fNumberReset').on('click', function (e) {
+        switch ($('#modalNumber .modal-title').html()) {
+            case 'Сектор':
+                setSector(0);
+                newMove();
+                break;
+            case 'Пройдено':
+                resetDistance();
+                break;
+            case 'Интервал':
+                resetInterval();
+                break;
+        }
+    })
+
+    function resetDistance() {
+        setDistanceGPS(0);
+        setDistanceBT(0);
+        setIntervalStartGPS(0);
+        setIntervalStartBT(0);
+        setIntervalDistanceGPS(0);
+		setIntervalDistanceBT(0);
+        newMove();
+    }
+
+    function resetInterval() {
+        setIntervalStartGPS(distanceGPS);
+		setIntervalStartBT(distanceBT);
+        setIntervalDistanceGPS(0);
+		setIntervalDistanceBT(0);
+        newMove();
+    }
+
+    $('#modalNumber').on('submit', function (e) {
+        var numberValue = parseFloat($('#numberValue').val());
+        if (isNaN(numberValue)) {
+            $('#numberValue').closest('.form-group').removeClass('has-success').addClass('has-error');
+        } else {
+            $('#numberValue').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#modalNumber').modal('hide');
+            switch ($('#modalNumber .modal-title').html()) {
+                case 'Сектор':
+                    setSector(numberValue);
+                    break;
+                case 'Пройдено':
+                    setDistanceGPS(numberValue);
+                    setDistanceBT(numberValue);
+                    setIntervalStartGPS(numberValue);
+                    setIntervalStartBT(numberValue);
+					setIntervalDistanceGPS(0);
+					setIntervalDistanceBT(0);
+                    break;
+                case 'Интервал':
+                    setIntervalDistanceGPS(isIntervalPosition ? numberValue - intervalStartGPS : numberValue);
+                    setIntervalDistanceBT(isIntervalPosition ? numberValue - intervalStartBT : numberValue);
+                    break;
+            }
+            newMove();
+        }
+        return false;
+    });
+
+    function showModalTime(title, value, seconds) {
+        $('#timeValue').val(getTimeString(value, seconds));
+        $('#modalTime .modal-title').html(title);
+        $('#modalTime').modal('show');
+    }
+
+    $('#modalTime').on('shown.bs.modal', function() {
+		setTimeout(function () { $('#timeValue').focus().select(); }, 100);
+        $('#timeValue').closest('.form-group').removeClass('has-error').removeClass('has-success');
+    })
+
+    $('#fTimeReset').on('click', function () {
+        switch ($('#modalTime .modal-title').html()) {
+            case 'Норма':
+                setNorm(3600);
+                break;
+            case 'Старт':
+                setStart(Math.floor(getCurrentTime() / 60) * 60); // current minute
+                break;
+            case 'Время':
+                timeCorrection = 0;
+                localStorage.setItem("timeCorrection", timeCorrection);
+                break;
+        }
+        newMove();
+    });
+
+    $('#modalTime').on('submit', function (e) {
+        var timeValue = $('#timeValue');
+        var result = getTimeValue(timeValue.val());
+
+        if (result < 0) {
+            timeValue.closest('.form-group').removeClass('has-success').addClass('has-error');
+        } else {
+            timeValue.closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#modalTime').modal('hide');
+            result = result % (24 * 60 * 60);
+            switch ($('#modalTime .modal-title').html()) {
+                case 'Норма':
+					setNorm(result);
+                    break;
+                case 'Старт':
+					setStart(result);
+                    break;
+                case 'Время':
+                    timeCorrection = 0;
+                    timeCorrection = result - getCurrentTime();
+                    localStorage.setItem("timeCorrection", timeCorrection);
+                    break;
+            }
+            newMove();
+        }
+        return false;
+    });
+
+    function showModalRdsItem(index) {
+        if (index < 0 || index >= rds.length) {
+            return;
+        }
+        editRdsItemIndex = index;
+        var ri = rds[index];
+        $('input[name=fRdsItemType][value=' + ri.type + ']').closest('.btn').button('toggle');
+        $('#fRdsItemDistance').val(ri.distance);
+        $('#fRdsItemSpeed').val(ri.speed);
+        $('#fRdsItemTime').val(getTimeString(ri.time, true));
+        $('#modalRdsItem').modal('show');
+
+        $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fRdsItemTime').closest('.form-group').removeClass('has-error').removeClass('has-success');
+    }
+
+    $('#modalRdsItem').on('shown.bs.modal', function() {
+        setTimeout(function () { $('#fRdsItemDistance').focus().select(); }, 100);
+    })
+
+    $('#modalRdsItem').on('submit', function (e) {
+        var isGood = true;
+        var riDistance = parseFloat($('#fRdsItemDistance').val());
+        if (riDistance == null) {
+            $('#fRdsItemDistance').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        }
+        var riSpeed = parseFloat($('#fRdsItemSpeed').val());
+        if (!riSpeed) {
+            $('#fRdsItemSpeed').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        }
+        var riTime = $('#fRdsItemTime').val();
+        var nTime = -1;
+        if (riTime) {
+            var t = riTime.split(/[\D]/);
+            if (t.length == 2) {
+                nTime = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]);
+            } else if (t.length == 3) {
+                nTime = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]) + parseInt(t[2]);
+            }
+        }
+        if (!nTime || nTime < 0) {
+            $('#fRdsItemTime').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        }
+
+        if (!isGood) {
+            return false;
+        } else {
+            $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#fRdsItemTime').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#modalRdsItem').modal('hide');
+            if (editRdsItemIndex >= 0 && editRdsItemIndex < rds.length) {
+                rds[editRdsItemIndex].type = $('input[name=fRdsItemType]:checked').val();
+                rds[editRdsItemIndex].distance = riDistance;
+                rds[editRdsItemIndex].speed = riSpeed;
+                rds[editRdsItemIndex].time = nTime;
+                rds.sort(compareRdsItems);
+                recalculateRds();
+                refreshRdsTable();
+                localStorage.setItem("rds", JSON.stringify(rds));
+                newMove();
+            }
+            return false;
+        }
+    });
+
+    $('#fRdsItemDelete').on('click', function () {
+        removeRdsItem(editRdsItemIndex);
+    });
+
+    function compareRdsItems(a, b) {
+        if (a.distance < b.distance) {
+            return -1;
+        } else if (a.distance > b.distance) {
+            return 1;
+        } else if (a.time < b.time) {
+            return -1;
+        } else if (a.time > b.time) {
+            return 1;
+        }
+        return 0;
+    }
+
+    function showModalCorrection() {
+        $('#modalCorrection').modal('show');
+        $('#fCorrectionValueGPS').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fCorrectionValueBT').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fCorrectionMinMove').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fCorrectionMinMove').val(minMove);
+		$('input[name=fCorrectionDefaultMeter][value=' + defaultMeter + ']').prop('checked', true);
+    }
+
+    $('#modalCorrection').on('shown.bs.modal', function() {
+        setTimeout(function () { $('#fCorrectionDistance').focus().select(); }, 100);
+    })
+
+    $('#modalCorrection').on('submit', function (e) {
+        var cGPS = parseFloat($('#fCorrectionValueGPS').val());
+        var cBT = parseFloat($('#fCorrectionValueBT').val());
+        var m = parseFloat($('#fCorrectionMinMove').val());
+        if (!cGPS) {
+            $('#fCorrectionValueGPS').closest('.form-group').removeClass('has-success').addClass('has-error');
+        }
+        if (!cBT) {
+            $('#fCorrectionValueBT').closest('.form-group').removeClass('has-success').addClass('has-error');
+        }
+        if (!m) {
+            $('#fCorrectionMinMove').closest('.form-group').removeClass('has-success').addClass('has-error');
+        }
+        if (cBT || (cGPS && m)) {
+            $('#modalCorrection').modal('hide');
+            correctionGPS = cGPS ? cGPS : correctionGPS;
+            correctionBT = cBT ? cBT : correctionBT;
+            localStorage.setItem("correctionGPS", correctionGPS);
+            localStorage.setItem("correctionBT", correctionBT);
+            minMove = m ? m : minMove;
+            localStorage.setItem("minMove", minMove);
+			defaultMeter = $('input[name=fCorrectionDefaultMeter]:checked').val();
+			localStorage.setItem("defaultMeter", defaultMeter);
+        }
+        return false;
+    });
+
+    $('input[name=fCorrectionType][value=I]').on('click', function () {
+        $('#fCorrectionIntervalGPS').prop('disabled', true);
+        $('#fCorrectionIntervalBT').prop('disabled', true);
+        $('#fCorrectionValueGPS').prop('disabled', true);
+        $('#fCorrectionValueBT').prop('disabled', true);
+    });
+
+    $('input[name=fCorrectionType][value=V]').on('click', function () {
+        $('#fCorrectionIntervalGPS').prop('disabled', false);
+        $('#fCorrectionIntervalBT').prop('disabled', false);
+        $('#fCorrectionValueGPS').prop('disabled', false);
+        $('#fCorrectionValueBT').prop('disabled', false);
+        $('#fCorrectionValueGPS').val(correctionGPS);
+        $('#fCorrectionValueBT').val(correctionBT);
+    });
+
+    $('#fCorrectionIntervalGPS').on('change', function() { refreshCorrection(); });
+    $('#fCorrectionIntervalBT').on('change', function() { refreshCorrection(); });
+    $('#fCorrectionDistance').on('change', function() { refreshCorrection(); });
+
+    function refreshCorrection(iGPS, iBT) {
+        iGPS = iGPS != null ? iGPS : parseFloat($('#fCorrectionIntervalGPS').val());
+        iBT = iBT != null ? iBT : parseFloat($('#fCorrectionIntervalBT').val());
+        var d = parseFloat($('#fCorrectionDistance').val());
+		$('#fCorrectionValueGPS').val((iGPS && d) ? correctionGPS * d / iGPS : null);
+		$('#fCorrectionValueBT').val((iBT && d) ? correctionBT * d / iBT : null);
+    }
+
+    function showModalSpeed() {
+        $('#modalSpeed').modal('show');
+
+        $('#modalSpeed ul a').remove();
+        for (var i = 0; i < speedIns.length; ++i) {
+            $('#modalSpeed ul').append(getSpeedInsListItem(i));
+        }
+    }
+
+    function getSpeedInsListItem(i) {
+        var t = '';
+        switch (speedIns[i].type) {
+            case 'S':
+                t = '<i class="fa fa-play rdsIcon"></i>';
+                break;
+            case 'P':
+                t = '<i class="fa fa-flag-checkered rdsIcon"></i>';
+                break;
+            case 'F':
+                t = '<i class="fa fa-stop rdsIcon"></i>';
+                break;
+            default:
+                t = '<i class="fa fa-tachometer rdsIcon"></i>';
+                break;
+        }
+        return '<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item si-item clearfix' + ((currentSiIndex == i) ? ' list-group-item-success' : '') + '">'
+                + t + ' '
+                + speedIns[i].toString()
+                + '<span class="pull-right">'
+                + '<button class="btn btn-info" onclick="showModalAddFormula(' + (i+1) + ');return false;"><i class="fa fa-plus-circle"></i></button>\
+                <button class="btn btn-danger" onclick="deleteSpeedInstruction(' + i + ');return false;"><i class="fa fa-trash"></i></button>&nbsp;\
+                </span></a>';
+    }
+
+    $('#modalSpeed').on('shown.bs.modal', function() {
+        $('#btnAdd').focus().select();
+    })
+
+    function applySpeedInstruction(index) {
+		if (index < 0 || index >= speedIns.length) return;
+        currentSiIndex = index;
+        localStorage.setItem("currentSiIndex", currentSiIndex);
+        if (index != -1) {
+            var si = speedIns[index];
+            var deltaGPS = 0;
+			var deltaBT = 0;
+            if (si.position != null && !isNaN(si.position)) {
+                deltaGPS = si.position - distanceGPS;
+				deltaBT = si.position - distanceBT;
+                setDistanceGPS(si.position);
+                setDistanceBT(si.position);
+            }
+            setIntervalStartGPS(distanceGPS);
+            setIntervalStartBT(distanceBT);
+            setIntervalDistanceGPS((index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStartGPS : 0);
+            setIntervalDistanceBT((index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStartBT : 0);
+            if (si.isFormula()) {
+                currentSpeedInstruction = si;
+                localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
+            }
+            switch (si.type) {
+                case 'S':
+                    rdsStart(si.vPdd, deltaGPS, deltaBT);
+                    break;
+                case 'P':
+                    rdsPF(si.vPdd, deltaGPS, deltaBT);
+                    break;
+                case 'F':
+                    rdsFinish(si.vPdd, deltaGPS, deltaBT);
+                    break;
+                default:
+                    rdsSpeedChange(si.vPdd, deltaGPS, deltaBT);
+                    break;
+            }
+        }
+        //newMove();
+        beep();
+    }
+
+    $('#modalSpeed').on('submit', function (e) {
+        $('#modalSpeed').modal('hide');
+        newMove();
+        return false;
+    });
+
+    function deleteSpeedInstruction(index) {
+        $('#modalSpeed ul a').eq(index).remove();
+        speedIns.splice(index, 1);
+        localStorage.setItem("speedIns", JSON.stringify(speedIns));
+        if (index <= currentSiIndex) {
+            currentSiIndex = currentSiIndex - 1;
+            localStorage.setItem("currentSiIndex", currentSiIndex);
+        }
+        for (var i = index; i < speedIns.length; ++i) {
+            $('#modalSpeed ul a').eq(i).replaceWith(getSpeedInsListItem(i));
+        }
+        // update rds siIndex
+        for (var i = 0; i < rds.length; ++i) {
+            if (rds[i].siIndex >= index) --rds[i].siIndex;
+        }
+    }
+
+    $('#modalSpeed #btnAdd').on('click', function (e) {
+        showModalAddFormula(speedIns.length);
+    });
+
+    function showModalAddFormula(i) {
+        addSiIndex = i;
+        $('#modalSpeed').modal('hide');
+        $('#modalAddFormula').modal('show');
+        $('input[name=fFormulaItemType][value=C]').closest('.btn').button('toggle');
+        $('#modalAddFormula #fPosition').val("");
+        $('#modalAddFormula #fVpdd').val("");
+        $('#modalAddFormula #fVds').val("");
+        $('#modalAddFormula #chbUseVpdd').prop('checked', false);
+        $('#modalAddFormula #fVds').show();
+        $('#modalAddFormula #lVpdd').hide();
+        $('#modalAddFormula #fSign').hide();
+        $('#modalAddFormula #fOperand').hide();
+        $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').removeClass('has-success');
+    }
+
+    $('#modalAddFormula').on('shown.bs.modal', function() {
+        $('#chbVpdd').focus().select();
+    })
+
+    $('#modalAddFormula').on('submit', function (e) {
+        var isGood = true;
+        var si = new SpeedInstruction();
+
+        si.type = $('input[name=fFormulaItemType]:checked').val();
+        si.position = parseFloat($('#modalAddFormula #fPosition').val());
+        si.vPdd = parseFloat($('#modalAddFormula #fVpdd').val());
+        si.isVpdd = $('#modalAddFormula #chbUseVpdd').prop('checked');
+        if (si.isVpdd) {
+            si.sign = $('#modalAddFormula #fSign').val();
+            if (si.sign) {
+                si.operand = parseFloat($('#modalAddFormula #fOperand').val());
+                if (si.operand) {
+                    $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').addClass('has-success');
+                } else {
+                    $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-success').addClass('has-error');
+                    isGood = false;
+                }
+            }
+        } else {
+            si.speed = parseFloat($('#modalAddFormula #fVds').val());
+        }
+        if (isGood && (si.type != 'C' || (si.position && !isNaN(si.position)) || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed)))) {
+            $('#modalAddFormula').modal('hide');
+            speedIns.splice(addSiIndex, 0, si);
+            localStorage.setItem("speedIns", JSON.stringify(speedIns));
+            if (isApply) {
+                applySpeedInstruction(addSiIndex);
+            } else {
+                showModalSpeed();
+            }
+        }
+        return false;
+    });
+
+    $('#modalAddFormula #chbVpdd').on('click', function (e) {
+        $('#modalAddFormula #fVpdd').prop('disabled', !this.checked);
+    });
+
+    $('#modalAddFormula #chbUseVpdd').on('click', function (e) {
+        if (this.checked) {
+            $('#modalAddFormula #fVds').hide();
+            $('#modalAddFormula #lVpdd').show();
+            $('#modalAddFormula #fSign').show();
+            $('#modalAddFormula #fOperand').show();
+        } else {
+            $('#modalAddFormula #fVds').show();
+            $('#modalAddFormula #lVpdd').hide();
+            $('#modalAddFormula #fSign').hide();
+            $('#modalAddFormula #fOperand').hide();
+        }
+    });
+
+    $('#modalAddFormula #chbVds').on('click', function (e) {
+        $('#modalAddFormula #fVds').prop('disabled', !this.checked);
+        $('#modalAddFormula #fSign').prop('disabled', !this.checked);
+        if (this.checked) {
+            $('#modalAddFormula #fSign').change();
+        } else {
+            $('#modalAddFormula #fOperand').prop('disabled', !this.checked);
+        }
+    });
+
+    $('#modalAddFormula #fSign').on('change', function (e) {
+        $('#modalAddFormula #fOperand').prop('disabled', !this.value);
+    });
+
+    function viewRds() {
+        if (rds.length == 0) {
+            return;
+        }
+		var n = 0;
+        var message = '<html><body><table><thead><tr><th>Тип</th><th>Дистанция</th><th>Скорость</th><th>Опоздание</th><th>Норма</th><th>Норматив</th><th>Время</th><th>Координаты</th><th>SiIndex</th><th>Дельта GPS</th><th>Дельта BT</th></tr></thead><tbody>';
+        for (var i = 0; i < rds.length; ++i) {
+			n += rds[i].norm;
+            message = message + '<tr>'
+                + '<td>' + rds[i].type + '</td>'
+                + '<td>' + getNumberString(rds[i].distance, 1000) + '</td>'
+                + '<td>' + getNumberString(rds[i].speed, 100) + '</td>'
+                + '<td>' + getNumberString(rds[i].lateness, 10) + '</td>'
+                + '<td>' + getTimeString(rds[i].norm, true) + '</td>'
+                + '<td>' + getTimeString(n, true) + '</td>'
+                + '<td>' + getTimeString(rds[i].time, true) + '</td>'
+                + '<td><a href="https://maps.yandex.ru/?text=' + rds[i].latitude + ', ' + rds[i].longitude + '">' + rds[i].latitude + ' ' + rds[i].longitude + '</a></td>'
+                + '<td>' + rds[i].siIndex + '</td>'
+                + '<td>' + getNumberString(rds[i].deltaGPS, 1000) + '</td>'
+                + '<td>' + getNumberString(rds[i].deltaBT, 1000) + '</td>'
+                + '</tr>';
+			if (rds[i].type != 'P' && rds[i].type != 'C') n = 0;
+        }
+        message = message + '</tbody></table></body><html>';
+        nw = window.open("");
+        nw.blur();
+        window.focus();
+        nw.document.write(message);
+        nw.document.close();
+    }
+
+    function showModalKvList() {
+        $('#modalKvList').modal('show');
+        refreshKvList();
+    }
+
+    $('#modalKvList').on('shown.bs.modal', function() {
+        $('#btnAddKv').focus().select();
+    })
+
+    function refreshKvList() {
+        $('#modalKvList tbody tr').remove();
+        var nextStart = start;
+        for (var i = 0; i < kvs.length; ++i) {
+            $('#modalKvList tbody').append($('<tr class="kv-item' + ((currentKvIndex == i) ? ' success' : '') + '" onclick="showModalKv(' + i + ');">')
+                .append($('<td>').text(i + 1))
+                .append($('<td>').text(getTimeString(kvs[i].start != null ? kvs[i].start : nextStart, true)))
+                .append($('<td>').text(getNumberString(kvs[i].sector, 100)))
+                .append($('<td>').text(getTimeString(kvs[i].norm, false)))
+                .append($('<td>').text(getTimeString(kvs[i].pause != null ? kvs[i].pause : 0, false)))
+            );
+            nextStart = (kvs[i].start != null ? kvs[i].start : nextStart) + kvs[i].norm + (kvs[i].pause != null ? kvs[i].pause : 0);
+            nextStart = nextStart % (24 * 60 * 60);
+        }
+    }
+
+    $('#modalKvList #btnAddKv').on('click', function (e) {
+        showModalKv(-1);
+    });
+
+    function showModalKv(i) {
+        editKvIndex = i;
+        $('#modalKv').modal('show');
+        $('#modalKv #fKvStart').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#modalKv #fKvSector').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#modalKv #fKvNorm').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#modalKv #fKvPause').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#modalKv #fKvStart').val((i == -1 || kvs[i].start == null) ? null : getTimeString(kvs[i].start, true));
+        $('#modalKv #fKvSector').val(i == -1 ? null : kvs[i].sector);
+        $('#modalKv #fKvNorm').val(i == -1 ? null : getTimeString(kvs[i].norm, false));
+        $('#modalKv #fKvPause').val((i == -1 || kvs[i].pause == null) ? null : getTimeString(kvs[i].pause, false));
+    }
+
+    $('#modalKv').on('shown.bs.modal', function() {
+        setTimeout(function () { $('#modalKv #fKvSector').focus().select(); }, 100);
+    })
+
+    $('#modalKv #fKvDelete').on('click', function (e) {
+        $('#modalKv').modal('hide');
+        kvs.splice(editKvIndex, 1);
+        localStorage.setItem("kvs", JSON.stringify(kvs));
+        if (editKvIndex <= currentKvIndex) {
+            currentKvIndex = (editKvIndex == currentKvIndex) ? -1 : currentKvIndex - 1;
+            localStorage.setItem("currentKvIndex", currentKvIndex);
+        }
+        refreshKvList();
+    });
+
+    $('#modalKv').on('submit', function (e) {
+        var isGood = true;
+        var startField = $('#fKvStart');
+        var startValue = getTimeValue(startField.val());
+        if (startValue < 0 && startField.val() != "") {
+            startField.closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        } else {
+            startField.closest('.form-group').removeClass('has-error').addClass('has-success');
+            startValue = (startValue > 0) ? startValue % (24 * 60 * 60) : null;
+        }
+        var sectorValue = parseFloat($('#fKvSector').val());
+        if (isNaN(sectorValue)) {
+            $('#fKvSector').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        } else {
+            $('#fKvSector').closest('.form-group').removeClass('has-error').addClass('has-success');
+        }
+        var normField = $('#fKvNorm');
+        var normValue = getTimeValue(normField.val());
+        if (normValue < 0) {
+            normField.closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        } else {
+            normField.closest('.form-group').removeClass('has-error').addClass('has-success');
+            normValue = normValue % (24 * 60 * 60);
+        }
+        var pauseField = $('#fKvPause');
+        var pauseValue = getTimeValue(pauseField.val());
+        if (pauseValue < 0 && pauseField.val() != "") {
+            pauseField.closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        } else {
+            pauseField.closest('.form-group').removeClass('has-error').addClass('has-success');
+            pauseValue = pauseValue > 0 ? pauseValue % (24 * 60 * 60) : null;
+        }
+        
+        if (isGood)
+        {
+            $('#modalKv').modal('hide');
+            var nk = new Kv(startValue, sectorValue, normValue, pauseValue);
+            if (editKvIndex == -1) {
+                editKvIndex = kvs.push(nk) - 1;
+            } else {
+                kvs[editKvIndex] = nk;
+            }
+            localStorage.setItem("kvs", JSON.stringify(kvs));
+            if (editKvIndex == currentKvIndex) {
+                applyKv(editKvIndex);
+            }
+            if (isKvStart) {
+                $('#modalKvList').modal('hide');
+                startKv(editKvIndex);
+            } else {
+                refreshKvList();
+            }
+        }
+        return false;
+    });
+
+    function getTimeValue(value) {
+        var result = -1;
+        if (value) {
+			value = value + '';
+            var t = value.split(/[\D]/);
+            switch (t.length) {
+                case 1: 
+                    result = 60 * parseInt(t[0]);
+                    break;
+                case 2:
+                    result = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]);
+                    break;
+                case 3:
+                    result = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]) + parseInt(t[2]);
+                    break;
+            }
+            if (isNaN(result)) {
+                result = -1;
+            }
+        }
+        return result;
+    }
+
+    function getTimeString(value, seconds) {
+        if (value == null) {
+            return "--:--:--";
+        }
+        var n = value < 0;
+        value = Math.abs(value);
+        var h = Math.floor(value / 3600);
+        var m = Math.floor((value - 3600 * h) / 60);
+        if (seconds) {
+            var s = Math.floor(value - 60 * m - 3600 * h);
+            return (n ? "-" : "") + h + (m < 10 ? ":0" : ":") + m + (s < 10 ? ":0" : ":") + s;
+        } else {
+            return (n ? "-" : "") + h + (m < 10 ? ":0" : ":") + m;
+        }
+    }
+
+    function getNumberString(value, size) {
+        if (value == null) {
+            return "--.--"
+        }
+        var n = value < 0;
+        value = Math.abs(value);
+        if (size <= 1) {
+            return (n ? "-" : "") + Math.floor(value * size) / size;
+        }
+        var s = Math.round(value * size) / size + '';
+        var d = s.indexOf(decimalPoint);
+        if (d == -1) {
+            d = size;
+            s = s + decimalPoint;
+        } else {
+            d = size / Math.pow(10, s.length - d - 1);
+        }
+        for (; d > 1; d = d / 10) {
+            s = s + '0';
+        }
+        return (n ? "-" : "") + s;
+    }
+
+    function showActions() {
+        $('#actions').css('display', 'block');
+    }
+
+    function hideActions() {
+        $('#actions').css('display', 'none');
+    }
+
+    var snd = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkXgoQwAEaYLWfkWgAI0wWs/ItAAAGDgYtAgAyN+QWaAAihwMWm4G8QQRDiMcCBcH3Cc+CDv/7xA4Tvh9Rz/y8QADBwMWgQAZG/ILNAARQ4GLTcDeIIIhxGOBAuD7hOfBB3/94gcJ3w+o5/5eIAIAAAVwWgQAVQ2ORaIQwEMAJiDg95G4nQL7mQVWI6GwRcfsZAcsKkJvxgxEjzFUgfHoSQ9Qq7KNwqHwuB13MA4a1q/DmBrHgPcmjiGoh//EwC5nGPEmS4RcfkVKOhJf+WOgoxJclFz3kgn//dBA+ya1GhurNn8zb//9NNutNuhz31f////9vt///z+IdAEAAAK4LQIAKobHItEIYCGAExBwe8jcToF9zIKrEdDYIuP2MgOWFSE34wYiR5iqQPj0JIeoVdlG4VD4XA67mAcNa1fhzA1jwHuTRxDUQ//iYBczjHiTJcIuPyKlHQkv/LHQUYkuSi57yQT//uggfZNajQ3Vmz+Zt//+mm3Wm3Q576v////+32///5/EOgAAADVghQAAAAA//uQZAUAB1WI0PZugAAAAAoQwAAAEk3nRd2qAAAAACiDgAAAAAAABCqEEQRLCgwpBGMlJkIz8jKhGvj4k6jzRnqasNKIeoh5gI7BJaC1A1AoNBjJgbyApVS4IDlZgDU5WUAxEKDNmmALHzZp0Fkz1FMTmGFl1FMEyodIavcCAUHDWrKAIA4aa2oCgILEBupZgHvAhEBcZ6joQBxS76AgccrFlczBvKLC0QI2cBoCFvfTDAo7eoOQInqDPBtvrDEZBNYN5xwNwxQRfw8ZQ5wQVLvO8OYU+mHvFLlDh05Mdg7BT6YrRPpCBznMB2r//xKJjyyOh+cImr2/4doscwD6neZjuZR4AgAABYAAAABy1xcdQtxYBYYZdifkUDgzzXaXn98Z0oi9ILU5mBjFANmRwlVJ3/6jYDAmxaiDG3/6xjQQCCKkRb/6kg/wW+kSJ5//rLobkLSiKmqP/0ikJuDaSaSf/6JiLYLEYnW/+kXg1WRVJL/9EmQ1YZIsv/6Qzwy5qk7/+tEU0nkls3/zIUMPKNX/6yZLf+kFgAfgGyLFAUwY//uQZAUABcd5UiNPVXAAAApAAAAAE0VZQKw9ISAAACgAAAAAVQIygIElVrFkBS+Jhi+EAuu+lKAkYUEIsmEAEoMeDmCETMvfSHTGkF5RWH7kz/ESHWPAq/kcCRhqBtMdokPdM7vil7RG98A2sc7zO6ZvTdM7pmOUAZTnJW+NXxqmd41dqJ6mLTXxrPpnV8avaIf5SvL7pndPvPpndJR9Kuu8fePvuiuhorgWjp7Mf/PRjxcFCPDkW31srioCExivv9lcwKEaHsf/7ow2Fl1T/9RkXgEhYElAoCLFtMArxwivDJJ+bR1HTKJdlEoTELCIqgEwVGSQ+hIm0NbK8WXcTEI0UPoa2NbG4y2K00JEWbZavJXkYaqo9CRHS55FcZTjKEk3NKoCYUnSQ0rWxrZbFKbKIhOKPZe1cJKzZSaQrIyULHDZmV5K4xySsDRKWOruanGtjLJXFEmwaIbDLX0hIPBUQPVFVkQkDoUNfSoDgQGKPekoxeGzA4DUvnn4bxzcZrtJyipKfPNy5w+9lnXwgqsiyHNeSVpemw4bWb9psYeq//uQZBoABQt4yMVxYAIAAAkQoAAAHvYpL5m6AAgAACXDAAAAD59jblTirQe9upFsmZbpMudy7Lz1X1DYsxOOSWpfPqNX2WqktK0DMvuGwlbNj44TleLPQ+Gsfb+GOWOKJoIrWb3cIMeeON6lz2umTqMXV8Mj30yWPpjoSa9ujK8SyeJP5y5mOW1D6hvLepeveEAEDo0mgCRClOEgANv3B9a6fikgUSu/DmAMATrGx7nng5p5iimPNZsfQLYB2sDLIkzRKZOHGAaUyDcpFBSLG9MCQALgAIgQs2YunOszLSAyQYPVC2YdGGeHD2dTdJk1pAHGAWDjnkcLKFymS3RQZTInzySoBwMG0QueC3gMsCEYxUqlrcxK6k1LQQcsmyYeQPdC2YfuGPASCBkcVMQQqpVJshui1tkXQJQV0OXGAZMXSOEEBRirXbVRQW7ugq7IM7rPWSZyDlM3IuNEkxzCOJ0ny2ThNkyRai1b6ev//3dzNGzNb//4uAvHT5sURcZCFcuKLhOFs8mLAAEAt4UWAAIABAAAAAB4qbHo0tIjVkUU//uQZAwABfSFz3ZqQAAAAAngwAAAE1HjMp2qAAAAACZDgAAAD5UkTE1UgZEUExqYynN1qZvqIOREEFmBcJQkwdxiFtw0qEOkGYfRDifBui9MQg4QAHAqWtAWHoCxu1Yf4VfWLPIM2mHDFsbQEVGwyqQoQcwnfHeIkNt9YnkiaS1oizycqJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=");
+    function beep() {
+        snd.play();
+    }
+</script>
+
 </div>
 </body>
 
