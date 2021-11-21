@@ -1348,7 +1348,7 @@
             displayRdsItems = parseInt(localStorage.getItem("displayRdsItems"));
             currentPddSpeed = parseFloat(localStorage.getItem("currentPddSpeed"));
             currentSpeedInstruction = new SpeedInstruction(JSON.parse(localStorage.getItem("currentSpeedInstruction")));
-            var sis = JSON.parse(localStorage.getItem("speedIns"));
+            var sis = (localStorage.getItem("speedIns") != '') ? JSON.parse(localStorage.getItem("speedIns")) : null;
 			speedIns = [];
             if (sis) {
                 for (var i = 0; i < sis.length; ++i) {
@@ -1359,7 +1359,7 @@
             //lastLatitude = parseFloat(localStorage.getItem("lastLatitude"));
             //lastLongitude = parseFloat(localStorage.getItem("lastLongitude"));
             //isDemo = localStorage.getItem("isDemo") == "true";
-            var kvis = JSON.parse(localStorage.getItem("kvs"));
+            var kvis = (localStorage.getItem("kvs") != '') ? JSON.parse(localStorage.getItem("kvs")) : null;
 			kvs = [];
             if (kvis) {
                 for (var i = 0; i < kvis.length; ++i) {
@@ -1985,14 +1985,30 @@
             $("#benefit").css("color", "black");
         }
         if (isRds()) {
+			lateness = getRdsLateness();
             $("#avgSpeed").html(getNumberString(getCurrentRdsSpeed(), 100));
-            $("#lateness").html(getTimeString(getRdsLateness(), true));
+            $("#lateness").html(getTimeString(lateness, true));
             $("#latenessPdd").html(getTimeString(getPddLateness(), true));
         } else {
             $("#avgSpeed").html(norm > 0 ? getNumberString(3600 * sector / norm, 100) : "--.--");
             $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
             $("#latenessPdd").html("-");
         }
+		// set body background
+		if ($('#enterType').text() != 'Ввод') {
+			$('body').css('background-color', 'Yellow');
+		} else {
+			if (isRds()) {
+				if (lateness <= 0) {
+					$('body').css('background-color', 'LightCoral');
+				} else {
+					$('body').css('background-color', 'LightGreen');
+				}
+			} else {
+				$('body').css('background-color', '');
+			}
+		}
+
 		$("#actualSpeed").html(getNumberString(getSpeed(), 10));
         $("#speed").html(currentSpeedInstruction.toString(true));
         $("#vpdd").html(getNumberString(currentPddSpeed, 100));
@@ -2372,6 +2388,7 @@
         enterSubTypeId = 0;
         $('#enterSubType').text((enterType[enterTypeId].length > 1) ? enterType[enterTypeId][++enterSubTypeId] : '-');
         $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+		//$('body').addClass('enter-value');
     }
 
     function keyDown(e) {
@@ -2471,6 +2488,7 @@
                     $('#enterType').text('Ввод');
                     $('#enterValue').html('x');
                     $('#enterSubType').text('-');
+					//$('body').removeClass("enter-value");
                 break;
 				case 37: // left arrow
 					e.preventDefault();
