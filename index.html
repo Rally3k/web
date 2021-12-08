@@ -975,6 +975,12 @@
                             <input type="number" class="form-control" id="fCorrectionMinMove" step="any" placeholder="В километрах">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionMaxSpeed">Максимальная скорость GPS</label>
+                        <div class="col-sm-8">
+                            <input type="number" class="form-control" id="fCorrectionMaxSpeed" step="any" placeholder="В км/ч">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <div class="btn-group btn-group-lg col-xs-12">
@@ -1255,6 +1261,7 @@
     var isApply = false;
     var fontSize = null;
     var minMove = 0;
+    var maxSpeed = 300;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1330,6 +1337,7 @@
             correctionGPS = parseFloat(localStorage.getItem("correctionGPS"));
             correctionBT = parseFloat(localStorage.getItem("correctionBT"));
             minMove = parseFloat(localStorage.getItem("minMove"));
+            maxSpeed = parseFloat(localStorage.getItem("maxSpeed"));
             intervalStartGPS = parseFloat(localStorage.getItem("intervalStartGPS"));
             intervalStartBT = parseFloat(localStorage.getItem("intervalStartBT"));
             intervalDistanceGPS = parseFloat(localStorage.getItem("intervalDistanceGPS"));
@@ -1376,6 +1384,7 @@
         correctionGPS = correctionGPS ? correctionGPS : 1.0;
         correctionBT = correctionBT ? correctionBT : 1.0;
         minMove = minMove ? minMove : 0.001;
+        maxSpeed = maxSpeed ? maxSpeed : 300;
         intervalStartGPS = intervalStartGPS ? intervalStartGPS : 0.0;
         intervalStartBT = intervalStartBT ? intervalStartBT : 0.0;
         intervalDistanceGPS = intervalDistanceGPS ? intervalDistanceGPS : 0.0;
@@ -1484,9 +1493,10 @@
     function newPosition(position) {
         wasUpdateGPS = true;
         var d = 0.0;
+        var isMove = 1;
         if (lastLatitude) {
             d = correctionGPS * getGpsDistance(lastLatitude, lastLongitude, position.coords.latitude, position.coords.longitude);
-			moveGPS(d);
+			isMove = moveGPS(d);
         }
         if (position.coords.accuracy > 10) {
             $(".fa-globe").css("color", "orange");
@@ -1495,7 +1505,8 @@
         }
         if (myMap != null && lastLatitude) {
             myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
-            if (myPolyline && (myPolyline.geometry.getLength() < 1 || getGpsDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020)) {
+            //if (myPolyline && (myPolyline.geometry.getLength() < 1 || getGpsDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020)) {
+            if (myPolyline && isMove) {
                 myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
             }
 
@@ -1507,7 +1518,7 @@
                 myPosition.geometry.setRadius(position.coords.accuracy);
             }
         }
-        if (!lastLatitude || d >= minMove) {
+        if (isMove) {
             lastLatitude = position.coords.latitude;
             lastLongitude = position.coords.longitude;
         }
@@ -1682,16 +1693,28 @@
 		localStorage.setItem("distanceGPS", d);
 	}
 	function moveGPS(d) {
-		if (!isPause && d >= minMove) {
-			setDistanceGPS(distanceGPS + (isReverse ? -d : d));
-		}
+        var res = 1;
 		// calculate speed
 		var time = getCurrentTime();
 		if (lastTimeGPS != null) {
-			speedGPS = d / (time - lastTimeGPS) * 60 * 60;
-		}
-		lastTimeGPS = time;
+            var s = d / (time - lastTimeGPS) * 60 * 60;
+            if (s < maxSpeed) {
+			    speedGPS = s;
+                lastTimeGPS = time;
+            } else {
+                res = 0;
+            }
+		} else {
+		    lastTimeGPS = time;
+            speedGPS = 0;
+        }
+        if (res && d >= minMove) {
+		    if (!isPause) setDistanceGPS(distanceGPS + (isReverse ? -d : d));
+		} else {
+            res = 0;
+        }
 		newMove();
+        return res;
 	}
 	function setDistanceBT(d) {
 		distanceBT = d;
@@ -2984,6 +3007,8 @@
         $('#fCorrectionValueBT').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fCorrectionMinMove').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fCorrectionMinMove').val(minMove);
+        $('#fCorrectionMaxSpeed').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fCorrectionMaxSpeed').val(maxSpeed);
 		$('input[name=fCorrectionDefaultMeter][value=' + defaultMeter + ']').prop('checked', true);
     }
 
@@ -2995,6 +3020,7 @@
         var cGPS = parseFloat($('#fCorrectionValueGPS').val());
         var cBT = parseFloat($('#fCorrectionValueBT').val());
         var m = parseFloat($('#fCorrectionMinMove').val());
+        var ms = parseFloat($('#fCorrectionMaxSpeed').val());
         if (!cGPS) {
             $('#fCorrectionValueGPS').closest('.form-group').removeClass('has-success').addClass('has-error');
         }
@@ -3004,7 +3030,10 @@
         if (!m) {
             $('#fCorrectionMinMove').closest('.form-group').removeClass('has-success').addClass('has-error');
         }
-        if (cBT || (cGPS && m)) {
+        if (!ms) {
+            $('#fCorrectionMaxSpeed').closest('.form-group').removeClass('has-success').addClass('has-error');
+        }
+        if (cBT || (cGPS && m && ms)) {
             $('#modalCorrection').modal('hide');
             correctionGPS = cGPS ? cGPS : correctionGPS;
             correctionBT = cBT ? cBT : correctionBT;
@@ -3012,6 +3041,8 @@
             localStorage.setItem("correctionBT", correctionBT);
             minMove = m ? m : minMove;
             localStorage.setItem("minMove", minMove);
+            maxSpeed = ms ? ms : maxSpeed;
+            localStorage.setItem("maxSpeed", maxSpeed);
 			defaultMeter = $('input[name=fCorrectionDefaultMeter]:checked').val();
 			localStorage.setItem("defaultMeter", defaultMeter);
         }
