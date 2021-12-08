@@ -1280,7 +1280,7 @@
         , ['Новая формула', 'Тип', 'Позиция', 'Vпдд', 'Vдс', 'Операция', 'Операнд']
 		, ['Тарировка']
         , ['Скорость']
-        , ['Действие скорости', 'Расстояние', 'Скорость после']
+        , ['↑скорость↑', 'Расстояние', 'Скорость после']
     ];
     var enterValue = [[], [], [], [], [], [], [], [], [], [], []];
     var enterTypeId = 2;
@@ -2232,6 +2232,8 @@
                 return operationsTypes[0];
             case 'Расстояние':
                 return "0.";
+            case 'Скорость после':
+                return "60";
             default:
                 return 'x';
         }
@@ -2521,7 +2523,7 @@
                         case 'Скорость':
                             result = setSpeed(parseFloat($('#enterValue').html()));
                             break;
-                        case 'Действие скорости':
+                        case '↑скорость↑':
                             result = setSpeedDistance(enterValue[enterTypeId][1], enterValue[enterTypeId][2]);
                             break;
                     }
