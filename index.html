@@ -401,7 +401,7 @@
         <div class="col-l-4 col-xs-8 border col-l-push-2 nopadding rect-box">
             <div class="square-content">
                 <div class="no-split">
-                    <a href="javascript:viewRds();" class="line-height-big">
+                    <a href="javascript:showModalRdsNormas();" class="line-height-big">
                         <span class="item-label-big" style="color:darkblue">Опоздание</span>
                         <span class="item-value-big" id="lateness">-10:00</span>
                         <span class="item-label-big" id="latenessPdd">10:00</span>
@@ -1200,6 +1200,37 @@
                         <button type="submit" class="btn btn-success col-xs-6"><i class="fa fa-check-circle"></i></button>
                         <button type="button" class="btn btn-default col-xs-6" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal RDS normas -->
+<div class="modal" id="modalRdsNormas" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Нормы РДС</h4>
+            </div>
+            <form class="form-horizontal" id="formRdsNormas">
+                <div class="modal-body">
+                    <table id="normTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>Тип</th>
+                                <th>Дистанция</th>
+                                <th>Норматив</th>
+                                <th>Время</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default col-xs-12" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                 </div>
             </form>
         </div>
@@ -3359,6 +3390,39 @@
             nextStart = nextStart % (24 * 60 * 60);
         }
     }
+
+    function showModalRdsNormas() {
+        $('#modalRdsNormas').modal('show');
+        $("#normTable > tbody tr").remove();
+        if (rds) {
+            var n = 0;
+            for (var i = 0; i < rds.length; ++i) {
+                var t = '';
+                n += rds[i].norm;
+                switch (rds[i].type) {
+                    case 'S':
+                        t = '<i class="fa fa-play"></i>';
+                        break;
+                    case 'P':
+                        t = '<i class="fa fa-flag-checkered"></i>';
+                        break;
+                    case 'F':
+                        t = '<i class="fa fa-stop"></i>';
+                        break;
+                }
+                if (rds[i].type != 'C') {
+                    $('#normTable > tbody').append($('<tr>')
+                        .append($('<td>').html(t))
+                        .append($('<td>').text(getNumberString(rds[i].distance, 1000)))
+                        .append($('<td>').text(getTimeString(n, true)))
+                        .append($('<td>').text(getTimeString(rds[i].time, true)))
+                    );
+                    if (rds[i].type != 'P') n = 0;
+                }
+            }
+        }
+    }
+
 
     $('#modalKvList #btnAddKv').on('click', function (e) {
         showModalKv(-1);
