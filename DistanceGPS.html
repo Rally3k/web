@@ -18,7 +18,7 @@
   <p id="text">text</p>
   <button id="send">Send</button>
   <br>
-Version 0.9
+Version 0.10
   <script>
 	let distanceMeter = null;
 	let distanceMeterTx = null;
@@ -93,7 +93,7 @@ Version 0.9
 	function handleCharacteristicValueChanged(event) {
 		try {
 			let d = event.target.value;
-			text.innerHTML = d;
+			text.innerHTML = d.byteLength;
 			d = d.buffer ? d : new DataView(d);
 			dataDistance.innerHTML = "D: " + d.getFloat64(0, true);
 			dataBattery.innerHTML = "B: " + d.getFloat32(8, true);
