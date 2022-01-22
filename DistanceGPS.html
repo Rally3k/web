@@ -17,7 +17,7 @@
   <p id="dataMillis">0</p>
   <button id="send">Send</button>
   <br>
-Version 0.7
+Version 0.8
   <script>
 	let distanceMeter = null;
 	let distanceMeterTx = null;
@@ -94,6 +94,7 @@ Version 0.7
 		dataDistance.innerHTML = "D: " + d.getFloat64(0, true);
 		dataBattery.innerHTML = "B: " + d.getFloat32(8, true);
 		dataTime.innerHTML = "T: " + d.getUint32(8+4, true);
+		alert(d.getFloat64(8+4+4, true));
 		dataSpeed.innerHTML = "S: " + d.getFloat64(8+4+4, true);
 		dataLat.innerHTML = "Lat: " + d.getFloat64(8+4+4+8, true);
 		dataLng.innerHTML = "Lat: " + d.getFloat64(8+4+4+8+8, true);
