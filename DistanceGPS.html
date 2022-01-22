@@ -18,7 +18,7 @@
   <p id="text">text</p>
   <button id="send">Send</button>
   <br>
-Version 0.11
+Version 0.12
   <script>
 	let distanceMeter = null;
 	let distanceMeterTx = null;
@@ -94,9 +94,9 @@ Version 0.11
 		try {
 			let d = event.target.value;
 			d = d.buffer ? d : new DataView(d);
-			dataDistance.innerHTML = "D: " + d.getFloat32(0, true);
-			dataBattery.innerHTML = "B: " + d.getFloat32(4, true);
-			dataSpeed.innerHTML = "S: " + d.getFloat32(8, true);
+			dataDistance.innerHTML = "D: " + Math.round(1000 * d.getFloat32(0, true)) / 1000;
+			dataBattery.innerHTML = "B: " + Math.round(100 * d.getFloat32(4, true)) / 100;
+			dataSpeed.innerHTML = "S: " + Math.round(10 * d.getFloat32(8, true)) / 10;
 			dataTime.innerHTML = "T: " + d.getUint32(12, true);
 			dataMillis.innerHTML = "Millis: " + d.getUint32(16, true);
 			if (d.byteLength > 20) {
