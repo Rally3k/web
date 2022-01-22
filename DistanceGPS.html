@@ -10,15 +10,15 @@
   <button id="bluetooth">BT</button>
   <p id="dataDistance">0</p>
   <p id="dataBattery">0</p>
-  <p id="dataTime">0</p>
   <p id="dataSpeed">0</p>
+  <p id="dataTime">0</p>
+  <p id="dataMillis">0</p>
   <p id="dataLat">0</p>
   <p id="dataLng">0</p>
-  <p id="dataMillis">0</p>
   <p id="text">text</p>
   <button id="send">Send</button>
   <br>
-Version 0.10
+Version 0.11
   <script>
 	let distanceMeter = null;
 	let distanceMeterTx = null;
@@ -93,17 +93,18 @@ Version 0.10
 	function handleCharacteristicValueChanged(event) {
 		try {
 			let d = event.target.value;
-			text.innerHTML = d.byteLength;
 			d = d.buffer ? d : new DataView(d);
-			dataDistance.innerHTML = "D: " + d.getFloat64(0, true);
-			dataBattery.innerHTML = "B: " + d.getFloat32(8, true);
-			dataTime.innerHTML = "T: " + d.getUint32(8+4, true);
-			dataSpeed.innerHTML = "S: " + d.getFloat64(8+4+4, true);
-			dataLat.innerHTML = "Lat: " + d.getFloat64(8+4+4+8, true);
-			dataLng.innerHTML = "Lat: " + d.getFloat64(8+4+4+8+8, true);
-			dataMillis.innerHTML = "Millis: " + d.getUint32(8+4+4+8+8+8, true);
+			dataDistance.innerHTML = "D: " + d.getFloat32(0, true);
+			dataBattery.innerHTML = "B: " + d.getFloat32(4, true);
+			dataSpeed.innerHTML = "S: " + d.getFloat32(8, true);
+			dataTime.innerHTML = "T: " + d.getUint32(12, true);
+			dataMillis.innerHTML = "Millis: " + d.getUint32(16, true);
+			if (d.byteLength > 20) {
+				dataLat.innerHTML = "Lat: " + d.getFloat64(20, true);
+				dataLng.innerHTML = "Lat: " + d.getFloat64(28, true);
+			}
 		} catch (e) {
-			//alert(e);
+			text.innerHTML = e;
 		}
 	}
   </script>
