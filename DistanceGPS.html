@@ -17,26 +17,26 @@
   <p id="dataMillis">0</p>
   <button id="send">Send</button>
   <br>
-Version 0.5
+Version 0.6
   <script>
 	function parseValue (v) {
 		// В Chrome 50+ используется DataView.
 		var value = v.buffer ? v : new DataView(v);
 		let result = {};
 		result.distance = value.getFloat64(0, true);
-		dataDistance.innerHTML = "D: " + d.distance;
+		dataDistance.innerHTML = "D: " + result.distance;
 		result.battery = value.getFloat32(8, true);
-		dataBattery.innerHTML = "B: " + d.battery;
+		dataBattery.innerHTML = "B: " + result.battery;
 		result.time = value.getUint32(8+4, true);
-		dataTime.innerHTML = "T: " + d.time;
+		dataTime.innerHTML = "T: " + result.time;
 		result.speed = value.getFloat64(8+4+4, true);
-		dataSpeed.innerHTML = "S: " + d.speed;
+		dataSpeed.innerHTML = "S: " + result.speed;
 		result.lat = value.getFloat64(8+4+4+8, true);
-		dataLat.innerHTML = "Lat: " + d.lat;
+		dataLat.innerHTML = "Lat: " + result.lat;
 		result.lng = value.getFloat64(8+4+4+8+8, true);
-		dataLng.innerHTML = "Lat: " + d.lng;
+		dataLng.innerHTML = "Lat: " + result.lng;
 		result.millis = value.getUint32(8+4+4+8+8+8, true);
-		dataMillis.innerHTML = "Millis: " + d.millis;
+		dataMillis.innerHTML = "Millis: " + result.millis;
 
 		return result;
 	}
