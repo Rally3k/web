@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <button id="bluetooth">BT</button>
+  <p id="dataDistance">0</p>
+  <p id="dataBattery">0</p>
+  <p id="dataTime">0</p>
+  <p id="dataSpeed">0</p>
+  <p id="dataLat">0</p>
+  <p id="dataLng">0</p>
+  <p id="dataMillis">0</p>
+  <button id="send">Send</button>
+  <br>
+Version 0.1
+  <script>
+	function parseValue (v) {
+		// В Chrome 50+ используется DataView.
+		var value = v.buffer ? v : new DataView(v);
+		let result = {};
+		result.distance = value.getFloat64(0, true);
+		result.battery = value.getFloat32(8, true);
+		result.time = value.getUint32(8+4, true);
+		result.speed = value.getFloat64(8+4+4, true);
+		result.lat = value.getFloat64(8+4+4+8, true);
+		result.lng = value.getFloat64(8+4+4+8+8, true);
+		result.millis = value.getUint32(8+4+4+8+8+8, true);
+
+		return result;
+	}
+
+	let distanceMeter = null;
+	let distanceMeterTx = null;
+    
+	window.onload = () => {
+      const btButton = document.getElementById('bluetooth');
+	  const dataDistance = document.getElementById('dataDistance');
+	  const dataBattery = document.getElementById('dataBattery');
+	  const dataTime = document.getElementById('dataTime');
+	  const dataSpeed = document.getElementById('dataSpeed');
+	  const dataLat = document.getElementById('dataLat');
+	  const dataLng = document.getElementById('dataLng');
+	  const dataMillis = document.getElementById('dataMillis');
+	  const send = document.getElementById('send');
+	  
+      btButton.addEventListener('pointerup', function(event) {
+		if (distanceMeter) {
+			distanceMeter.removeEventListener('gattserverdisconnected', handleDisconnection);
+			if (distanceMeter.gatt.connected) {
+				distanceMeter.gatt.disconnect();
+			}
+
+			if (distanceMeterTx) {
+				distanceMeterTx.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+				distanceMeterTx = null;
+			}
+
+			distanceMeter = null;
+		} else {
+			navigator.bluetooth.requestDevice({
+				filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {'name': 'ESP32Meter'} ]
+			  })
+			  .then((device) => {
+				device.addEventListener('gattserverdisconnected', handleDisconnection);
+				distanceMeter = device;
+				return device.gatt.connect();
+			  })
+			  .then(server => {
+				return server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+			  })
+			  .then(service => {
+				service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e').then(characteristic => {
+					distanceMeterTx = characteristic;
+				});
+				return service;
+			  })
+			  .then(service => {
+				return service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+			  })
+			  .then(characteristic => characteristic.startNotifications())
+			  .then(characteristic => {
+				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+			  })
+			  .catch(error => { console.log(error); });
+		}
+      });
+	  
+      send.addEventListener('pointerup', function(event) {
+	    distanceMeterTx.writeValue(new TextEncoder().encode('Hello!'));
+	  });
+    }
+	
+	// Обработчик разъединения
+	function handleDisconnection(event) {
+		alert('Disconnected');
+		//let device = event.target;
+		//connectDeviceAndCacheCharacteristic(device).
+		//then(characteristic => startNotifications(characteristic)).
+		//catch(error => log(error));
+	}
+	function handleCharacteristicValueChanged(event) {
+		let value = event.target.value;
+		var d = parseValue(value);
+		dataDistance.innerHTML = "D: " + d.distance;
+		dataBattery.innerHTML = "B: " + d.battery;
+		dataTime.innerHTML = "T: " + d.time;
+		dataSpeed.innerHTML = "S: " + d.speed;
+		dataLat.innerHTML = "Lat: " + d.lat;
+		dataLng.innerHTML = "Lat: " + d.lng;
+		dataMillis.innerHTML = "Millis: " + d.millis;
+	}
+  </script>
+</body>
+</html>
