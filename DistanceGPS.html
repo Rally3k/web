@@ -18,7 +18,7 @@
   <p id="text">text</p>
   <button id="send">Send</button>
   <br>
-Version 0.12
+Version 0.13
   <script>
 	let distanceMeter = null;
 	let distanceMeterTx = null;
@@ -94,15 +94,13 @@ Version 0.12
 		try {
 			let d = event.target.value;
 			d = d.buffer ? d : new DataView(d);
-			dataDistance.innerHTML = "D: " + Math.round(1000 * d.getFloat32(0, true)) / 1000;
-			dataBattery.innerHTML = "B: " + Math.round(100 * d.getFloat32(4, true)) / 100;
-			dataSpeed.innerHTML = "S: " + Math.round(10 * d.getFloat32(8, true)) / 10;
-			dataTime.innerHTML = "T: " + d.getUint32(12, true);
-			dataMillis.innerHTML = "Millis: " + d.getUint32(16, true);
-			if (d.byteLength > 20) {
-				dataLat.innerHTML = "Lat: " + d.getFloat64(20, true);
-				dataLng.innerHTML = "Lat: " + d.getFloat64(28, true);
-			}
+			dataDistance.innerHTML = "D: " + (d.byteLength >= 4 ? Math.round(1000 * d.getFloat32(0, true)) / 1000 : "-.---");
+			dataBattery.innerHTML = "B: " + (d.byteLength >= 8 ? Math.round(100 * d.getFloat32(4, true)) / 100 : "-.--");
+			dataSpeed.innerHTML = "S: " + (d.byteLength >= 12 ? Math.round(10 * d.getFloat32(8, true)) / 10 : "-.-");
+			dataTime.innerHTML = "T: " + (d.byteLength >= 16 ? d.getUint32(12, true) : "--:--:--");
+			dataMillis.innerHTML = "Millis: " + (d.byteLength >= 20 ? d.getUint32(16, true) : "-");
+			dataLat.innerHTML = "Lat: " + (d.byteLength >= 28 ? d.getFloat64(20, true) : "-.--");
+			dataLng.innerHTML = "Lat: " + (d.byteLength >= 36 ? d.getFloat64(28, true) : "-.--");
 		} catch (e) {
 			text.innerHTML = e;
 		}
