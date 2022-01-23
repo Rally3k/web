@@ -1517,7 +1517,7 @@
 		wasUpdateBT = true;
 		var d = event.target.value;
 		d = d.buffer ? d : new DataView(d);
-		d = correctionBT * d.getUint32(0, true);
+		d = correctionBT * d.getFloat32(0, true);
 		moveBT(d);
 	}
 /*
