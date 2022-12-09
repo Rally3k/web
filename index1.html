@@ -1247,7 +1247,9 @@
     var intervalStartGPS;
     var intervalStartBT;
     var intervalDistanceGPS;
+    var lastIntervalPositionGPS;
     var intervalDistanceBT;
+    var lastIntervalPositionBT;
     var timeCorrection;
     var isPause = false;
     var isReverse = false;
@@ -1376,7 +1378,9 @@
             intervalStartGPS = parseFloat(localStorage.getItem("intervalStartGPS"));
             intervalStartBT = parseFloat(localStorage.getItem("intervalStartBT"));
             intervalDistanceGPS = parseFloat(localStorage.getItem("intervalDistanceGPS"));
+            lastIntervalPositionGPS = parseFloat(localStorage.getItem("lastIntervalPositionGPS"));
             intervalDistanceBT = parseFloat(localStorage.getItem("intervalDistanceBT"));
+            lastIntervalPositionBT = parseFloat(localStorage.getItem("lastIntervalPositionBT"));
             timeCorrection = parseFloat(localStorage.getItem("timeCorrection"));
 			defaultMeter = localStorage.getItem("defaultMeter");
             //isPause = localStorage.getItem("isPause") == "true";
@@ -1423,7 +1427,9 @@
         intervalStartGPS = intervalStartGPS ? intervalStartGPS : 0.0;
         intervalStartBT = intervalStartBT ? intervalStartBT : 0.0;
         intervalDistanceGPS = intervalDistanceGPS ? intervalDistanceGPS : 0.0;
+        lastIntervalPositionGPS = lastIntervalPositionGPS ? lastIntervalPositionGPS : 0.0;
         intervalDistanceBT = intervalDistanceBT ? intervalDistanceBT : 0.0;
+        lastIntervalPositionBT = lastIntervalPositionBT ? lastIntervalPositionBT : 0.0;
         timeCorrection = timeCorrection ? timeCorrection : 0.0;
 		defaultMeter = defaultMeter ? defaultMeter : 'GPS';
         displayRdsItems = displayRdsItems ? displayRdsItems : 10;
@@ -1777,12 +1783,22 @@
 	}
 	function setIntervalDistanceGPS(i) {
         intervalDistanceGPS = i;
+        if (i != 0) setLastIntervalPositionGPS(intervalStartGPS + i);
 		localStorage.setItem("intervalDistanceGPS", i);
 	}
+    function setLastIntervalPositionGPS(p) {
+        lastIntervalPositionGPS = p;
+		localStorage.setItem("lastIntervalPositionGPS", p);
+    }
 	function setIntervalDistanceBT(i) {
         intervalDistanceBT = i;
+        if (i != 0) setLastIntervalPositionBT(intervalStartBT + i);
 		localStorage.setItem("intervalDistanceBT", i);
 	}
+    function setLastIntervalPositionBT(p) {
+        lastIntervalPositionBT = p;
+		localStorage.setItem("lastIntervalPositionBT", p);
+    }
 	function setCurrentKvIndex(i) {
         currentKvIndex = i;
         localStorage.setItem("currentKvIndex", i);
@@ -2283,14 +2299,14 @@
         $('#enterValue').html(array[i]);
     }
 
-    function setPosition(value) {
-        if (isNaN(value)) {
+    function setPosition(valueGPS, valueBT) {
+        if (isNaN(valueGPS) || isNaN(valueBT)) {
             return 0;
         } else {
-			setDistanceGPS(value);
-			setDistanceBT(value);
-			setIntervalStartGPS(value);
-			setIntervalStartBT(value);
+			setDistanceGPS(valueGPS);
+			setDistanceBT(valueBT);
+			setIntervalStartGPS(valueGPS);
+			setIntervalStartBT(valueBT);
 			setIntervalDistanceGPS(0);
 			setIntervalDistanceBT(0);
         }
@@ -2513,7 +2529,7 @@
                     var result = 0;
                     switch ($('#enterType').text()) {
                         case 'Пройдено':
-                            result = setPosition(parseFloat($('#enterValue').html()));
+                            result = setPosition(parseFloat($('#enterValue').html()), parseFloat($('#enterValue').html()));
                             break;
                         case 'Сектор':
                             result = setSector(parseFloat($('#enterValue').html()));
@@ -2678,6 +2694,10 @@
 				case 8: // backspace
 					//e.preventDefault();
                     resetInterval();
+                break;
+                case 106: // j set last position (by interval)
+                    setPosition(lastIntervalPositionGPS, lastIntervalPositionBT);
+                    beep();
                 break;
                 case 75: // k add KV
                     showModalKv(-1);
