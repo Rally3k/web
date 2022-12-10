@@ -2082,9 +2082,9 @@
 		} else {
 			if (isRds()) {
 				if (lateness <= 0) {
-					$('body').css('background-color', 'LightCoral');
+					$('body').css('background-color', (myMap == null) ? 'LightCoral' : 'Red');
 				} else {
-					$('body').css('background-color', 'LightGreen');
+					$('body').css('background-color', (myMap == null) ? 'LightGreen': 'Green');
 				}
 			} else {
 				$('body').css('background-color', '');
