@@ -1326,7 +1326,6 @@
         speechSynthesis.onvoiceschanged = populateVoiceList;
     }
 
-    var speech = [];
     function speak(text) {
         if (text == "x") {
             return;
@@ -1340,21 +1339,23 @@
             text = "Финиш";
         } else if (text == '↑скорость↑') {
             text = "Действие скорости";
+        } else if (text == 'Новая формула') {
+            text = "Формула";
         } else if (text == '-') {
             text = "минус";
         } else if (text == '*') {
             text = "умножить";
         }
         if (synth.speaking) {
-            speech.push(text);
-            return;
+            //speech.push(text);
+            //return;
         }
 
         if (text !== "") {
             const utterThis = new SpeechSynthesisUtterance(text);
 
             utterThis.onend = function (event) {
-                speak(speech.shift());
+                //speak(speech.shift());
                 //console.log("SpeechSynthesisUtterance.onend");
             };
 
@@ -1903,6 +1904,7 @@
             localStorage.setItem("currentPddSpeed", currentPddSpeed);
             lastSpeedDistance = getDistance();
             speedInterval = 0; // reset
+            speak("ПДД " + pddSpeed);
         }
     }
 
@@ -1911,6 +1913,7 @@
         if (!isNaN(pddSpeed) && !isNaN(distance)) lastSpeedDistance = distance;
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * (isNaN(distance) ? getDistance() : distance)) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+            speak("ДС " + currentSpeedInstruction.getSpeed());
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
             }
@@ -2129,6 +2132,7 @@
         var lateness;
         if (sector > 0) {
             lateness = getKvTime() - getDistance() / sector * norm;
+            if (benefit + lateness + 60 < 0 && $("#benefit").css("color") == "rgb(0, 0, 0)") speak("Льгота");
             $("#benefit").css("color", (benefit + lateness + 60 < 0) ? "red" : "black");
         } else {
             $("#benefit").css("color", "black");
@@ -2369,6 +2373,7 @@
         }
         enterValue[enterTypeId][enterSubTypeId] = array[i];
         $('#enterValue').html(array[i]);
+        synth.cancel();
         speak(array[i]);
     }
 
@@ -2559,11 +2564,12 @@
             enterValue[enterTypeId][enterSubTypeId] = $('#enterValue').html();
             enterTypeId = (enterTypeId >= enterType.length - 1) ? 0 : enterTypeId + 1;
         }
+        synth.cancel();
         $('#enterType').text(enterType[enterTypeId][0]);
         speak(enterType[enterTypeId][0]);
         enterSubTypeId = 0;
         $('#enterSubType').text((enterType[enterTypeId].length > 1) ? enterType[enterTypeId][++enterSubTypeId] : '-');
-        if (enterType[enterTypeId].length > 1) speak(enterType[enterTypeId][enterSubTypeId]);
+        if (enterType[enterTypeId].length > 1 && enterType[enterTypeId][0] != "Новая формула") speak(enterType[enterTypeId][enterSubTypeId]);
         $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
         speak(enterValue[enterTypeId][enterSubTypeId]);
 		//$('body').addClass('enter-value');
@@ -2675,6 +2681,7 @@
 					e.preventDefault();
                 case 78: // n previous sub type
                     if (enterType[enterTypeId].length > 1) {
+                        synth.cancel();
                         enterSubTypeId = (enterSubTypeId <= 1) ? enterType[enterTypeId].length - 1 : enterSubTypeId - 1;
                         $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
                         speak(enterType[enterTypeId][enterSubTypeId]);
@@ -2686,6 +2693,7 @@
 					e.preventDefault();
                 case 77: // m next sub type
                     if (enterType[enterTypeId].length > 1) {
+                        synth.cancel();
                         enterSubTypeId = (enterSubTypeId >= enterType[enterTypeId].length - 1) ? 1 : enterSubTypeId + 1;
                         $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
                         speak(enterType[enterTypeId][enterSubTypeId]);
@@ -2722,6 +2730,8 @@
                     }
                     var val = (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && enterValue[enterTypeId][enterSubTypeId] == vdsItemTypes[1]) ? '' : $('#enterValue').html();
                     $('#enterValue').html((val.length < 2) ? 'x' : val.substr(0, val.length - 1));
+                    synth.cancel();
+                    speak($('#enterValue').html());
                 break;
                 case 188: // ,
                 case 190: // .
