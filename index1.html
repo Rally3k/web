@@ -2253,18 +2253,21 @@
     }
 
     function mapType() {
-        if (myMap == null) return;
-
-        switch(myMap.getType()) {
-            case 'yandex#map':
-                myMap.setType('yandex#satellite');
-                break;
-            case 'yandex#satellite':
-                myMap.setType('yandex#hybrid');
-                break;
-            case 'yandex#hybrid':
-                myMap.setType('yandex#map');
-                break;
+        if (myMap == null) {
+            map(); // switch on map
+        } else {
+            switch(myMap.getType()) {
+                case 'yandex#map':
+                    myMap.setType('yandex#satellite');
+                    break;
+                case 'yandex#satellite':
+                    myMap.setType('yandex#hybrid');
+                    break;
+                case 'yandex#hybrid':
+                    //myMap.setType('yandex#map');
+                    map(); // switch off map
+                    break;
+            }
         }
     }
 
@@ -2295,6 +2298,7 @@
                 zoom: 16,
                 controls: []
             });
+        myMap.setType('yandex#map');
     }
 
     function pause() {
@@ -2845,6 +2849,9 @@
                 break;
                 case 85: // u enter speed interval
                     setEnterType(10);
+                break;
+                case 66: // b map
+                    mapType();
                 break;
                 default:
                     //alert(keyCode);
