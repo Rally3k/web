@@ -1904,7 +1904,7 @@
             localStorage.setItem("currentPddSpeed", currentPddSpeed);
             lastSpeedDistance = getDistance();
             speedInterval = 0; // reset
-            speak("Пэ Дэ Дэ " + pddSpeed);
+            speak("Знак " + pddSpeed);
         }
     }
 
@@ -1913,7 +1913,7 @@
         if (!isNaN(pddSpeed) && !isNaN(distance)) lastSpeedDistance = distance;
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * (isNaN(distance) ? getDistance() : distance)) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
-            speak("Дэ Эс " + currentSpeedInstruction.getSpeed());
+            speak("Доп " + currentSpeedInstruction.getSpeed());
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
             }
@@ -2416,7 +2416,7 @@
             setIntervalDistanceGPS(isPosition ? value - intervalStartGPS : value);
             setIntervalDistanceBT(isPosition ? value - intervalStartBT : value);
             if (getIntervalDistance() > 0 && getIntervalStart() + getIntervalDistance() - getDistance() > 0.6) {
-                speak('едем ' + getNumberString(getIntervalStart() + getIntervalDistance() - getDistance(), 10) + ' кэмэ');
+                speak('едем ' + getNumberString(getIntervalStart() + getIntervalDistance() - getDistance(), 10));
             }
         }
         return -1;
