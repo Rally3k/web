@@ -1298,6 +1298,7 @@
     var lastSpeedDistance = 0.0;
     var speedInterval = 0.0;
     var speedNext = 60.0;
+    var lastLatenessSpeak = 0;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1904,7 +1905,7 @@
             localStorage.setItem("currentPddSpeed", currentPddSpeed);
             lastSpeedDistance = getDistance();
             speedInterval = 0; // reset
-            speak("Знак " + pddSpeed);
+            speak("Знак " + Math.round(pddSpeed));
         }
     }
 
@@ -1913,7 +1914,7 @@
         if (!isNaN(pddSpeed) && !isNaN(distance)) lastSpeedDistance = distance;
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * (isNaN(distance) ? getDistance() : distance)) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
-            speak("Доп " + currentSpeedInstruction.getSpeed());
+            speak("Доп " + Math.round(currentSpeedInstruction.getSpeed()));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
             }
@@ -2140,8 +2141,40 @@
         if (isRds()) {
 			lateness = getRdsLateness();
             $("#avgSpeed").html(getNumberString(getCurrentRdsSpeed(), 100));
-            $("#lateness").html(getTimeString(lateness, true));
-            $("#latenessPdd").html(getTimeString(getPddLateness(), true));
+            $("#lateness").html(Math.abs(lateness) < 60 ? getNumberString(lateness, 10) : getTimeString(lateness, true));
+            $("#latenessPdd").html(Math.abs(getPddLateness()) < 60 ? getNumberString(getPddLateness(), 10) : getTimeString(getPddLateness(), true));
+            //$("#latenessPdd").html(getTimeString(getPddLateness(), true));
+            if (lateness >= 19.5) {
+                if (lastLatenessSpeak != 20) speak("Нажми на педаль!");
+                lastLatenessSpeak = 20;
+            } else if (lateness >= 9.5 && lateness < 11.5) {
+                if (lastLatenessSpeak != 10) speak("Опоздание 10");
+                lastLatenessSpeak = 10;
+            } else if (lateness >= 4.5 && lateness < 5.5) {
+                if (lastLatenessSpeak != 5) speak("Опоздание 5");
+                lastLatenessSpeak = 5;
+            /*} else if (lateness >= -0.5 && lateness < 0.5) {
+                if (lastLatenessSpeak != 0) speak("В нуле");
+                lastLatenessSpeak = 0;*/
+            } else if (lateness > 0.5 && lateness <= 1) {
+                if (lastLatenessSpeak != 1) speak("Газ");
+                lastLatenessSpeak = 1;
+            } else if (lateness >= 0 && lateness <= 0.5) {
+                if (lastLatenessSpeak != 0) speak("Тормоз");
+                lastLatenessSpeak = 0;
+            } else if (lateness > -5.5 && lateness <= -4.5) {
+                if (lastLatenessSpeak != -5) speak("Опережение 5");
+                lastLatenessSpeak = -5;
+            } else if (lateness > -10.5 && lateness <= -9.5) {
+                if (lastLatenessSpeak != -10) speak("Опережение 10");
+                lastLatenessSpeak = -10;
+            } else if (lateness > -15.5 && lateness <= -14.5) {
+                if (lastLatenessSpeak != -15) speak("Опережение 15");
+                lastLatenessSpeak = -15;
+            } else if (lateness <= -20) {
+                if (lastLatenessSpeak != -20) speak("Куда ты валишь?");
+                lastLatenessSpeak = -20;
+            }
         } else {
             $("#avgSpeed").html(norm > 0 ? getNumberString(3600 * sector / norm, 100) : "--.--");
             $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
@@ -2157,7 +2190,7 @@
 			$('body').css('background-color', 'Yellow');
 		} else {
 			if (isRds()) {
-				if (lateness <= 0) {
+				if (lateness <= 0.5) {
 					$('body').css('background-color', (myMap == null) ? 'LightCoral' : 'Red');
 				} else {
 					$('body').css('background-color', (myMap == null) ? 'LightGreen': 'Green');
