@@ -260,9 +260,9 @@
         }
 
         #map{
-            height:100%;
-            width: 100%;
-            position: fixed; top: 0; left: 0;
+            height:98%;
+            width: 96%;
+            position: fixed; top: 1%; left: 2%;
         }
 
         .content{
@@ -402,7 +402,7 @@
             <div class="square-content">
                 <div class="no-split">
                     <a href="javascript:showModalRdsNormas();" class="line-height-big">
-                        <span class="item-label-big" style="color:darkblue">Опоздание</span>
+                        <span class="item-label-big" style="color:darkblue" id="labelLateness">Опоздание</span>
                         <span class="item-value-big" id="lateness">-10:00</span>
                         <span class="item-label-big" id="latenessPdd">10:00</span>
                     </a>
@@ -1247,7 +1247,9 @@
     var intervalStartGPS;
     var intervalStartBT;
     var intervalDistanceGPS;
+    var lastIntervalPositionGPS;
     var intervalDistanceBT;
+    var lastIntervalPositionBT;
     var timeCorrection;
     var isPause = false;
     var isReverse = false;
@@ -1296,9 +1298,83 @@
     var lastSpeedDistance = 0.0;
     var speedInterval = 0.0;
     var speedNext = 60.0;
+    var lastLatenessSpeak = 0;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
+
+    const synth = window.speechSynthesis;
+    let voices = [];
+
+    function populateVoiceList() {
+        voices = synth.getVoices().sort(function (a, b) {
+            const aname = a.name.toUpperCase();
+            const bname = b.name.toUpperCase();
+
+            if (aname < bname) {
+                return -1;
+            } else if (aname == bname) {
+                return 0;
+            } else {
+                return +1;
+            }
+        });
+    }
+
+    populateVoiceList();
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = populateVoiceList;
+    }
+
+    function speak(text) {
+        if (text == "x") {
+            return;
+        } else if (text == '<i class="fa fa-play"></i>') {
+            text = "Старт";
+        } else if (text == '<i class="fa fa-tachometer"></i>') {
+            text = "Смена";
+        } else if (text == '<i class="fa fa-flag-checkered"></i>') {
+            text = "Пром";
+        } else if (text == '<i class="fa fa-stop"></i>') {
+            text = "Финиш";
+        } else if (text == '↑скорость↑') {
+            text = "Действие скорости";
+        } else if (text == 'Новая формула') {
+            text = "Формула";
+        } else if (text == '-') {
+            text = "минус";
+        } else if (text == '*') {
+            text = "умножить";
+        }
+        if (synth.speaking) {
+            //speech.push(text);
+            //return;
+        }
+
+        if (text !== "") {
+            const utterThis = new SpeechSynthesisUtterance(text);
+
+            utterThis.onend = function (event) {
+                //speak(speech.shift());
+                //console.log("SpeechSynthesisUtterance.onend");
+            };
+
+            utterThis.onerror = function (event) {
+                console.error("SpeechSynthesisUtterance.onerror");
+            };
+
+            for (let i = 0; i < voices.length; i++) {
+                if (voices[i].name === 'Google русский') {
+                    utterThis.voice = voices[i];
+                    break;
+                }
+            }
+            utterThis.pitch = 1;
+            utterThis.rate = 1;
+            synth.speak(utterThis);
+        }
+    }
 
     var enterType = [
           ['Время']
@@ -1376,7 +1452,9 @@
             intervalStartGPS = parseFloat(localStorage.getItem("intervalStartGPS"));
             intervalStartBT = parseFloat(localStorage.getItem("intervalStartBT"));
             intervalDistanceGPS = parseFloat(localStorage.getItem("intervalDistanceGPS"));
+            lastIntervalPositionGPS = parseFloat(localStorage.getItem("lastIntervalPositionGPS"));
             intervalDistanceBT = parseFloat(localStorage.getItem("intervalDistanceBT"));
+            lastIntervalPositionBT = parseFloat(localStorage.getItem("lastIntervalPositionBT"));
             timeCorrection = parseFloat(localStorage.getItem("timeCorrection"));
 			defaultMeter = localStorage.getItem("defaultMeter");
             //isPause = localStorage.getItem("isPause") == "true";
@@ -1423,7 +1501,9 @@
         intervalStartGPS = intervalStartGPS ? intervalStartGPS : 0.0;
         intervalStartBT = intervalStartBT ? intervalStartBT : 0.0;
         intervalDistanceGPS = intervalDistanceGPS ? intervalDistanceGPS : 0.0;
+        lastIntervalPositionGPS = lastIntervalPositionGPS ? lastIntervalPositionGPS : 0.0;
         intervalDistanceBT = intervalDistanceBT ? intervalDistanceBT : 0.0;
+        lastIntervalPositionBT = lastIntervalPositionBT ? lastIntervalPositionBT : 0.0;
         timeCorrection = timeCorrection ? timeCorrection : 0.0;
 		defaultMeter = defaultMeter ? defaultMeter : 'GPS';
         displayRdsItems = displayRdsItems ? displayRdsItems : 10;
@@ -1777,12 +1857,22 @@
 	}
 	function setIntervalDistanceGPS(i) {
         intervalDistanceGPS = i;
+        if (i != 0) setLastIntervalPositionGPS(intervalStartGPS + i);
 		localStorage.setItem("intervalDistanceGPS", i);
 	}
+    function setLastIntervalPositionGPS(p) {
+        lastIntervalPositionGPS = p;
+		localStorage.setItem("lastIntervalPositionGPS", p);
+    }
 	function setIntervalDistanceBT(i) {
         intervalDistanceBT = i;
+        if (i != 0) setLastIntervalPositionBT(intervalStartBT + i);
 		localStorage.setItem("intervalDistanceBT", i);
 	}
+    function setLastIntervalPositionBT(p) {
+        lastIntervalPositionBT = p;
+		localStorage.setItem("lastIntervalPositionBT", p);
+    }
 	function setCurrentKvIndex(i) {
         currentKvIndex = i;
         localStorage.setItem("currentKvIndex", i);
@@ -1815,6 +1905,7 @@
             localStorage.setItem("currentPddSpeed", currentPddSpeed);
             lastSpeedDistance = getDistance();
             speedInterval = 0; // reset
+            speak("Знак " + Math.round(pddSpeed));
         }
     }
 
@@ -1823,6 +1914,7 @@
         if (!isNaN(pddSpeed) && !isNaN(distance)) lastSpeedDistance = distance;
         if (isRds()) {
             addRdsItem(new RdsItem(Math.floor(1000 * (isNaN(distance) ? getDistance() : distance)) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+            speak("Доп " + Math.round(currentSpeedInstruction.getSpeed()));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
             }
@@ -1856,7 +1948,6 @@
         refreshRdsTable();
         localStorage.setItem("rds", JSON.stringify(rds));
         newMove();
-        beep();
     }
 
     function removeRdsItem(i) {
@@ -2025,7 +2116,8 @@
         if (getIntervalDistance() > 0 && interval < 0.5) {
             if ($("#interval").css("color") == "rgb(0, 0, 0)") {
                 $("#interval").css("color", "rgb(255, 0, 0)");
-                beep();
+                //beep();
+                speak(Math.round(1000*interval) + " метров");
             } else if (interval < 0.1) {
                 beep();
             }
@@ -2041,6 +2133,7 @@
         var lateness;
         if (sector > 0) {
             lateness = getKvTime() - getDistance() / sector * norm;
+            if (benefit + lateness + 60 < 0 && $("#benefit").css("color") == "rgb(0, 0, 0)") speak("Льгота");
             $("#benefit").css("color", (benefit + lateness + 60 < 0) ? "red" : "black");
         } else {
             $("#benefit").css("color", "black");
@@ -2048,9 +2141,57 @@
         if (isRds()) {
 			lateness = getRdsLateness();
             $("#avgSpeed").html(getNumberString(getCurrentRdsSpeed(), 100));
-            $("#lateness").html(getTimeString(lateness, true));
-            $("#latenessPdd").html(getTimeString(getPddLateness(), true));
+            $("#lateness").html(Math.abs(lateness) < 60 ? getNumberString(lateness, 10) : getTimeString(lateness, true));
+            $("#latenessPdd").html(Math.abs(getPddLateness()) < 60 ? getNumberString(getPddLateness(), 10) : getTimeString(getPddLateness(), true));
+            //$("#latenessPdd").html(getTimeString(getPddLateness(), true));
+            if (lateness >= 19.5) {
+                $("#labelLateness").html("Опоздание");
+                if (lastLatenessSpeak != 20) speak("Нажми на педаль!");
+                lastLatenessSpeak = 20;
+            } else if (lateness >= 9.5 && lateness < 11.5) {
+                $("#labelLateness").html("Опоздание");
+                if (lastLatenessSpeak != 10) speak("Опоздание 10");
+                lastLatenessSpeak = 10;
+            } else if (lateness >= 4.5 && lateness < 5.5) {
+                $("#labelLateness").html("Опоздание");
+                if (lastLatenessSpeak != 5) speak("Опоздание 5");
+                lastLatenessSpeak = 5;
+            /*} else if (lateness >= -0.5 && lateness < 0.5) {
+                if (lastLatenessSpeak != 0) speak("В нуле");
+                lastLatenessSpeak = 0;*/
+            } else if (lateness > 0.5 && lateness <= 1) {
+                $("#labelLateness").html("Газ");
+                if (lastLatenessSpeak != 1) {
+                    synth.cancel();
+                    speak("Газ");
+                }
+                lastLatenessSpeak = 1;
+            } else if (lateness >= 0 && lateness <= 0.5) {
+                $("#labelLateness").html("Тормоз");
+                if (lastLatenessSpeak != 0) {
+                    synth.cancel();
+                    speak("Тормоз");
+                }
+                lastLatenessSpeak = 0;
+            } else if (lateness > -5.5 && lateness <= -4.5) {
+                $("#labelLateness").html("Опережение");
+                if (lastLatenessSpeak != -5) speak("Опережение 5");
+                lastLatenessSpeak = -5;
+            } else if (lateness > -10.5 && lateness <= -9.5) {
+                $("#labelLateness").html("Опережение");
+                if (lastLatenessSpeak != -10) speak("Опережение 10");
+                lastLatenessSpeak = -10;
+            } else if (lateness > -15.5 && lateness <= -14.5) {
+                $("#labelLateness").html("Опережение");
+                if (lastLatenessSpeak != -15) speak("Опережение 15");
+                lastLatenessSpeak = -15;
+            } else if (lateness <= -20) {
+                $("#labelLateness").html("Опережение");
+                if (lastLatenessSpeak != -20) speak("Куда ты валишь?");
+                lastLatenessSpeak = -20;
+            }
         } else {
+            $("#labelLateness").html(lateness < 0 ? "Опережение" : "Опоздание");
             $("#avgSpeed").html(norm > 0 ? getNumberString(3600 * sector / norm, 100) : "--.--");
             $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
             $("#latenessPdd").html("-");
@@ -2065,10 +2206,10 @@
 			$('body').css('background-color', 'Yellow');
 		} else {
 			if (isRds()) {
-				if (lateness <= 0) {
-					$('body').css('background-color', 'LightCoral');
+				if (lateness <= 0.5) {
+					$('body').css('background-color', (myMap == null) ? 'LightCoral' : 'Red');
 				} else {
-					$('body').css('background-color', 'LightGreen');
+					$('body').css('background-color', (myMap == null) ? 'LightGreen': 'Green');
 				}
 			} else {
 				$('body').css('background-color', '');
@@ -2161,18 +2302,21 @@
     }
 
     function mapType() {
-        if (myMap == null) return;
-
-        switch(myMap.getType()) {
-            case 'yandex#map':
-                myMap.setType('yandex#satellite');
-                break;
-            case 'yandex#satellite':
-                myMap.setType('yandex#hybrid');
-                break;
-            case 'yandex#hybrid':
-                myMap.setType('yandex#map');
-                break;
+        if (myMap == null) {
+            map(); // switch on map
+        } else {
+            switch(myMap.getType()) {
+                case 'yandex#map':
+                    myMap.setType('yandex#satellite');
+                    break;
+                case 'yandex#satellite':
+                    myMap.setType('yandex#hybrid');
+                    break;
+                case 'yandex#hybrid':
+                    //myMap.setType('yandex#map');
+                    map(); // switch off map
+                    break;
+            }
         }
     }
 
@@ -2203,6 +2347,7 @@
                 zoom: 16,
                 controls: []
             });
+        myMap.setType('yandex#map');
     }
 
     function pause() {
@@ -2257,7 +2402,7 @@
 
     function getDefaultEnterValue(typeId, subTypeId) {
         switch (enterType[typeId][subTypeId]) {
-            case 'Тип':
+            case 'Тип':$('#enterValue')
                 return rdsItemHtmlTypes[1];
             case 'Операция':
                 return operationsTypes[0];
@@ -2281,16 +2426,18 @@
         }
         enterValue[enterTypeId][enterSubTypeId] = array[i];
         $('#enterValue').html(array[i]);
+        synth.cancel();
+        speak(array[i]);
     }
 
-    function setPosition(value) {
-        if (isNaN(value)) {
+    function setPosition(valueGPS, valueBT) {
+        if (isNaN(valueGPS) || isNaN(valueBT)) {
             return 0;
         } else {
-			setDistanceGPS(value);
-			setDistanceBT(value);
-			setIntervalStartGPS(value);
-			setIntervalStartBT(value);
+			setDistanceGPS(valueGPS);
+			setDistanceBT(valueBT);
+			setIntervalStartGPS(valueGPS);
+			setIntervalStartBT(valueBT);
 			setIntervalDistanceGPS(0);
 			setIntervalDistanceBT(0);
         }
@@ -2317,6 +2464,9 @@
         } else {
             setIntervalDistanceGPS(isPosition ? value - intervalStartGPS : value);
             setIntervalDistanceBT(isPosition ? value - intervalStartBT : value);
+            if (getIntervalDistance() > 0 && getIntervalStart() + getIntervalDistance() - getDistance() > 0.6) {
+                speak('едем ' + getNumberString(getIntervalStart() + getIntervalDistance() - getDistance(), 10));
+            }
         }
         return -1;
     }
@@ -2467,10 +2617,14 @@
             enterValue[enterTypeId][enterSubTypeId] = $('#enterValue').html();
             enterTypeId = (enterTypeId >= enterType.length - 1) ? 0 : enterTypeId + 1;
         }
+        synth.cancel();
         $('#enterType').text(enterType[enterTypeId][0]);
+        speak(enterType[enterTypeId][0]);
         enterSubTypeId = 0;
         $('#enterSubType').text((enterType[enterTypeId].length > 1) ? enterType[enterTypeId][++enterSubTypeId] : '-');
+        if (enterType[enterTypeId].length > 1 && enterType[enterTypeId][0] != "Новая формула") speak(enterType[enterTypeId][enterSubTypeId]);
         $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+        speak(enterValue[enterTypeId][enterSubTypeId]);
 		//$('body').addClass('enter-value');
     }
 
@@ -2513,7 +2667,7 @@
                     var result = 0;
                     switch ($('#enterType').text()) {
                         case 'Пройдено':
-                            result = setPosition(parseFloat($('#enterValue').html()));
+                            result = setPosition(parseFloat($('#enterValue').html()), parseFloat($('#enterValue').html()));
                             break;
                         case 'Сектор':
                             result = setSector(parseFloat($('#enterValue').html()));
@@ -2580,18 +2734,24 @@
 					e.preventDefault();
                 case 78: // n previous sub type
                     if (enterType[enterTypeId].length > 1) {
+                        synth.cancel();
                         enterSubTypeId = (enterSubTypeId <= 1) ? enterType[enterTypeId].length - 1 : enterSubTypeId - 1;
                         $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
+                        speak(enterType[enterTypeId][enterSubTypeId]);
                         $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+                        speak(enterValue[enterTypeId][enterSubTypeId]);
                     }
                 break;
 				case 39: // right arrow
 					e.preventDefault();
                 case 77: // m next sub type
                     if (enterType[enterTypeId].length > 1) {
+                        synth.cancel();
                         enterSubTypeId = (enterSubTypeId >= enterType[enterTypeId].length - 1) ? 1 : enterSubTypeId + 1;
                         $('#enterSubType').text(enterType[enterTypeId][enterSubTypeId]);
+                        speak(enterType[enterTypeId][enterSubTypeId]);
                         $('#enterValue').html(enterValue[enterTypeId][enterSubTypeId]);
+                        speak(enterValue[enterTypeId][enterSubTypeId]);
                     }
                 break;
 				case 40: // down arrow
@@ -2623,6 +2783,8 @@
                     }
                     var val = (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && enterValue[enterTypeId][enterSubTypeId] == vdsItemTypes[1]) ? '' : $('#enterValue').html();
                     $('#enterValue').html((val.length < 2) ? 'x' : val.substr(0, val.length - 1));
+                    synth.cancel();
+                    speak($('#enterValue').html());
                 break;
                 case 188: // ,
                 case 190: // .
@@ -2630,6 +2792,7 @@
                         break;
                     }
                     $('#enterValue').html(($('#enterValue').html() == 'x') ? decimalPoint : $('#enterValue').html() + decimalPoint);
+                    speak("точка");
                 break;
                 default:
                     if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && $('#enterValue').html() == vdsItemTypes[1]) || enterType[enterTypeId][enterSubTypeId] == 'Операция') {
@@ -2637,6 +2800,7 @@
                     }
                     if (keyCode > 47 && keyCode < 58) {
                         $('#enterValue').html(($('#enterValue').html() == 'x') ? String.fromCharCode(e.keyCode) : $('#enterValue').html() + String.fromCharCode(e.keyCode));
+                        speak((keyCode - 48) + "");
                     }
                 break;
             }
@@ -2678,6 +2842,10 @@
 				case 8: // backspace
 					//e.preventDefault();
                     resetInterval();
+                break;
+                case 74: // j set last position (by interval)
+                    setPosition(lastIntervalPositionGPS, lastIntervalPositionBT);
+                    beep();
                 break;
                 case 75: // k add KV
                     showModalKv(-1);
@@ -2730,6 +2898,9 @@
                 break;
                 case 85: // u enter speed interval
                     setEnterType(10);
+                break;
+                case 66: // b map
+                    mapType();
                 break;
                 default:
                     //alert(keyCode);
@@ -2893,6 +3064,8 @@
         setIntervalDistanceGPS(0);
 		setIntervalDistanceBT(0);
         newMove();
+        speak("Смотрим знаки");
+
     }
 
     $('#modalNumber').on('submit', function (e) {
@@ -3218,7 +3391,6 @@
             }
         }
         //newMove();
-        beep();
     }
 
     $('#modalSpeed').on('submit', function (e) {
@@ -3590,6 +3762,7 @@
     function beep() {
         snd.play();
     }
+
 </script>
 
 </div>
