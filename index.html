@@ -327,7 +327,7 @@
                 <i class="fa icon-small fa-globe" style="position: fixed; top: 0; left: 0;"></i>
             </div>
             <div class="square-content">
-                <i class="fa icon-small fa-bluetooth" style="position: fixed; top: 0; right: 0;"></i>
+                <span class="item-label" id="batteryBT" style="position: fixed; top: 0; right: 0; transform: translate(-70%, 0);"></span><i class="fa icon-small fa-bluetooth" style="position: fixed; top: 0; right: 0;"><span class="item-label" id="batteryBT"></span></i>
             </div>
             <div class="square-content">
                 <div class="split-vertical">
@@ -1277,6 +1277,7 @@
 	var wasUpdateBT = false;
 	var speedGPS = 0;
 	var speedBT = 0;
+    var batteryBT = 0;
     var isDemo = false;
 	var defaultMeter = 'GPS';
 	var isBT = false;
@@ -1597,8 +1598,10 @@
 		wasUpdateBT = true;
 		var d = event.target.value;
 		d = d.buffer ? d : new DataView(d);
-		d = correctionBT * d.getFloat32(0, true);
-		moveBT(d);
+		dBT = correctionBT * d.getFloat32(0, true);
+        batteryBT = d.byteLength >= 8 ? d.getFloat32(4, true) : undefined;
+		sBT = d.byteLength >= 12 ? correctionBT * d.getFloat32(8, true) : undefined;
+		moveBT(dBT, sBT);
 	}
 /*
 	send.addEventListener('pointerup', function(event) {
@@ -1835,13 +1838,15 @@
 		distanceBT = d;
 		localStorage.setItem("distanceBT", d);
 	}
-	function moveBT(d) {
+	function moveBT(d, s) {
 		if (!isPause) {
 			setDistanceBT(distanceBT + (isReverse ? -d : d));
 		}
 		// calculate speed
 		var time = getCurrentTime();
-		if (lastTimeBT != null) {
+        if (s === undefined) {
+            speedBT = s;
+        } else if (lastTimeBT != null) {
 			speedBT = d / (time - lastTimeBT) * 60 * 60;
 		}
 		lastTimeBT = time;
@@ -2075,6 +2080,7 @@
                 }
             }
         }
+        $("#batteryBT").html(batteryBT === undefined? "" : getNumberString(batteryBT, 100) + "v");
         $("#time").html(getTimeString(getCurrentTime(), true));
         var sectorTime = getCurrentTime() - start + ((getCurrentTime() > start) ? 0 : 24 * 60 * 60);
         if (norm - sectorTime > 60) {
