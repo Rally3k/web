@@ -7,15 +7,16 @@
   <title>Distance GPS</title>
 </head>
 <body>
-  <button id="bluetooth">BT</button>
+  <button id="bluetooth">BT</button><br>
+  <input type="number" step="any" id="dataCorrection" value="1.0">
   <p id="dataDistance">0</p>
   <p id="dataBattery">0</p>
   <p id="dataSpeed">0</p>
+  <p id="dataInterval">0</p>
   <p id="dataTime">0</p>
-  <p id="dataMillis">0</p>
   <p id="dataLat">0</p>
   <p id="dataLng">0</p>
-  <p id="text">text</p>
+  <p id="text">Results</p>
   <button id="send">Send</button>
   <br>
 Version 0.13
@@ -25,13 +26,14 @@ Version 0.13
     
 	window.onload = () => {
       const btButton = document.getElementById('bluetooth');
+	  const dataCorrection = document.getElementById('dataCorrection');
 	  const dataDistance = document.getElementById('dataDistance');
 	  const dataBattery = document.getElementById('dataBattery');
-	  const dataTime = document.getElementById('dataTime');
+	  const dataInterval = document.getElementById('dataInterval');
 	  const dataSpeed = document.getElementById('dataSpeed');
-	  const dataLat = document.getElementById('dataLat');
-	  const dataLng = document.getElementById('dataLng');
-	  const dataMillis = document.getElementById('dataMillis');
+	  const dataTime = document.getElementById('dataTime');
+	  //const dataLat = document.getElementById('dataLat');
+	  //const dataLng = document.getElementById('dataLng');
 	  const text = document.getElementById('text');
 	  const send = document.getElementById('send');
 	  
@@ -90,17 +92,59 @@ Version 0.13
 		//then(characteristic => startNotifications(characteristic)).
 		//catch(error => log(error));
 	}
+
+    function getTimeString(value, seconds) {
+        if (value == null) {
+            return "--:--:--";
+        }
+        var n = value < 0;
+        value = Math.abs(value);
+		var d = Math.floor(value / 24 / 3600);
+        var h = Math.floor((value - 24 * 3600 * d)/ 3600);
+        var m = Math.floor((value - 3600 * h) / 60);
+        if (seconds) {
+            var s = Math.floor(value - 60 * m - 3600 * h);
+            return (n ? "-" : "") + h + (m < 10 ? ":0" : ":") + m + (s < 10 ? ":0" : ":") + s;
+        } else {
+            return (n ? "-" : "") + h + (m < 10 ? ":0" : ":") + m;
+        }
+    }
+
+	var lastTime = 0;
+	var lastSpeed = 0;
+
 	function handleCharacteristicValueChanged(event) {
 		try {
 			let d = event.target.value;
 			d = d.buffer ? d : new DataView(d);
-			dataDistance.innerHTML = "D: " + (d.byteLength >= 4 ? Math.round(1000 * d.getFloat32(0, true)) / 1000 : "-.---");
-			dataBattery.innerHTML = "B: " + (d.byteLength >= 8 ? Math.round(100 * d.getFloat32(4, true)) / 100 : "-.--");
-			dataSpeed.innerHTML = "S: " + (d.byteLength >= 12 ? Math.round(10 * d.getFloat32(8, true)) / 10 : "-.-");
-			dataTime.innerHTML = "T: " + (d.byteLength >= 16 ? d.getUint32(12, true) : "--:--:--");
-			dataMillis.innerHTML = "Millis: " + (d.byteLength >= 20 ? d.getUint32(16, true) : "-");
-			dataLat.innerHTML = "Lat: " + (d.byteLength >= 28 ? d.getFloat64(20, true) : "-.--");
-			dataLng.innerHTML = "Lat: " + (d.byteLength >= 36 ? d.getFloat64(28, true) : "-.--");
+			dataDistance.innerHTML = "Distance: " + (d.byteLength >= 4 ? Math.round(1000 * d.getFloat32(0, true) * parseFloat(dataCorrection.value)) / 1000 : "-.---");
+			dataBattery.innerHTML = "Battery: " + (d.byteLength >= 8 ? Math.round(100 * d.getFloat32(4, true)) / 100 : "-.--");
+			var speed = d.byteLength >= 12 ? d.getFloat32(8, true) * parseFloat(dataCorrection.value) : 0.0;
+			dataSpeed.innerHTML = "Speed: " + (Math.round(10 * speed) / 10);
+			dataInterval.innerHTML = "Interval: " + (d.byteLength >= 16 ? d.getUint32(12, true) : "----");
+			var time = d.byteLength >= 20 ? d.getUint32(16, true) : 0;
+			dataTime.innerHTML = "Time: " + (time == 0 ? "Ready" : time / 1000.0);
+			if (lastTime == 0 && time != 0) {
+				var dt = new Date();
+				text.innerHTML = dt.getHours() + ":" + (dt.getMinutes() < 10 ? "0" : "") + dt.getMinutes() + ":" + (dt.getSeconds() < 10 ? "0" : "") + dt.getSeconds() + "<br>" + text.innerHTML;
+			}
+			if (lastSpeed < 30 && speed > 30) {
+				var t = lastTime + (30.0 - lastSpeed) / (speed - lastSpeed) * (time - lastTime);
+				text.innerHTML = "0-30: " + (Math.round(t / 10) / 100.0) + "s<br>" + text.innerHTML;
+			} else if (lastSpeed < 60 && speed > 60) {
+				var t = lastTime + (60.0 - lastSpeed) / (speed - lastSpeed) * (time - lastTime);
+				text.innerHTML = "0-60: " + (Math.round(t / 10) / 100.0) + "s<br>" + text.innerHTML;
+			} else if (lastSpeed < 80 && speed > 80) {
+				var t = lastTime + (80.0 - lastSpeed) / (speed - lastSpeed) * (time - lastTime);
+				text.innerHTML = "0-80: " + (Math.round(t / 10) / 100.0) + "s<br>" + text.innerHTML;
+			} else if (lastSpeed < 100 && speed > 100) {
+				var t = lastTime + (100.0 - lastSpeed) / (speed - lastSpeed) * (time - lastTime);
+				text.innerHTML = "0-100: " + (Math.round(t / 10) / 100.0) + "s<br>" + text.innerHTML;
+			}
+			lastTime = time;
+			lastSpeed = speed;
+			//dataLat.innerHTML = "Lat: " + (d.byteLength >= 28 ? d.getFloat64(20, true) : "-.--");
+			//dataLng.innerHTML = "Lat: " + (d.byteLength >= 36 ? d.getFloat64(28, true) : "-.--");
 		} catch (e) {
 			text.innerHTML = e;
 		}
