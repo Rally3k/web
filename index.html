@@ -1844,7 +1844,7 @@
 		}
 		// calculate speed
 		var time = getCurrentTime();
-        if (s === undefined) {
+        if (s !== undefined) {
             speedBT = s;
         } else if (lastTimeBT != null) {
 			speedBT = d / (time - lastTimeBT) * 60 * 60;
