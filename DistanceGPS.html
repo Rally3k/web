@@ -8,7 +8,7 @@
 </head>
 <body>
   <button id="bluetooth">BT</button><br>
-  <input type="number" step="any" id="dataCorrection" value="1.0">
+  <input type="number" step="any" id="dataCorrection" value="0.0001">
   <p id="dataDistance">0</p>
   <p id="dataBattery">0</p>
   <p id="dataSpeed">0</p>
@@ -112,6 +112,7 @@ Version 0.13
 
 	var lastTime = 0;
 	var lastSpeed = 0;
+	var nextSpeed = 10;
 
 	function handleCharacteristicValueChanged(event) {
 		try {
@@ -126,20 +127,15 @@ Version 0.13
 			dataTime.innerHTML = "Time: " + (time == 0 ? "Ready" : time / 1000.0);
 			if (lastTime == 0 && time != 0) {
 				var dt = new Date();
-				text.innerHTML = dt.getHours() + ":" + (dt.getMinutes() < 10 ? "0" : "") + dt.getMinutes() + ":" + (dt.getSeconds() < 10 ? "0" : "") + dt.getSeconds() + "<br>" + text.innerHTML;
+				//text.innerHTML = dt.getHours() + ":" + (dt.getMinutes() < 10 ? "0" : "") + dt.getMinutes() + ":" + (dt.getSeconds() < 10 ? "0" : "") + dt.getSeconds() + "<br>" + text.innerHTML;
+				text.innerHTML = dt + "<br>" + text.innerHTML;
+				nextSpeed = 10;
+				lastSpeed = 0;
 			}
-			if (lastSpeed < 30 && speed > 30) {
-				var t = lastTime + (30.0 - lastSpeed) / (speed - lastSpeed) * (time - lastTime);
-				text.innerHTML = "0-30: " + (Math.round(t / 10) / 100.0) + "s<br>" + text.innerHTML;
-			} else if (lastSpeed < 60 && speed > 60) {
-				var t = lastTime + (60.0 - lastSpeed) / (speed - lastSpeed) * (time - lastTime);
-				text.innerHTML = "0-60: " + (Math.round(t / 10) / 100.0) + "s<br>" + text.innerHTML;
-			} else if (lastSpeed < 80 && speed > 80) {
-				var t = lastTime + (80.0 - lastSpeed) / (speed - lastSpeed) * (time - lastTime);
-				text.innerHTML = "0-80: " + (Math.round(t / 10) / 100.0) + "s<br>" + text.innerHTML;
-			} else if (lastSpeed < 100 && speed > 100) {
-				var t = lastTime + (100.0 - lastSpeed) / (speed - lastSpeed) * (time - lastTime);
-				text.innerHTML = "0-100: " + (Math.round(t / 10) / 100.0) + "s<br>" + text.innerHTML;
+			while(nextSpeed <= speed) {
+				var t = lastTime + (nextSpeed - lastSpeed) / (speed - lastSpeed) * (time - lastTime);
+				text.innerHTML = "0-" + nextSpeed + ": " + (Math.round(t / 10) / 100.0) + "s<br>" + text.innerHTML;
+				nextSpeed += 10;
 			}
 			lastTime = time;
 			lastSpeed = speed;
