@@ -3348,7 +3348,7 @@
         }
         return '<a href="javascript:showModalAddFormula(' + i + ', true);" class="list-group-item si-item clearfix' + ((currentSiIndex == i) ? ' list-group-item-success' : '') + '">'
                 + '<span class="pull-left"><button class="btn btn-warning" onclick="applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();return false;"><i class="fa fa-play"></i></button></span>'
-                + t + ' '
+                + '&nbsp;' + t + ' '
                 + speedIns[i].toString()
                 + '<span class="pull-right">'
                 + '<button class="btn btn-info" onclick="showModalAddFormula(' + (i+1) + ', false);return false;"><i class="fa fa-plus-circle"></i></button>\
