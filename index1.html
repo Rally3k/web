@@ -2145,10 +2145,11 @@
             $("#benefit").css("color", "black");
         }
         if (isRds()) {
+            kvLateness = lateness;
 			lateness = getRdsLateness();
             $("#avgSpeed").html(getNumberString(getCurrentRdsSpeed(), 100));
             $("#lateness").html(Math.abs(lateness) < 60 ? getNumberString(lateness, 10) : getTimeString(lateness, true));
-            $("#latenessPdd").html(Math.abs(getPddLateness()) < 60 ? getNumberString(getPddLateness(), 10) : getTimeString(getPddLateness(), true));
+            $("#latenessPdd").html((Math.abs(getPddLateness()) < 60 ? getNumberString(getPddLateness(), 10) : getTimeString(getPddLateness(), true)) + "/" + (Math.abs(kvLateness) < 60 ? getNumberString(kvLateness, 10) : getTimeString(kvLateness, true)));
             //$("#latenessPdd").html(getTimeString(getPddLateness(), true));
             if (lateness >= 19.5) {
                 $("#labelLateness").html("Опоздание");
@@ -2375,6 +2376,19 @@
         } else {
             $('#moveReverse').hide();
         }
+        if (myMap && myPolyline) {
+            // Создаем ломаную с помощью вспомогательного класса Polyline.
+            myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
+                    // Цвет линии.
+                    strokeColor: "#FF0000",
+                    // Ширина линии.
+                    strokeWidth: 4,
+                    // Коэффициент прозрачности.
+                    strokeOpacity: 0.5
+                });
+            myMap.geoObjects.add(myPolyline);
+        }
+
         beep();
     }
 
