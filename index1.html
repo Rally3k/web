@@ -2334,7 +2334,7 @@
             // Создаем ломаную с помощью вспомогательного класса Polyline.
             myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
                     // Цвет линии.
-                    strokeColor: "#0000FF",
+                    strokeColor: (isReverse ? "#FF0000" : "#0000FF"),
                     // Ширина линии.
                     strokeWidth: 4,
                     // Коэффициент прозрачности.
@@ -2380,7 +2380,7 @@
             // Создаем ломаную с помощью вспомогательного класса Polyline.
             myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
                     // Цвет линии.
-                    strokeColor: "#FF0000",
+                    strokeColor: (isReverse ? "#FF0000" : "#0000FF"),
                     // Ширина линии.
                     strokeWidth: 4,
                     // Коэффициент прозрачности.
