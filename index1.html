@@ -745,7 +745,7 @@
             <div class="col-l-1 col-xs-2 border nopadding square-box">
                 <div class="square-content">
                     <div class="no-split">
-                        <a href="javascript:hideActions();stayAwake();">
+                        <a href="javascript:hideActions();noSleep.enable();">
                             <i class="fa icon fa-lightbulb-o"></i>
                         </a>
                     </div>
@@ -2902,8 +2902,7 @@
                 //break;
                 /* comment for Samsung browser */
 				case 84: // t lamp // minus
-                    //noSleep.enable(); // minus();
-                    stayAwake();
+                    noSleep.enable(); // minus();
                 break;
                 case 71: // g globe // plus
                     gpsClick(); // plus();
@@ -3810,15 +3809,6 @@
     function beep() {
         snd.play();
     }
-
-    let wakeLock = null;
-    const stayAwake = async () => {
-        try {
-            wakeLock = await navigator.wakeLock.request("screen");
-        } catch (err) {
-        }
-    };
-
 </script>
 
 </div>
