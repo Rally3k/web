@@ -1092,7 +1092,7 @@
                     <div class="btn-group btn-group-lg col-xs-12">
                         <button type="submit" class="btn btn-success col-xs-4" onclick="isApply=false;"><i class="fa fa-check-circle"></i></button>
                         <button type="submit" class="btn btn-warning col-xs-4" onclick="isApply=true;"><i class="fa fa-play-circle"></i></button>
-                        <button type="button" class="btn btn-default col-xs-4" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+                        <button type="button" class="btn btn-default col-xs-4" id="btnClose" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
                     </div>
                 </div>
             </form>
@@ -2145,10 +2145,11 @@
             $("#benefit").css("color", "black");
         }
         if (isRds()) {
+            kvLateness = lateness;
 			lateness = getRdsLateness();
             $("#avgSpeed").html(getNumberString(getCurrentRdsSpeed(), 100));
             $("#lateness").html(Math.abs(lateness) < 60 ? getNumberString(lateness, 10) : getTimeString(lateness, true));
-            $("#latenessPdd").html(Math.abs(getPddLateness()) < 60 ? getNumberString(getPddLateness(), 10) : getTimeString(getPddLateness(), true));
+            $("#latenessPdd").html((Math.abs(getPddLateness()) < 60 ? getNumberString(getPddLateness(), 10) : getTimeString(getPddLateness(), true)) + "/" + (Math.abs(kvLateness) < 60 ? getNumberString(kvLateness, 10) : getTimeString(kvLateness, true)));
             //$("#latenessPdd").html(getTimeString(getPddLateness(), true));
             if (lateness >= 19.5) {
                 $("#labelLateness").html("Опоздание");
@@ -2333,7 +2334,7 @@
             // Создаем ломаную с помощью вспомогательного класса Polyline.
             myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
                     // Цвет линии.
-                    strokeColor: "#0000FF",
+                    strokeColor: (isReverse ? "#FF0000" : "#0000FF"),
                     // Ширина линии.
                     strokeWidth: 4,
                     // Коэффициент прозрачности.
@@ -2375,6 +2376,19 @@
         } else {
             $('#moveReverse').hide();
         }
+        if (myMap && myPolyline) {
+            // Создаем ломаную с помощью вспомогательного класса Polyline.
+            myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
+                    // Цвет линии.
+                    strokeColor: (isReverse ? "#FF0000" : "#0000FF"),
+                    // Ширина линии.
+                    strokeWidth: 4,
+                    // Коэффициент прозрачности.
+                    strokeOpacity: 0.5
+                });
+            myMap.geoObjects.add(myPolyline);
+        }
+
         beep();
     }
 
@@ -3346,11 +3360,12 @@
                 t = '<i class="fa fa-tachometer rdsIcon"></i>';
                 break;
         }
-        return '<a href="javascript:applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();" class="list-group-item si-item clearfix' + ((currentSiIndex == i) ? ' list-group-item-success' : '') + '">'
-                + t + ' '
+        return '<a href="javascript:showModalAddFormula(' + i + ', true);" class="list-group-item si-item clearfix' + ((currentSiIndex == i) ? ' list-group-item-success' : '') + '">'
+                + '<span class="pull-left"><button class="btn btn-warning" onclick="applySpeedInstruction(' + i + ');$(\'#formFormula\').submit();return false;"><i class="fa fa-play"></i></button></span>'
+                + '&nbsp;' + t + ' '
                 + speedIns[i].toString()
                 + '<span class="pull-right">'
-                + '<button class="btn btn-info" onclick="showModalAddFormula(' + (i+1) + ');return false;"><i class="fa fa-plus-circle"></i></button>\
+                + '<button class="btn btn-info" onclick="showModalAddFormula(' + (i+1) + ', false);return false;"><i class="fa fa-plus-circle"></i></button>\
                 <button class="btn btn-danger" onclick="deleteSpeedInstruction(' + i + ');return false;"><i class="fa fa-trash"></i></button>&nbsp;\
                 </span></a>';
     }
@@ -3423,27 +3438,53 @@
     }
 
     $('#modalSpeed #btnAdd').on('click', function (e) {
-        showModalAddFormula(speedIns.length);
+        showModalAddFormula(speedIns.length, false);
     });
 
-    function showModalAddFormula(i) {
+    function showModalAddFormula(i, e) {
         addSiIndex = i;
+        addSiEdit = e;
         $('#modalSpeed').modal('hide');
         $('#modalAddFormula').modal('show');
-        $('input[name=fFormulaItemType][value=C]').closest('.btn').button('toggle');
-        $('#modalAddFormula #fPosition').val("");
-        $('#modalAddFormula #fVpdd').val("");
-        $('#modalAddFormula #fVds').val("");
-        $('#modalAddFormula #chbUseVpdd').prop('checked', false);
-        $('#modalAddFormula #fVds').show();
-        $('#modalAddFormula #lVpdd').hide();
-        $('#modalAddFormula #fSign').hide();
-        $('#modalAddFormula #fOperand').hide();
+        if (addSiEdit && addSiIndex >= 0 && addSiIndex < speedIns.length) {
+            var si = speedIns[addSiIndex];
+            $('input[name=fFormulaItemType][value=' + si.type + ']').closest('.btn').button('toggle');
+            $('#modalAddFormula #fPosition').val(si.position || "");
+            $('#modalAddFormula #fVpdd').val(si.vPdd || "");
+            $('#modalAddFormula #fVds').val(si.speed || "");
+            $('#modalAddFormula #chbUseVpdd').prop('checked', si.isVpdd);
+            $('#modalAddFormula #fSign').val(si.sign);
+            $('#modalAddFormula #fOperand').val(si.operand);
+            if (si.isVpdd) {
+                $('#modalAddFormula #fVds').hide();
+                $('#modalAddFormula #lVpdd').show();
+                $('#modalAddFormula #fSign').show();
+                $('#modalAddFormula #fOperand').show();
+                if (si.sign != '') {
+                    $('#modalAddFormula #fOperand').prop('disabled', false);
+                }
+            } else {
+                $('#modalAddFormula #fVds').show();
+                $('#modalAddFormula #lVpdd').hide();
+                $('#modalAddFormula #fSign').hide();
+                $('#modalAddFormula #fOperand').hide();
+            }
+        } else {
+            $('input[name=fFormulaItemType][value=C]').closest('.btn').button('toggle');
+            $('#modalAddFormula #fPosition').val("");
+            $('#modalAddFormula #fVpdd').val("");
+            $('#modalAddFormula #fVds').val("");
+            $('#modalAddFormula #chbUseVpdd').prop('checked', false);
+            $('#modalAddFormula #fVds').show();
+            $('#modalAddFormula #lVpdd').hide();
+            $('#modalAddFormula #fSign').hide();
+            $('#modalAddFormula #fOperand').hide();
+        }
         $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').removeClass('has-success');
     }
 
     $('#modalAddFormula').on('shown.bs.modal', function() {
-        $('#chbVpdd').focus().select();
+        $('#fPosition').focus().select();
     })
 
     $('#modalAddFormula').on('submit', function (e) {
@@ -3470,7 +3511,7 @@
         }
         if (isGood && (si.type != 'C' || (si.position && !isNaN(si.position)) || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed)))) {
             $('#modalAddFormula').modal('hide');
-            speedIns.splice(addSiIndex, 0, si);
+            speedIns.splice(addSiIndex, addSiEdit ? 1 : 0, si);
             localStorage.setItem("speedIns", JSON.stringify(speedIns));
             if (isApply) {
                 applySpeedInstruction(addSiIndex);
@@ -3479,10 +3520,6 @@
             }
         }
         return false;
-    });
-
-    $('#modalAddFormula #chbVpdd').on('click', function (e) {
-        $('#modalAddFormula #fVpdd').prop('disabled', !this.checked);
     });
 
     $('#modalAddFormula #chbUseVpdd').on('click', function (e) {
@@ -3511,6 +3548,10 @@
 
     $('#modalAddFormula #fSign').on('change', function (e) {
         $('#modalAddFormula #fOperand').prop('disabled', !this.value);
+    });
+
+    $('#modalAddFormula #btnClose').on('click', function (e) {
+        if (addSiEdit) showModalSpeed();
     });
 
     function viewRds() {
@@ -3768,7 +3809,6 @@
     function beep() {
         snd.play();
     }
-
 </script>
 
 </div>

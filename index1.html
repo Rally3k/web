@@ -263,6 +263,7 @@
             height:98%;
             width: 96%;
             position: fixed; top: 1%; left: 2%;
+            opacity: 75%;
         }
 
         .content{
@@ -774,6 +775,15 @@
                     <div class="no-split">
                         <a href="javascript:hideActions();loadData();">
                             <i class="fa icon fa-rotate-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();document.getElementById('map').style.zIndex = 10;">
+                            <i class="fa icon fa-window-restore"></i>
                         </a>
                     </div>
                 </div>
@@ -1300,6 +1310,7 @@
     var speedInterval = 0.0;
     var speedNext = 60.0;
     var lastLatenessSpeak = 0;
+    var applingDistance = 0;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1622,7 +1633,9 @@
             $(".fa-globe").css("color", "green");
         }
         if (myMap != null && lastLatitude) {
-            myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
+            if (document.getElementById('map').style.zIndex != 10) {
+                myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
+            }
             //if (myPolyline && (myPolyline.geometry.getLength() < 1 || getGpsDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020)) {
             if (myPolyline && isMove) {
                 myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
@@ -2334,7 +2347,7 @@
             // Создаем ломаную с помощью вспомогательного класса Polyline.
             myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
                     // Цвет линии.
-                    strokeColor: (isReverse ? "#FF0000" : "#0000FF"),
+                    strokeColor: (isPause ? "#00FF00" : (isReverse ? "#FF0000" : "#0000FF")),
                     // Ширина линии.
                     strokeWidth: 4,
                     // Коэффициент прозрачности.
@@ -2352,9 +2365,12 @@
         myMap = new ymaps.Map('map', {
                 center: (lastLatitude) ? [lastLatitude, lastLongitude] : [55.751286, 37.616516],
                 zoom: 16,
-                controls: []
+                controls: ['rulerControl', 'geolocationControl']
             });
         myMap.setType('yandex#map');
+        var btn = new ymaps.control.Button("В фон");
+        btn.events.add('click', function() {document.getElementById('map').style.zIndex = -1;});
+        myMap.controls.add(btn, {float: 'right'});
     }
 
     function pause() {
@@ -2920,7 +2936,17 @@
                     setEnterType(10);
                 break;
                 case 66: // b map
-                    mapType();
+                    if (myMap != null) {
+                        var pm = new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: getNumberString(getDistance(), 1000)}, {preset: 'islands#blackStretchyIcon'});
+                        pm.properties.iconContent = getNumberString(getDistance(), 1000);
+                        pm.events.add('click', function(e) {
+                            applingDistance = e.get('target').properties.iconContent;
+                            modalConfirm("Установить дистанцию " + applingDistance + "?", function() {setDistanceBT(applingDistance);setDistanceGPS(applingDistance);});
+                        });
+                        myMap.geoObjects.add(pm);
+                    } else {
+                        mapType();
+                    }
                 break;
                 default:
                     //alert(keyCode);
