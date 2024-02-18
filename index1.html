@@ -3111,7 +3111,15 @@
 		setIntervalDistanceBT(0);
         newMove();
         speak("Смотрим знаки");
-
+        if (myMap != null) {
+            var pm = new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: getNumberString(getDistance(), 1000)}, {preset: 'islands#blackStretchyIcon'});
+            pm.properties.iconContent = getNumberString(getDistance(), 1000);
+            pm.events.add('click', function(e) {
+                applingDistance = e.get('target').properties.iconContent;
+                modalConfirm("Установить дистанцию " + applingDistance + "?", function() {setDistanceBT(applingDistance);setDistanceGPS(applingDistance);});
+            });
+            myMap.geoObjects.add(pm);
+        }
     }
 
     $('#modalNumber').on('submit', function (e) {
