@@ -2381,6 +2381,18 @@
         } else {
             $('#movePause').hide();
         }
+        if (myMap && myPolyline) {
+            // Создаем ломаную с помощью вспомогательного класса Polyline.
+            myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
+                    // Цвет линии.
+                    strokeColor: (isPause ? "#00FF00" : (isReverse ? "#FF0000" : "#0000FF")),
+                    // Ширина линии.
+                    strokeWidth: 4,
+                    // Коэффициент прозрачности.
+                    strokeOpacity: 0.5
+                });
+            myMap.geoObjects.add(myPolyline);
+        }
         beep();
     }
 
@@ -2396,7 +2408,7 @@
             // Создаем ломаную с помощью вспомогательного класса Polyline.
             myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
                     // Цвет линии.
-                    strokeColor: (isReverse ? "#FF0000" : "#0000FF"),
+                    strokeColor: (isPause ? "#00FF00" : (isReverse ? "#FF0000" : "#0000FF")),
                     // Ширина линии.
                     strokeWidth: 4,
                     // Коэффициент прозрачности.
@@ -2404,7 +2416,6 @@
                 });
             myMap.geoObjects.add(myPolyline);
         }
-
         beep();
     }
 
