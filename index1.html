@@ -805,6 +805,7 @@
     <tbody>
     </tbody>
 </table>
+<button type="button" class="btn btn-default" onclick="showModalNumber('Кол-во записей РДС', displayRdsItems);">Кол-во записей РДС</button>
 <!-- Modal Number -->
 <div class="modal" id="modalNumber" role="dialog">
     <div class="modal-dialog">
@@ -899,7 +900,13 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-2" for="fRdsItemSpeed">Скорость</label>
+                        <label class="control-label col-sm-2" for="fRdsItemVpdd">Vпдд</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control big-input" id="fRdsItemVpdd" step="any" placeholder="Vпдд">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemSpeed" id="fRdsItemSpeedLabel">Скорость</label>
                         <div class="col-sm-10">
                             <input type="number" class="form-control big-input" id="fRdsItemSpeed" step="any" placeholder="Скорость">
                         </div>
@@ -1818,11 +1825,16 @@
 	function getIntervalDistance2() {
 		return getPrimaryMeter() == 'GPS' ? intervalDistanceBT : intervalDistanceGPS;
 	}
-
 	function setDistanceGPS(d) {
 		distanceGPS = d;
 		localStorage.setItem("distanceGPS", d);
 	}
+    function setRdsItemsCount(n) {
+        displayRdsItems = n;
+        localStorage.setItem("displayRdsItems", n);
+        refreshRdsTable();
+    }
+
 	function moveGPS(d) {
         var res = 1;
 		// calculate speed
@@ -3105,6 +3117,9 @@
             case 'Интервал':
                 resetInterval();
                 break;
+            case 'Кол-во записей РДС':
+                setRdsItemsCount(10);
+                break;
         }
     })
 
@@ -3158,6 +3173,9 @@
                 case 'Интервал':
                     setIntervalDistanceGPS(isIntervalPosition ? numberValue - intervalStartGPS : numberValue);
                     setIntervalDistanceBT(isIntervalPosition ? numberValue - intervalStartBT : numberValue);
+                    break;
+                case 'Кол-во записей РДС':
+                    setRdsItemsCount(numberValue);
                     break;
             }
             newMove();
@@ -3228,11 +3246,14 @@
         var ri = rds[index];
         $('input[name=fRdsItemType][value=' + ri.type + ']').closest('.btn').button('toggle');
         $('#fRdsItemDistance').val(ri.distance);
+        $('#fRdsItemVpdd').val(ri.vPdd);
+        $('#fRdsItemSpeedLabel').text((ri.siIndex < 0 || ri.siIndex >= speedIns.length) ? 'Скорость' : 'Скорость (' + speedIns[ri.siIndex] + ')');
         $('#fRdsItemSpeed').val(ri.speed);
         $('#fRdsItemTime').val(getTimeString(ri.time, true));
         $('#modalRdsItem').modal('show');
 
         $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fRdsItemVpdd').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fRdsItemTime').closest('.form-group').removeClass('has-error').removeClass('has-success');
     }
@@ -3241,11 +3262,33 @@
         setTimeout(function () { $('#fRdsItemDistance').focus().select(); }, 100);
     })
 
+    $('#fRdsItemVpdd').on('change', function() {
+        if (editRdsItemIndex < 0 || editRdsItemIndex >= rds.length) return;
+        var ri = rds[editRdsItemIndex];
+        //alert(ri.siIndex);
+        if (ri.siIndex < 0 || ri.siIndex >= speedIns.length) return;
+        var si = speedIns[ri.siIndex];
+        //alert(si);
+        var riVpdd = parseFloat($('#fRdsItemVpdd').val());
+        if (!riVpdd) {
+            $('#fRdsItemVpdd').closest('.form-group').removeClass('has-success').addClass('has-error');
+            return;
+        }
+        if (!si.isFormula()) return;
+        //alert('PDD speed changed');
+        $('#fRdsItemSpeed').val(si.getSpeed(riVpdd));
+    })
+
     $('#modalRdsItem').on('submit', function (e) {
         var isGood = true;
         var riDistance = parseFloat($('#fRdsItemDistance').val());
         if (riDistance == null) {
             $('#fRdsItemDistance').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        }
+        var riVpdd = parseFloat($('#fRdsItemVpdd').val());
+        if (!riVpdd) {
+            $('#fRdsItemVpdd').closest('.form-group').removeClass('has-success').addClass('has-error');
             isGood = false;
         }
         var riSpeed = parseFloat($('#fRdsItemSpeed').val());
@@ -3273,11 +3316,13 @@
         } else {
             $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').addClass('has-success');
             $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#fRdsItemVpdd').closest('.form-group').removeClass('has-error').addClass('has-success');
             $('#fRdsItemTime').closest('.form-group').removeClass('has-error').addClass('has-success');
             $('#modalRdsItem').modal('hide');
             if (editRdsItemIndex >= 0 && editRdsItemIndex < rds.length) {
                 rds[editRdsItemIndex].type = $('input[name=fRdsItemType]:checked').val();
                 rds[editRdsItemIndex].distance = riDistance;
+                rds[editRdsItemIndex].vPdd = riVpdd;
                 rds[editRdsItemIndex].speed = riSpeed;
                 rds[editRdsItemIndex].time = nTime;
                 rds.sort(compareRdsItems);
