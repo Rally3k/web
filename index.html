@@ -263,6 +263,7 @@
             height:98%;
             width: 96%;
             position: fixed; top: 1%; left: 2%;
+            opacity: 90%;
         }
 
         .content{
@@ -778,6 +779,15 @@
                     </div>
                 </div>
             </div>
+            <div class="col-l-1 col-xs-2 border nopadding square-box">
+                <div class="square-content">
+                    <div class="no-split">
+                        <a href="javascript:hideActions();document.getElementById('map').style.zIndex = 10;">
+                            <i class="fa icon fa-window-restore"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -795,6 +805,9 @@
     <tbody>
     </tbody>
 </table>
+<div class="btn-group btn-group-lg col-xs-12">
+    <button type="button" class="btn btn-default" onclick="showModalNumber('Кол-во записей РДС', displayRdsItems);">Кол-во записей РДС</button>
+</div>
 <!-- Modal Number -->
 <div class="modal" id="modalNumber" role="dialog">
     <div class="modal-dialog">
@@ -889,7 +902,13 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-2" for="fRdsItemSpeed">Скорость</label>
+                        <label class="control-label col-sm-2" for="fRdsItemVpdd">Vпдд</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control big-input" id="fRdsItemVpdd" step="any" placeholder="Vпдд">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="fRdsItemSpeed" id="fRdsItemSpeedLabel">Скорость</label>
                         <div class="col-sm-10">
                             <input type="number" class="form-control big-input" id="fRdsItemSpeed" step="any" placeholder="Скорость">
                         </div>
@@ -1300,6 +1319,7 @@
     var speedInterval = 0.0;
     var speedNext = 60.0;
     var lastLatenessSpeak = 0;
+    var applingDistance = 0;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1622,7 +1642,9 @@
             $(".fa-globe").css("color", "green");
         }
         if (myMap != null && lastLatitude) {
-            myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
+            if (document.getElementById('map').style.zIndex != 10) {
+                myMap.panTo([position.coords.latitude, position.coords.longitude], {flying: 1});
+            }
             //if (myPolyline && (myPolyline.geometry.getLength() < 1 || getGpsDistance(myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[0], myPolyline.geometry.get(myPolyline.geometry.getLength() - 1)[1], position.coords.latitude, position.coords.longitude) > 0.020)) {
             if (myPolyline && isMove) {
                 myPolyline.geometry.insert(myPolyline.geometry.getLength(), [position.coords.latitude, position.coords.longitude]);
@@ -1805,11 +1827,16 @@
 	function getIntervalDistance2() {
 		return getPrimaryMeter() == 'GPS' ? intervalDistanceBT : intervalDistanceGPS;
 	}
-
 	function setDistanceGPS(d) {
 		distanceGPS = d;
 		localStorage.setItem("distanceGPS", d);
 	}
+    function setRdsItemsCount(n) {
+        displayRdsItems = n;
+        localStorage.setItem("displayRdsItems", n);
+        refreshRdsTable();
+    }
+
 	function moveGPS(d) {
         var res = 1;
 		// calculate speed
@@ -2334,7 +2361,7 @@
             // Создаем ломаную с помощью вспомогательного класса Polyline.
             myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
                     // Цвет линии.
-                    strokeColor: (isReverse ? "#FF0000" : "#0000FF"),
+                    strokeColor: (isPause ? "#00FF00" : (isReverse ? "#FF0000" : "#0000FF")),
                     // Ширина линии.
                     strokeWidth: 4,
                     // Коэффициент прозрачности.
@@ -2352,9 +2379,12 @@
         myMap = new ymaps.Map('map', {
                 center: (lastLatitude) ? [lastLatitude, lastLongitude] : [55.751286, 37.616516],
                 zoom: 16,
-                controls: []
+                controls: ['rulerControl', 'geolocationControl']
             });
         myMap.setType('yandex#map');
+        var btn = new ymaps.control.Button("В фон");
+        btn.events.add('click', function() {document.getElementById('map').style.zIndex = -1;});
+        myMap.controls.add(btn, {float: 'right'});
     }
 
     function pause() {
@@ -2364,6 +2394,18 @@
             $('#movePause').show();
         } else {
             $('#movePause').hide();
+        }
+        if (myMap && myPolyline) {
+            // Создаем ломаную с помощью вспомогательного класса Polyline.
+            myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
+                    // Цвет линии.
+                    strokeColor: (isPause ? "#00FF00" : (isReverse ? "#FF0000" : "#0000FF")),
+                    // Ширина линии.
+                    strokeWidth: 4,
+                    // Коэффициент прозрачности.
+                    strokeOpacity: 0.5
+                });
+            myMap.geoObjects.add(myPolyline);
         }
         beep();
     }
@@ -2380,7 +2422,7 @@
             // Создаем ломаную с помощью вспомогательного класса Polyline.
             myPolyline = new ymaps.Polyline((lastLatitude) ? [[lastLatitude, lastLongitude]] : [], null, {
                     // Цвет линии.
-                    strokeColor: (isReverse ? "#FF0000" : "#0000FF"),
+                    strokeColor: (isPause ? "#00FF00" : (isReverse ? "#FF0000" : "#0000FF")),
                     // Ширина линии.
                     strokeWidth: 4,
                     // Коэффициент прозрачности.
@@ -2388,7 +2430,6 @@
                 });
             myMap.geoObjects.add(myPolyline);
         }
-
         beep();
     }
 
@@ -2920,7 +2961,20 @@
                     setEnterType(10);
                 break;
                 case 66: // b map
-                    mapType();
+                    if (myMap != null) {
+                        var pm = new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: getNumberString(getDistance(), 1000)}, {preset: 'islands#blackStretchyIcon'});
+                        pm.properties.iconContent = getNumberString(getDistance(), 1000);
+                        pm.events.add('click', function(e) {
+                            applingDistance = e.get('target').properties.iconContent;
+                            modalConfirm("Установить дистанцию " + applingDistance + "?", function() {var numberValue = parseFloat(applingDistance);if (!isNaN(numberValue)) {setDistanceBT(numberValue);setDistanceGPS(numberValue);}});
+                            
+        
+
+                        });
+                        myMap.geoObjects.add(pm);
+                    } else {
+                        mapType();
+                    }
                 break;
                 default:
                     //alert(keyCode);
@@ -3065,6 +3119,9 @@
             case 'Интервал':
                 resetInterval();
                 break;
+            case 'Кол-во записей РДС':
+                setRdsItemsCount(10);
+                break;
         }
     })
 
@@ -3085,7 +3142,15 @@
 		setIntervalDistanceBT(0);
         newMove();
         speak("Смотрим знаки");
-
+        if (myMap != null) {
+            var pm = new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: getNumberString(getDistance(), 1000)}, {preset: 'islands#blackStretchyIcon'});
+            pm.properties.iconContent = getNumberString(getDistance(), 1000);
+            pm.events.add('click', function(e) {
+                applingDistance = e.get('target').properties.iconContent;
+                modalConfirm("Установить дистанцию " + applingDistance + "?", function() {setDistanceBT(applingDistance);setDistanceGPS(applingDistance);});
+            });
+            myMap.geoObjects.add(pm);
+        }
     }
 
     $('#modalNumber').on('submit', function (e) {
@@ -3110,6 +3175,9 @@
                 case 'Интервал':
                     setIntervalDistanceGPS(isIntervalPosition ? numberValue - intervalStartGPS : numberValue);
                     setIntervalDistanceBT(isIntervalPosition ? numberValue - intervalStartBT : numberValue);
+                    break;
+                case 'Кол-во записей РДС':
+                    setRdsItemsCount(numberValue);
                     break;
             }
             newMove();
@@ -3180,11 +3248,14 @@
         var ri = rds[index];
         $('input[name=fRdsItemType][value=' + ri.type + ']').closest('.btn').button('toggle');
         $('#fRdsItemDistance').val(ri.distance);
+        $('#fRdsItemVpdd').val(ri.vPdd);
+        $('#fRdsItemSpeedLabel').text((ri.siIndex < 0 || ri.siIndex >= speedIns.length) ? 'Скорость' : 'Скорость (' + speedIns[ri.siIndex] + ')');
         $('#fRdsItemSpeed').val(ri.speed);
         $('#fRdsItemTime').val(getTimeString(ri.time, true));
         $('#modalRdsItem').modal('show');
 
         $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fRdsItemVpdd').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fRdsItemTime').closest('.form-group').removeClass('has-error').removeClass('has-success');
     }
@@ -3193,11 +3264,33 @@
         setTimeout(function () { $('#fRdsItemDistance').focus().select(); }, 100);
     })
 
+    $('#fRdsItemVpdd').on('change', function() {
+        if (editRdsItemIndex < 0 || editRdsItemIndex >= rds.length) return;
+        var ri = rds[editRdsItemIndex];
+        //alert(ri.siIndex);
+        if (ri.siIndex < 0 || ri.siIndex >= speedIns.length) return;
+        var si = speedIns[ri.siIndex];
+        //alert(si);
+        var riVpdd = parseFloat($('#fRdsItemVpdd').val());
+        if (!riVpdd) {
+            $('#fRdsItemVpdd').closest('.form-group').removeClass('has-success').addClass('has-error');
+            return;
+        }
+        if (!si.isFormula()) return;
+        //alert('PDD speed changed');
+        $('#fRdsItemSpeed').val(si.getSpeed(riVpdd));
+    })
+
     $('#modalRdsItem').on('submit', function (e) {
         var isGood = true;
         var riDistance = parseFloat($('#fRdsItemDistance').val());
         if (riDistance == null) {
             $('#fRdsItemDistance').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        }
+        var riVpdd = parseFloat($('#fRdsItemVpdd').val());
+        if (!riVpdd) {
+            $('#fRdsItemVpdd').closest('.form-group').removeClass('has-success').addClass('has-error');
             isGood = false;
         }
         var riSpeed = parseFloat($('#fRdsItemSpeed').val());
@@ -3225,11 +3318,13 @@
         } else {
             $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').addClass('has-success');
             $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#fRdsItemVpdd').closest('.form-group').removeClass('has-error').addClass('has-success');
             $('#fRdsItemTime').closest('.form-group').removeClass('has-error').addClass('has-success');
             $('#modalRdsItem').modal('hide');
             if (editRdsItemIndex >= 0 && editRdsItemIndex < rds.length) {
                 rds[editRdsItemIndex].type = $('input[name=fRdsItemType]:checked').val();
                 rds[editRdsItemIndex].distance = riDistance;
+                rds[editRdsItemIndex].vPdd = riVpdd;
                 rds[editRdsItemIndex].speed = riSpeed;
                 rds[editRdsItemIndex].time = nTime;
                 rds.sort(compareRdsItems);
