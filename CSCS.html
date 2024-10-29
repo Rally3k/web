@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <button id="bluetooth">BT</button>
+  <p id="data">0</p>
+  <p id="dataAP">0</p>
+  <p id="dataAN">0</p>
+  <p id="dataAO">0</p>
+  <button id="send">Send</button>
+  <br>
+Version 0.2
+  <script>
+	function parseValue (v) {
+		// В Chrome 50+ используется DataView.
+		var value = v.buffer ? v : new DataView(v);
+		let result = {};
+		result.distance = value.getUint16(1, true);
+		result.ap = value.getUint8(0, true);
+		result.an = value.getUint16(3, true);
+		result.ao = value.getUint16(5, true);
+
+		return result;
+	}
+
+	let distanceMeter = null;
+	let distanceMeterTx = null;
+    
+	window.onload = () => {
+      const btButton = document.getElementById('bluetooth');
+	  const data = document.getElementById('data');
+	  const dataAP = document.getElementById('dataAP');
+	  const dataAN = document.getElementById('dataAN');
+	  const dataAO = document.getElementById('dataAO');
+	  const send = document.getElementById('send');
+	  
+      btButton.addEventListener('pointerup', function(event) {
+		if (distanceMeter) {
+			distanceMeter.removeEventListener('gattserverdisconnected', handleDisconnection);
+			if (distanceMeter.gatt.connected) {
+				distanceMeter.gatt.disconnect();
+			}
+
+			if (distanceMeterTx) {
+				distanceMeterTx.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+				distanceMeterTx = null;
+			}
+
+			distanceMeter = null;
+		} else {
+			navigator.bluetooth.requestDevice({
+				filters: [{ services: ['00001816-0000-1000-8000-00805f9b34fb']}, {'name': 'DM'} ]
+			  })
+			  .then((device) => {
+				device.addEventListener('gattserverdisconnected', handleDisconnection);
+				distanceMeter = device;
+				return device.gatt.connect();
+			  })
+			  .then(server => {
+				return server.getPrimaryService('00001816-0000-1000-8000-00805f9b34fb');
+			  })
+			  .then(service => {
+				return service.getCharacteristic('00002a5b-0000-1000-8000-00805f9b34fb');
+			  })
+			  .then(characteristic => characteristic.startNotifications())
+			  .then(characteristic => {
+				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+			  })
+			  .catch(error => { console.log(error); });
+		}
+      });
+	}
+	
+	// Обработчик разъединения
+	function handleDisconnection(event) {
+		alert('Disconnected');
+		//let device = event.target;
+		//connectDeviceAndCacheCharacteristic(device).
+		//then(characteristic => startNotifications(characteristic)).
+		//catch(error => log(error));
+	}
+	function handleCharacteristicValueChanged(event) {
+		let value = event.target.value;
+		var d = parseValue(value);
+		data.innerHTML = "D: " + d.distance;
+		dataAP.innerHTML = "A+: " + d.ap;
+		dataAN.innerHTML = "A-: " + d.an;
+		dataAO.innerHTML = "Aout: " + d.ao;
+	}
+  </script>
+</body>
+</html>
