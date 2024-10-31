@@ -79,10 +79,10 @@ Version 0.2
 	// Обработчик разъединения
 	function handleDisconnection(event) {
 		alert('Disconnected');
-		//let device = event.target;
-		//connectDeviceAndCacheCharacteristic(device).
-		//then(characteristic => startNotifications(characteristic)).
-		//catch(error => log(error));
+		let device = event.target;
+		connectDeviceAndCacheCharacteristic(device).
+		then(characteristic => startNotifications(characteristic)).
+		catch(error => alert(error));
 	}
 	function handleCharacteristicValueChanged(event) {
 		let value = event.target.value;
