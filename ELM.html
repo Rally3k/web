@@ -12,10 +12,15 @@
   <p id="dataAP">0</p>
   <p id="dataAN">0</p>
   <p id="dataAO">0</p>
+  <input type="text" id="sendData" value="AT DP">
   <button id="send">Send</button>
-  <br>
-Version 0.2
+  <p id="text">Results</p>
+  <br>Version 0.1
   <script>
+//00001800-0000-1000-8000-00805f9b34fb
+//0000fff1-0000-1000-8000-00805f9b34fb
+//0000fff2-0000-1000-8000-00805f9b34fb
+
 	function parseValue (v) {
 		// В Chrome 50+ используется DataView.
 		var value = v.buffer ? v : new DataView(v);
@@ -29,6 +34,7 @@ Version 0.2
 	}
 
 	let distanceMeter = null;
+	let distanceMeterTx = null;
 	let lastValue = null;
     
 	window.onload = () => {
@@ -37,8 +43,9 @@ Version 0.2
 	  const dataAP = document.getElementById('dataAP');
 	  const dataAN = document.getElementById('dataAN');
 	  const dataAO = document.getElementById('dataAO');
+	  const sendData = document.getElementById('sendData');
 	  const send = document.getElementById('send');
-	  
+
       btButton.addEventListener('pointerup', function(event) {
 		if (distanceMeter) {
 			distanceMeter.removeEventListener('gattserverdisconnected', handleDisconnection);
@@ -54,7 +61,7 @@ Version 0.2
 			distanceMeter = null;
 		} else {
 			navigator.bluetooth.requestDevice({
-				filters: [{ services: ['00001816-0000-1000-8000-00805f9b34fb']} ]
+				filters: [{ services: ['0000fff0-0000-1000-8000-00805f9b34fb']} ]
 			  })
 			  .then((device) => { connectBT(device); });
 		}
@@ -65,9 +72,14 @@ Version 0.2
 		device.addEventListener('gattserverdisconnected', handleDisconnection);
 		distanceMeter = device;
 		device.gatt.connect().then(server => {
-			return server.getPrimaryService('00001816-0000-1000-8000-00805f9b34fb');
+			return server.getPrimaryService('0000fff0-0000-1000-8000-00805f9b34fb');
 		}).then(service => {
-			return service.getCharacteristic('00002a5b-0000-1000-8000-00805f9b34fb');
+			service.getCharacteristic('0000fff1-0000-1000-8000-00805f9b34fb').then(characteristic => {
+				distanceMeterTx = characteristic;
+			});
+			return service;
+		}).then(service => {
+			return service.getCharacteristic('0000fff1-0000-1000-8000-00805f9b34fb');
 		}).then(characteristic => characteristic.startNotifications())
 		.then(characteristic => {
 			characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
@@ -85,15 +97,23 @@ Version 0.2
 	}
 	function handleCharacteristicValueChanged(event) {
 		let value = event.target.value;
-		var d = parseValue(value);
+		/*var d = parseValue(value);
 		data.innerHTML = "D: " + d.distance;
 		dataAP.innerHTML = "A+: " + d.ap;
 		if (lastValue != null) {
 			dataAN.innerHTML = "A-: " + (d.distance - lastValue);
 		}
 		dataAO.innerHTML = "Aout: " + d.ao;
-		lastValue = d.distance;
+		lastValue = d.distance;*/
+		const decoder = new TextDecoder();
+		const str = decoder.decode(value);
+		text.innerHTML = str + "<br>" + text.innerHTML;
 	}
+
+	send.addEventListener('pointerup', function(event) {
+	    distanceMeterTx.writeValue(new TextEncoder().encode(sendData.value + '\r'));
+	});
+
 	
 	setInterval(function() { if (distanceMeter && !distanceMeter.gatt.connected) { connectBT(distanceMeter); } }, 1000);
   </script>
