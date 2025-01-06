@@ -1320,6 +1320,7 @@
     var speedNext = 60.0;
     var lastLatenessSpeak = 0;
     var applingDistance = 0;
+    var lastBTDistance = 0;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1613,12 +1614,16 @@
 		beep();
 		alert('Bluetooth disconnected!');
 		bluetoothClick(); // close connections
+        lastBTDistance = 0;
 	}
 	function handleCharacteristicValueChanged(event) {
 		wasUpdateBT = true;
 		var d = event.target.value;
 		d = d.buffer ? d : new DataView(d);
-		dBT = correctionBT * d.getFloat32(0, true);
+        dBT = d.getUint32(0, true);
+        if (dBT < lastBTDistance) lastBTDistance -= 0xFFFFFFFF;
+		dBT = (lastBTDistance != 0) ? correctionBT * (dBT - lastBTDistance) : 0;
+        lastBTDistance = d.getUint32(0, true);
         batteryBT = d.byteLength >= 8 ? d.getFloat32(4, true) : undefined;
 		sBT = d.byteLength >= 12 ? correctionBT * d.getFloat32(8, true) : undefined;
 		moveBT(dBT, sBT);
