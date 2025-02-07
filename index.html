@@ -2872,6 +2872,9 @@
             }
         } else {
             switch (keyCode) {
+                case 27:
+                    addDistancePlacemark();
+                    break;
                 case 83: // s start DS
                     rdsStart();
                 break;
@@ -2967,16 +2970,7 @@
                 break;
                 case 66: // b map
                     if (myMap != null) {
-                        var pm = new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: getNumberString(getDistance(), 1000)}, {preset: 'islands#blackStretchyIcon'});
-                        pm.properties.iconContent = getNumberString(getDistance(), 1000);
-                        pm.events.add('click', function(e) {
-                            applingDistance = e.get('target').properties.iconContent;
-                            modalConfirm("Установить дистанцию " + applingDistance + "?", function() {var numberValue = parseFloat(applingDistance);if (!isNaN(numberValue)) {setDistanceBT(numberValue);setDistanceGPS(numberValue);}});
-                            
-        
-
-                        });
-                        myMap.geoObjects.add(pm);
+                        addDistancePlacemark();
                     } else {
                         mapType();
                     }
@@ -3147,12 +3141,16 @@
 		setIntervalDistanceBT(0);
         newMove();
         speak("Смотрим знаки");
+        addDistancePlacemark();
+    }
+
+    function addDistancePlacemark() {
         if (myMap != null) {
             var pm = new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: getNumberString(getDistance(), 1000)}, {preset: 'islands#blackStretchyIcon'});
             pm.properties.iconContent = getNumberString(getDistance(), 1000);
             pm.events.add('click', function(e) {
                 applingDistance = e.get('target').properties.iconContent;
-                modalConfirm("Установить дистанцию " + applingDistance + "?", function() {setDistanceBT(applingDistance);setDistanceGPS(applingDistance);});
+                modalConfirm("Установить дистанцию " + applingDistance + "?", function() {var numberValue = parseFloat(applingDistance);if (!isNaN(numberValue)) {setDistanceBT(numberValue);setDistanceGPS(numberValue);}});
             });
             myMap.geoObjects.add(pm);
         }
