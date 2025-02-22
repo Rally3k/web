@@ -1321,6 +1321,8 @@
     var lastLatenessSpeak = 0;
     var applingDistance = 0;
     var lastBTDistance = 0;
+    var lastBTTime = 0;
+    var lastBTSpeed = 0;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1582,32 +1584,30 @@
             $(".fa-bluetooth").css("color", "red");
 			isBT = true;
 			navigator.bluetooth.requestDevice({
-				filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {'name': 'ESP32Meter'} ]
-			  })
-			  .then((device) => {
-				device.addEventListener('gattserverdisconnected', handleDisconnection);
-				distanceMeter = device;
-				return device.gatt.connect();
-			  })
-			  .then(server => {
-				return server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
-			  })
-			  .then(service => {
-				service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e').then(characteristic => {
-					distanceMeterTx = characteristic;
-				});
-				return service;
-			  })
-			  .then(service => {
-				return service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
-			  })
-			  .then(characteristic => characteristic.startNotifications())
-			  .then(characteristic => {
-				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-			  })
-			  .catch(error => { console.log(error); });
+			    filters: [{ services: ['0000fff0-0000-1000-8000-00805f9b34fb']} ]
+            })
+			.then((device) => { connectBT(device); });
         }
     }
+
+	function connectBT(device) {
+		device.addEventListener('gattserverdisconnected', handleDisconnection);
+		distanceMeter = device;
+		device.gatt.connect().then(server => {
+			return server.getPrimaryService('0000fff0-0000-1000-8000-00805f9b34fb');
+		}).then(service => {
+			service.getCharacteristic('0000fff1-0000-1000-8000-00805f9b34fb').then(characteristic => {
+				distanceMeterTx = characteristic;
+				distanceMeterTx.writeValue(new TextEncoder().encode('AT SP 0\r'));
+			});
+			return service;
+		}).then(service => {
+			return service.getCharacteristic('0000fff1-0000-1000-8000-00805f9b34fb');
+		}).then(characteristic => characteristic.startNotifications())
+		.then(characteristic => {
+			characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+		}).catch(error => { console.log(error); });
+	}
 
 	// Bluetooth disconnetion
 	function handleDisconnection(event) {
@@ -1615,19 +1615,35 @@
 		alert('Bluetooth disconnected!');
 		bluetoothClick(); // close connections
         lastBTDistance = 0;
+        lastBTTime = 0;
+        lastBTSpeed = 0;
 	}
+
 	function handleCharacteristicValueChanged(event) {
 		wasUpdateBT = true;
-		var d = event.target.value;
-		d = d.buffer ? d : new DataView(d);
-        dBT = d.getUint32(0, true);
-        if (dBT < lastBTDistance) lastBTDistance -= 0xFFFFFFFF;
-		dBT = (lastBTDistance != 0) ? correctionBT * (dBT - lastBTDistance) : 0;
-        lastBTDistance = d.getUint32(0, true);
-        batteryBT = d.byteLength >= 8 ? d.getFloat32(4, true) : undefined;
-		sBT = d.byteLength >= 12 ? correctionBT * d.getFloat32(8, true) : undefined;
-		moveBT(dBT, sBT);
-	}
+		let value = event.target.value;
+		const decoder = new TextDecoder();
+		const str = decoder.decode(value);
+        $("#batteryBT").html(str.replace('\r', ' '));
+		var arr = str.split('\r');
+		for (i = 0; i < arr.length; ++i) {
+			arri = arr[i].split(' ');
+			if (arri.length < 3 || arri[0] != "41" || arri[1] != "0D") continue;
+			var sBT = Number("0x" + arri[2]);
+			if (!isNaN(sBT)) {
+                currTime = Date.now();
+                if (lastBTTime != 0) {
+                    var dBT = correctionBT * (sBT + lastBTSpeed) / 2.0 * (currTime - lastBTTime) / (1000.0 * 60.0 * 60.0);
+                }
+                lastBTTime = currTime;
+                lastBTSpeed = sBT;
+                moveBT(dBT, sBT);
+            }
+			break;
+		}
+    }
+
+    setInterval(function() { if (distanceMeter && distanceMeter.gatt.connected && distanceMeterTx) { distanceMeterTx.writeValue(new TextEncoder().encode('010D\r')); } }, 2000);
 /*
 	send.addEventListener('pointerup', function(event) {
 		distanceMeterTx.writeValue(new TextEncoder().encode('Hello!'));
@@ -1976,6 +1992,7 @@
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
             }
         }
+        $("#benefit").css("color", "black"); // чтобы Льгота сказала
     }
 
     function addRdsItem(item) {
@@ -2112,7 +2129,7 @@
                 }
             }
         }
-        $("#batteryBT").html(batteryBT === undefined? "" : getNumberString(batteryBT, 100) + "v");
+        //$("#batteryBT").html(batteryBT === undefined? "" : getNumberString(batteryBT, 100) + "v");
         $("#time").html(getTimeString(getCurrentTime(), true));
         var sectorTime = getCurrentTime() - start + ((getCurrentTime() > start) ? 0 : 24 * 60 * 60);
         if (norm - sectorTime > 60) {
@@ -2168,11 +2185,14 @@
         //var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
         var benefit = (getKvTime() > 60) ? 60 * Math.floor((getKvTime() + 9 * 60) / 600) : 60;
         $("#benefit").html(getTimeString(benefit, false));
-        var lateness;
+        var lateness, latenessVkv = 0;
         if (sector > 0) {
             lateness = getKvTime() - getDistance() / sector * norm;
-            if (benefit + lateness + 60 < 0 && $("#benefit").css("color") == "rgb(0, 0, 0)") speak("Льгота");
-            $("#benefit").css("color", (benefit + lateness + 60 < 0) ? "red" : "black");
+            latenessVkv = 60 * (Math.floor(getKvTime() / 60) - Math.floor(getDistance() / sector * norm / 60));
+            //if (benefit + lateness + 60 < 0 && $("#benefit").css("color") == "rgb(0, 0, 0)") speak("Льгота");
+            //$("#benefit").css("color", (benefit + lateness + 60 < 0) ? "red" : "black");
+            if (benefit + latenessVkv < 0 && $("#benefit").css("color") == "rgb(0, 0, 0)") speak("Льгота");
+            $("#benefit").css("color", (benefit + latenessVkv < 0) ? "red" : "black");
         } else {
             $("#benefit").css("color", "black");
         }
@@ -2233,7 +2253,8 @@
             $("#labelLateness").html(lateness < 0 ? "Опережение" : "Опоздание");
             $("#avgSpeed").html(norm > 0 ? getNumberString(3600 * sector / norm, 100) : "--.--");
             $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
-            $("#latenessPdd").html("-");
+            //$("#latenessPdd").html("-");
+            $("#latenessPdd").html(getTimeString(latenessVkv, false) + " (ВКВ)");
         }
         // Check speed litmit zone
         if (speedInterval != 0 && getDistance() >= lastSpeedDistance + speedInterval) {
@@ -2872,6 +2893,9 @@
             }
         } else {
             switch (keyCode) {
+                case 27:
+                    addDistancePlacemark();
+                    break;
                 case 83: // s start DS
                     rdsStart();
                 break;
@@ -2967,16 +2991,7 @@
                 break;
                 case 66: // b map
                     if (myMap != null) {
-                        var pm = new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: getNumberString(getDistance(), 1000)}, {preset: 'islands#blackStretchyIcon'});
-                        pm.properties.iconContent = getNumberString(getDistance(), 1000);
-                        pm.events.add('click', function(e) {
-                            applingDistance = e.get('target').properties.iconContent;
-                            modalConfirm("Установить дистанцию " + applingDistance + "?", function() {var numberValue = parseFloat(applingDistance);if (!isNaN(numberValue)) {setDistanceBT(numberValue);setDistanceGPS(numberValue);}});
-                            
-        
-
-                        });
-                        myMap.geoObjects.add(pm);
+                        addDistancePlacemark();
                     } else {
                         mapType();
                     }
@@ -3147,12 +3162,16 @@
 		setIntervalDistanceBT(0);
         newMove();
         speak("Смотрим знаки");
+        addDistancePlacemark();
+    }
+
+    function addDistancePlacemark() {
         if (myMap != null) {
             var pm = new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: getNumberString(getDistance(), 1000)}, {preset: 'islands#blackStretchyIcon'});
             pm.properties.iconContent = getNumberString(getDistance(), 1000);
             pm.events.add('click', function(e) {
                 applingDistance = e.get('target').properties.iconContent;
-                modalConfirm("Установить дистанцию " + applingDistance + "?", function() {setDistanceBT(applingDistance);setDistanceGPS(applingDistance);});
+                modalConfirm("Установить дистанцию " + applingDistance + "?", function() {var numberValue = parseFloat(applingDistance);if (!isNaN(numberValue)) {setDistanceBT(numberValue);setDistanceGPS(numberValue);}});
             });
             myMap.geoObjects.add(pm);
         }
