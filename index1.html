@@ -1634,10 +1634,12 @@
                 currTime = Date.now();
                 if (lastBTTime != 0) {
                     var dBT = correctionBT * (sBT + lastBTSpeed) / 2.0 * (currTime - lastBTTime) / (1000.0 * 60.0 * 60.0);
+                    moveBT(dBT, sBT);
+                } else {
+                    moveBT(0, sBT);
                 }
                 lastBTTime = currTime;
                 lastBTSpeed = sBT;
-                moveBT(dBT, sBT);
             }
 			break;
 		}
