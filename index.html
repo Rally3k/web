@@ -1582,8 +1582,7 @@
             $(".fa-bluetooth").css("color", "red");
 			isBT = true;
 			navigator.bluetooth.requestDevice({
-				//filters: [{ services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {'name': 'ESP32Meter'} ]
-                filters: [{ namePrefix: 'Meter'}]
+				filters: [{services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {namePrefix: 'Meter'} ]
 			  })
 			  .then((device) => {
 				device.addEventListener('gattserverdisconnected', handleDisconnection);
