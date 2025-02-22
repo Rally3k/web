@@ -1977,6 +1977,7 @@
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
             }
         }
+        $("#benefit").css("color", "black"); // чтобы Льгота сказала
     }
 
     function addRdsItem(item) {
@@ -2169,11 +2170,14 @@
         //var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
         var benefit = (getKvTime() > 60) ? 60 * Math.floor((getKvTime() + 9 * 60) / 600) : 60;
         $("#benefit").html(getTimeString(benefit, false));
-        var lateness;
+        var lateness, latenessVkv = 0;
         if (sector > 0) {
             lateness = getKvTime() - getDistance() / sector * norm;
-            if (benefit + lateness + 60 < 0 && $("#benefit").css("color") == "rgb(0, 0, 0)") speak("Льгота");
-            $("#benefit").css("color", (benefit + lateness + 60 < 0) ? "red" : "black");
+            latenessVkv = 60 * (Math.floor(getKvTime() / 60) - Math.floor(getDistance() / sector * norm / 60));
+            //if (benefit + lateness + 60 < 0 && $("#benefit").css("color") == "rgb(0, 0, 0)") speak("Льгота");
+            //$("#benefit").css("color", (benefit + lateness + 60 < 0) ? "red" : "black");
+            if (benefit + latenessVkv < 0 && $("#benefit").css("color") == "rgb(0, 0, 0)") speak("Льгота");
+            $("#benefit").css("color", (benefit + latenessVkv < 0) ? "red" : "black");
         } else {
             $("#benefit").css("color", "black");
         }
@@ -2234,7 +2238,8 @@
             $("#labelLateness").html(lateness < 0 ? "Опережение" : "Опоздание");
             $("#avgSpeed").html(norm > 0 ? getNumberString(3600 * sector / norm, 100) : "--.--");
             $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
-            $("#latenessPdd").html("-");
+            //$("#latenessPdd").html("-");
+            $("#latenessPdd").html(getTimeString(latenessVkv, false) + " (ВКВ)");
         }
         // Check speed litmit zone
         if (speedInterval != 0 && getDistance() >= lastSpeedDistance + speedInterval) {
