@@ -1659,9 +1659,10 @@
         if (dBT < lastBTDistance) lastBTDistance -= 0xFFFFFFFF;
         if (tBT < lastBTTime) lastBTTime -= 0xFFFF;
 		dBT = (lastBTDistance != 0) ? correctionBT * (dBT - lastBTDistance) : 0;
-		sBT = dBT * 1024.0 * 3600.0 / (tBT - lastBTTime);
-        lastBTDistance = d.getUint32(1, true);
+        var sBT = 0;
+        sBT = (tBT != lastBTTime) ? dBT * 1024.0 * 3600.0 / (tBT - lastBTTime) : 0;
         lastBTTime = tBT;
+        lastBTDistance = d.getUint32(1, true);
 		moveBT(dBT, sBT);
 	}
     function handleCharacteristicBatteryChanged(event) {
@@ -2918,7 +2919,7 @@
             }
         } else {
             switch (keyCode) {
-                case 27:
+                case 27: // esc
                     addDistancePlacemark();
                     break;
                 case 83: // s start DS
@@ -2960,6 +2961,10 @@
                 break;
                 case 74: // j set last position (by interval)
                     setPosition(lastIntervalPositionGPS, lastIntervalPositionBT);
+                    beep();
+                break;
+                case 65: // a auto correction
+                    setCorrection(getIntervalDistance());
                     beep();
                 break;
                 case 75: // k add KV
