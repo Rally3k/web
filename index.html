@@ -2680,7 +2680,7 @@
     }
 
     function setCorrection(value) {
-        if (isNaN(value)) {
+        if (isNaN(value) || value == 0) {
             return 0;
         } else {
             var iGPS = distanceGPS - intervalStartGPS;
@@ -2964,7 +2964,7 @@
                     beep();
                 break;
                 case 65: // a auto correction
-                    setCorrection(getIntervalDistance());
+                    setCorrection(getIntervalDistance()); // работает, если только недопробег
                     beep();
                 break;
                 case 75: // k add KV
@@ -3417,6 +3417,10 @@
         $('#fCorrectionMaxSpeed').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fCorrectionMaxSpeed').val(maxSpeed);
 		$('input[name=fCorrectionDefaultMeter][value=' + defaultMeter + ']').prop('checked', true);
+        if ($('input[name=fCorrectionType]:checked').val() == 'V') {
+            $('#fCorrectionValueGPS').val(correctionGPS);
+            $('#fCorrectionValueBT').val(correctionBT);
+        }
     }
 
     $('#modalCorrection').on('shown.bs.modal', function() {
