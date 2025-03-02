@@ -1321,6 +1321,7 @@
     var lastLatenessSpeak = 0;
     var applingDistance = 0;
     var lastBTDistance = 0;
+    var lastBTTime = 0;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1582,7 +1583,7 @@
             $(".fa-bluetooth").css("color", "red");
 			isBT = true;
 			navigator.bluetooth.requestDevice({
-				filters: [{services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}, {namePrefix: 'Meter'} ]
+				filters: [{ services: ['00001816-0000-1000-8000-00805f9b34fb']} ], optionalServices: ['0000180f-0000-1000-8000-00805f9b34fb']
 			  })
 			  .then((device) => {
 				device.addEventListener('gattserverdisconnected', handleDisconnection);
@@ -1606,8 +1607,37 @@
 				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
 			  })
 			  .catch(error => { console.log(error); });
+
+              navigator.bluetooth.requestDevice({
+				filters: [{ services: ['00001816-0000-1000-8000-00805f9b34fb']} ], optionalServices: ['0000180f-0000-1000-8000-00805f9b34fb']
+			  })
+			  .then((device) => { connectBT(device); });
         }
     }
+
+    function connectBT(device) {
+		device.addEventListener('gattserverdisconnected', handleDisconnection);
+		distanceMeter = device;
+
+		device.gatt.connect().then(server => {
+			return server.getPrimaryService('00001816-0000-1000-8000-00805f9b34fb');
+		}).then(service => {
+			return service.getCharacteristic('00002a5b-0000-1000-8000-00805f9b34fb');
+		}).then(characteristic => characteristic.startNotifications())
+		.then(characteristic => {
+			characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+		}).catch(error => { console.log(error); });
+
+		// battery service
+		device.gatt.connect().then(server => {
+			return server.getPrimaryService('0000180f-0000-1000-8000-00805f9b34fb');
+		}).then(service => {
+			return service.getCharacteristic('00002a19-0000-1000-8000-00805f9b34fb');
+		}).then(characteristic => characteristic.startNotifications())
+		.then(characteristic => {
+			characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicBatteryChanged);
+		}).catch(error => { console.log(error); });
+	}
 
 	// Bluetooth disconnetion
 	function handleDisconnection(event) {
@@ -1620,14 +1650,25 @@
 		wasUpdateBT = true;
 		var d = event.target.value;
 		d = d.buffer ? d : new DataView(d);
-        dBT = d.getUint32(0, true);
+        if (!(d.getUint8(0, true) & 1)) {
+            console.log('No speed data');
+            return;
+        }
+        dBT = d.getUint32(1, true);
+        tBT = d.getUint16(5, true);
         if (dBT < lastBTDistance) lastBTDistance -= 0xFFFFFFFF;
+        if (tBT < lastBTTime) lastBTTime -= 0xFFFF;
 		dBT = (lastBTDistance != 0) ? correctionBT * (dBT - lastBTDistance) : 0;
-        lastBTDistance = d.getUint32(0, true);
-        batteryBT = d.byteLength >= 8 ? d.getFloat32(4, true) : undefined;
-		sBT = d.byteLength >= 12 ? correctionBT * d.getFloat32(8, true) : undefined;
+		sBT = dBT * 1024.0 * 3600.0 / (tBT - lastBTTime);
+        lastBTDistance = d.getUint32(1, true);
+        lastBTTime = tBT;
 		moveBT(dBT, sBT);
 	}
+    function handleCharacteristicBatteryChanged(event) {
+		var value = event.target.value.buffer ? event.target.value : new DataView(event.target.value);
+        batteryBT = value.getUint8(0, true);
+	}	
+
 /*
 	send.addEventListener('pointerup', function(event) {
 		distanceMeterTx.writeValue(new TextEncoder().encode('Hello!'));
@@ -2113,7 +2154,7 @@
                 }
             }
         }
-        $("#batteryBT").html(batteryBT === undefined? "" : getNumberString(batteryBT, 100) + "v");
+        $("#batteryBT").html(batteryBT === undefined? "" : batteryBT + "%");
         $("#time").html(getTimeString(getCurrentTime(), true));
         var sectorTime = getCurrentTime() - start + ((getCurrentTime() > start) ? 0 : 24 * 60 * 60);
         if (norm - sectorTime > 60) {
