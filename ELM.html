@@ -36,6 +36,7 @@
 	let distanceMeter = null;
 	let distanceMeterTx = null;
 	let lastValue = null;
+	var nextBTTime = Date.now() + 30000;
     
 	window.onload = () => {
       const btButton = document.getElementById('bluetooth');
@@ -110,12 +111,14 @@
 		const decoder = new TextDecoder();
 		const str = decoder.decode(value);
 		text.innerHTML = str + "<br>" + text.innerHTML;
+		str = str.replaceAll(" ", "").toUpperCase();
 		var arr = str.split('\r');
 		for (i = 0; i < arr.length; ++i) {
-			arri = arr[i].split(' ');
-			if (arri.length < 3 || arri[0] != "41" || arri[1] != "0D") continue;
-			var elmSpeed = Number("0x" + arri[2]);
-			if (!isNaN(elmSpeed)) text.innerHTML = "Speed: " + elmSpeed + "km/h<br>" + text.innerHTML;
+			var arri = arr[i].match("410C([0-9A-F]{4})") ;
+			if (arri == null || arri.length < 2) continue;
+			var elmSpeed = Number("0x" + arri[1]);
+			if (!isNaN(elmSpeed)) text.innerHTML = "RPM: " + elmSpeed/4 + "<br>" + text.innerHTML;
+			nextBTTime = Date.now() + 500;
 			break;
 		}
 	}
@@ -124,18 +127,19 @@
 	    distanceMeterTx.writeValue(new TextEncoder().encode(sendData.value + '\r'));
 	});
 
-	var str = "010D\r41 0D 19\r41 0D 18\r";
+	var str = "010C\r410C0ABE\r41 0C 18 20\r";
+	str = str.replaceAll(" ", "").toUpperCase();
 	var arr = str.split('\r');
 	for (i = 0; i < arr.length; ++i) {
-		arri = arr[i].split(' ');
-		if (arri.length < 3 || arri[0] != "41" || arri[1] != "0D") continue;
-		var elmSpeed = Number("0x" + arri[2]);
-		if (!isNaN(elmSpeed)) alert("Speed: " + elmSpeed + "km/h");
+		var arri = arr[i].match("410C([0-9A-F]{4})") ;
+		if (arri == null || arri.length < 2) continue;
+		var elmSpeed = Number("0x" + arri[1]);
+		if (!isNaN(elmSpeed)) alert("RPM: " + elmSpeed/4);
 		break;
 	}
 	
 	setInterval(function() { if (distanceMeter && !distanceMeter.gatt.connected) { connectBT(distanceMeter); } }, 1000);
-	setInterval(function() { if (distanceMeter && distanceMeter.gatt.connected && distanceMeterTx) { distanceMeterTx.writeValue(new TextEncoder().encode('010D\r')); } }, 2000);
+	setInterval(function() { if (distanceMeter && distanceMeter.gatt.connected && distanceMeterTx && (Data.now()-nextBTTime) >= 0) { distanceMeterTx.writeValue(new TextEncoder().encode('010C\r')); nextBTTime = Date.now() + 2000; } }, 100);
   </script>
 </body>
 </html>
