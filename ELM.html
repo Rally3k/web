@@ -78,17 +78,17 @@
 	function handleCharacteristicValueChanged(event) {
 		let value = event.target.value;
 		const decoder = new TextDecoder();
-		const str = decoder.decode(value);
+		var str = decoder.decode(value);
 		text.innerHTML = str + "<br>" + text.innerHTML;
 		str = str.replaceAll(" ", "").toUpperCase();
-		var arr = str.split('\r');
-		for (i = 0; i < arr.length; ++i) {
-			var arri = arr[i].match("410C([0-9A-F]{4})") ;
-			if (arri == null || arri.length < 2) continue;
-			var elmSpeed = Number("0x" + arri[1]);
-			if (!isNaN(elmSpeed)) text.innerHTML = "RPM: " + elmSpeed/4 + "<br>" + text.innerHTML;
-			nextBTTime = Date.now() + 500;
-			break;
+		var arr = str.match("410C([0-9A-F]{4})");
+		//var arr = str.match("S([0-9A-F]{2})");
+		if (arr != null && arr.length > 1) {
+			var elmSpeed = Number("0x" + arr[1]);
+			if (!isNaN(elmSpeed)) {
+				text.innerHTML = "RPM: " + elmSpeed/4 + "<br>" + text.innerHTML;
+				nextBTTime = Date.now() + 500;
+			}
 		}
 	}
 
