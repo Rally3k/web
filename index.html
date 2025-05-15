@@ -1582,36 +1582,10 @@
         } else {
             $(".fa-bluetooth").css("color", "red");
 			isBT = true;
-			navigator.bluetooth.requestDevice({
-				filters: [{ services: ['00001816-0000-1000-8000-00805f9b34fb']} ], optionalServices: ['0000180f-0000-1000-8000-00805f9b34fb']
-			  })
-			  .then((device) => {
-				device.addEventListener('gattserverdisconnected', handleDisconnection);
-				distanceMeter = device;
-				return device.gatt.connect();
-			  })
-			  .then(server => {
-				return server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
-			  })
-			  .then(service => {
-				service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e').then(characteristic => {
-					distanceMeterTx = characteristic;
-				});
-				return service;
-			  })
-			  .then(service => {
-				return service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
-			  })
-			  .then(characteristic => characteristic.startNotifications())
-			  .then(characteristic => {
-				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-			  })
-			  .catch(error => { console.log(error); });
-
-              navigator.bluetooth.requestDevice({
-				filters: [{ services: ['00001816-0000-1000-8000-00805f9b34fb']} ], optionalServices: ['0000180f-0000-1000-8000-00805f9b34fb']
-			  })
-			  .then((device) => { connectBT(device); });
+            navigator.bluetooth.requestDevice({
+        		filters: [{ services: ['00001816-0000-1000-8000-00805f9b34fb']} ], optionalServices: ['0000180f-0000-1000-8000-00805f9b34fb']
+		    })
+			.then((device) => { connectBT(device); });
         }
     }
 
