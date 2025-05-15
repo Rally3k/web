@@ -1571,12 +1571,6 @@
 				if (distanceMeter.gatt.connected) {
 					distanceMeter.gatt.disconnect();
 				}
-
-				if (distanceMeterTx) {
-					distanceMeterTx.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-					distanceMeterTx = null;
-				}
-
 				distanceMeter = null;
 			}
         } else {
@@ -1590,6 +1584,7 @@
     }
 
     function connectBT(device) {
+        lastBTDistance = 0;
 		device.addEventListener('gattserverdisconnected', handleDisconnection);
 		distanceMeter = device;
 
