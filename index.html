@@ -954,7 +954,18 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-4" for="fCorrectionType">С колёс</label>
+                        <label class="control-label col-sm-4" for="fCorrectionBTMeter">Датчик (BT)</label>
+                        <div class="col-sm-8">
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionBTMeter" value="ELM" checked>ELM327
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="fCorrectionBTMeter" value="Bike">Велодатчик скорости
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionType">Тарировка по</label>
                         <div class="col-sm-8">
                             <label class="radio-inline">
                                 <input type="radio" name="fCorrectionType" value="I" checked>Интервал
@@ -974,7 +985,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-4" for="fCorrectionDistance">Дистанция</label>
+                        <label class="control-label col-sm-4" for="fCorrectionDistance">Дистанция (эталон)</label>
                         <div class="col-sm-8">
                             <input type="number" class="form-control" id="fCorrectionDistance" step="any" placeholder="Дистанция">
                         </div>
@@ -1299,6 +1310,7 @@
     var batteryBT = undefined;
     var isDemo = false;
 	var defaultMeter = 'GPS';
+    var btMeter = 'ELM';
 	var isBT = false;
 	var distanceMeter = null;
 	var distanceMeterTx = null;
@@ -1322,6 +1334,8 @@
     var applingDistance = 0;
     var lastBTDistance = 0;
     var lastBTTime = 0;
+    var lastBTSpeed = 0;
+    var nextBTTime = 0;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1480,6 +1494,7 @@
             lastIntervalPositionBT = parseFloat(localStorage.getItem("lastIntervalPositionBT"));
             timeCorrection = parseFloat(localStorage.getItem("timeCorrection"));
 			defaultMeter = localStorage.getItem("defaultMeter");
+            btMeter = localStorage.getItem("btMeter");
             //isPause = localStorage.getItem("isPause") == "true";
             //isReverse = localStorage.getItem("isReverse") == "true";
             var ris = JSON.parse(localStorage.getItem("rds"));
@@ -1529,6 +1544,7 @@
         lastIntervalPositionBT = lastIntervalPositionBT ? lastIntervalPositionBT : 0.0;
         timeCorrection = timeCorrection ? timeCorrection : 0.0;
 		defaultMeter = defaultMeter ? defaultMeter : 'GPS';
+        btMeter = btMeter ? btMeter : 'ELM';
         displayRdsItems = displayRdsItems ? displayRdsItems : 10;
         currentPddSpeed = currentPddSpeed ? currentPddSpeed : 60.0;
         currentSpeedInstruction = currentSpeedInstruction == "undefined" || currentSpeedInstruction == "" ? new SpeedInstruction(true) : currentSpeedInstruction;
@@ -1559,27 +1575,42 @@
         }
     }
 
+    function disconnectBT() {
+        $(".fa-bluetooth").css("color", "");
+        isBT = false;
+        if (distanceMeter) {
+            distanceMeter.removeEventListener('gattserverdisconnected', handleDisconnection);
+            if (distanceMeter.gatt.connected) {
+                distanceMeter.gatt.disconnect();
+            }
+            distanceMeter = null;
+        }
+        if (distanceMeterTx) {
+            distanceMeterTx.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+            distanceMeterTx = null;
+        }
+    }
+
     function bluetoothClick(e) {
         if (isDemo) {
             demo();
         }
         if (isBT) {
-            $(".fa-bluetooth").css("color", "");
-            isBT = false;
-			if (distanceMeter) {
-				distanceMeter.removeEventListener('gattserverdisconnected', handleDisconnection);
-				if (distanceMeter.gatt.connected) {
-					distanceMeter.gatt.disconnect();
-				}
-				distanceMeter = null;
-			}
+            disconnectBT();
         } else {
             $(".fa-bluetooth").css("color", "red");
 			isBT = true;
-            navigator.bluetooth.requestDevice({
-        		filters: [{ services: ['00001816-0000-1000-8000-00805f9b34fb']} ], optionalServices: ['0000180f-0000-1000-8000-00805f9b34fb']
-		    })
-			.then((device) => { connectBT(device); });
+            if (btMeter == 'Bike') {
+                navigator.bluetooth.requestDevice({
+                    filters: [{ services: ['00001816-0000-1000-8000-00805f9b34fb']} ], optionalServices: ['0000180f-0000-1000-8000-00805f9b34fb']
+                })
+                .then((device) => { connectBT(device); });
+            } else {
+                navigator.bluetooth.requestDevice({
+                    filters: [{ services: ['0000fff0-0000-1000-8000-00805f9b34fb']} ]
+                })
+                .then((device) => { connectBT(device); });
+            }
         }
     }
 
@@ -1588,32 +1619,78 @@
 		device.addEventListener('gattserverdisconnected', handleDisconnection);
 		distanceMeter = device;
 
-		device.gatt.connect().then(server => {
-			// speed service
-			server.getPrimaryService('00001816-0000-1000-8000-00805f9b34fb').then(service => {
-				return service.getCharacteristic('00002a5b-0000-1000-8000-00805f9b34fb');
-			}).then(characteristic => characteristic.startNotifications())
-			.then(characteristic => {
-				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-			}).catch(error => { console.log(error); });
-			// battery service
-			server.getPrimaryService('0000180f-0000-1000-8000-00805f9b34fb').then(service => {
-				return service.getCharacteristic('00002a19-0000-1000-8000-00805f9b34fb');
-			}).then(characteristic => characteristic.startNotifications())
-			.then(characteristic => {
-				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicBatteryChanged);
-			}).catch(error => { console.log(error); });
-		}).catch(error => { console.log(error); });
+        if (btMeter == 'Bike') {
+            device.gatt.connect().then(server => {
+                // speed service
+                server.getPrimaryService('00001816-0000-1000-8000-00805f9b34fb').then(service => {
+                    return service.getCharacteristic('00002a5b-0000-1000-8000-00805f9b34fb');
+                }).then(characteristic => characteristic.startNotifications())
+                .then(characteristic => {
+                    characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicBikehanged);
+                }).catch(error => { console.log(error); });
+                // battery service
+                server.getPrimaryService('0000180f-0000-1000-8000-00805f9b34fb').then(service => {
+                    return service.getCharacteristic('00002a19-0000-1000-8000-00805f9b34fb');
+                }).then(characteristic => characteristic.startNotifications())
+                .then(characteristic => {
+                    characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicBatteryChanged);
+                }).catch(error => { console.log(error); });
+            }).catch(error => { console.log(error); });
+        } else {
+            // ELM
+            device.gatt.connect().then(server => {
+                return server.getPrimaryService('0000fff0-0000-1000-8000-00805f9b34fb');
+            }).then(service => {
+                service.getCharacteristic('0000fff1-0000-1000-8000-00805f9b34fb').then(characteristic => {
+                    distanceMeterTx = characteristic;
+                    var initELM = "ATZ;ATSP0;ATE0";
+                    var arr = initELM.split(';');
+                    for (i = 0; i < arr.length; ++i) {
+                        var str = arr[i]+'\r';
+                        setTimeout(function(val) { distanceMeterTx.writeValue(new TextEncoder().encode(val)); }, 1000 * i + 1000, str);
+                    }
+                    nextBTTime = Date.now() + 1000 * arr.length + 5000;
+                    characteristic.startNotifications();
+                    characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicELMChanged);
+                });
+            }).catch(error => { console.log(error); });
+        }
 	}
 
 	// Bluetooth disconnetion
 	function handleDisconnection(event) {
 		beep();
 		alert('Bluetooth disconnected!');
-		bluetoothClick(); // close connections
+		disconnectBT(); // close connections
         lastBTDistance = 0;
+        lastBTTime = 0;
+        lastBTSpeed = 0;
 	}
-	function handleCharacteristicValueChanged(event) {
+	function handleCharacteristicELMChanged(event) {
+		let value = event.target.value;
+		const decoder = new TextDecoder();
+		let str = decoder.decode(value);
+        $("#batteryBT").html(str.replace('\r', ' '));
+		str = str.replaceAll(" ", "").toUpperCase();
+		var arr = str.match("410D([0-9A-F]{2})");
+		if (arr != null && arr.length > 1) {
+			var sBT = Number("0x" + arr[1]);
+			if (!isNaN(sBT)) {
+        		wasUpdateBT = true;
+                let currTime = Date.now();
+                if (lastBTTime != 0) {
+                    var dBT = correctionBT * (sBT + lastBTSpeed) / 2.0 * (currTime - lastBTTime) / (1000.0 * 60.0 * 60.0);
+                    moveBT(dBT, sBT);
+                } else {
+                    moveBT(0, sBT);
+                }
+                lastBTTime = currTime;
+                lastBTSpeed = sBT;
+    			nextBTTime = Date.now() + 500;
+            }
+		}
+    }
+	function handleCharacteristicBikeChanged(event) {
 		wasUpdateBT = true;
 		var d = event.target.value;
 		d = d.buffer ? d : new DataView(d);
@@ -1635,8 +1712,10 @@
     function handleCharacteristicBatteryChanged(event) {
 		var value = event.target.value.buffer ? event.target.value : new DataView(event.target.value);
         batteryBT = value.getUint8(0, true);
+        $("#batteryBT").html(batteryBT === undefined? "" : batteryBT + "%");
 	}	
 
+    setInterval(function() { if (btMeter == 'ELM' && distanceMeter && distanceMeter.gatt.connected && distanceMeterTx && (Date.now()-nextBTTime) >= 0) { distanceMeterTx.writeValue(new TextEncoder().encode('010D\r')); nextBTTime = Date.now() + 5000; } }, 100);
 /*
 	send.addEventListener('pointerup', function(event) {
 		distanceMeterTx.writeValue(new TextEncoder().encode('Hello!'));
@@ -1849,6 +1928,14 @@
         displayRdsItems = n;
         localStorage.setItem("displayRdsItems", n);
         refreshRdsTable();
+    }
+
+    function setBTMeter(v) {
+        if (v != btMeter) {
+        	btMeter = v;
+			localStorage.setItem("btMeter", btMeter);
+            if (isBT) disconnectBT();
+        }
     }
 
 	function moveGPS(d) {
@@ -2122,7 +2209,6 @@
                 }
             }
         }
-        $("#batteryBT").html(batteryBT === undefined? "" : batteryBT + "%");
         $("#time").html(getTimeString(getCurrentTime(), true));
         var sectorTime = getCurrentTime() - start + ((getCurrentTime() > start) ? 0 : 24 * 60 * 60);
         if (norm - sectorTime > 60) {
@@ -3384,6 +3470,7 @@
         $('#fCorrectionMaxSpeed').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fCorrectionMaxSpeed').val(maxSpeed);
 		$('input[name=fCorrectionDefaultMeter][value=' + defaultMeter + ']').prop('checked', true);
+		$('input[name=fCorrectionBTMeter][value=' + btMeter + ']').prop('checked', true);
         if ($('input[name=fCorrectionType]:checked').val() == 'V') {
             $('#fCorrectionValueGPS').val(correctionGPS);
             $('#fCorrectionValueBT').val(correctionBT);
@@ -3423,6 +3510,7 @@
             localStorage.setItem("maxSpeed", maxSpeed);
 			defaultMeter = $('input[name=fCorrectionDefaultMeter]:checked').val();
 			localStorage.setItem("defaultMeter", defaultMeter);
+            setBTMeter($('input[name=fCorrectionBTMeter]:checked').val());
         }
         return false;
     });
