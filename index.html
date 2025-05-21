@@ -430,14 +430,14 @@
             <div class="square-content">
                 <div class="split-vertical">
                     <a href="javascript:showModalNumber('Сектор', sector);" class="line-height-small">
-                        <span class="item-label" style="color:darkblue">Сектор</span>
+                        <span class="item-label" style="color:darkblue" id="labelSector">Сектор</span>
                         <span class="item-label" id="sector">000.000</span>
                         <span class="item-value" id="sectorRest">999.999</span>
                     </a>
                 </div>
                 <div class="split-vertical">
                     <a href="javascript:showModalTime('Норма', norm, false);" class="line-height-small">
-                        <span class="item-label" style="color:darkblue">Норма</span>
+                        <span class="item-label" style="color:darkblue" id="labelNorm">Норма</span>
                         <span class="item-label" id="norm">00:00</span>
                         <span class="item-value" id="normRest">04:55</span>
                     </a>
@@ -880,7 +880,7 @@
                         <label class="control-label col-sm-2" for="fRdsItemType">Тип</label>
                         <div class="col-sm-10">
                             <div class="btn-group" data-toggle="buttons">
-                                <label class="btn btn-default" id="testLabel">
+                                <label class="btn btn-default">
                                     <input type="radio" name="fRdsItemType" value="S"><i class="fa fa-play"></i>
                                 </label>
                                 <label class="btn btn-default">
@@ -1063,16 +1063,19 @@
                         <div class="col-xs-9">
                             <div class="btn-group" data-toggle="buttons">
                                 <label class="btn btn-default">
-                                    <input type="radio" name="fFormulaItemType" value="S"><i class="fa fa-play"></i>
+                                    <input type="radio" id="fFormulaItemType" name="fFormulaItemType" value="S"><i class="fa fa-play"></i>
                                 </label>
                                 <label class="btn btn-default">
-                                    <input type="radio" name="fFormulaItemType" value="C"><i class="fa fa-tachometer"></i>
+                                    <input type="radio" id="fFormulaItemType" name="fFormulaItemType" value="C"><i class="fa fa-tachometer"></i>
                                 </label>
                                 <label class="btn btn-default">
-                                    <input type="radio" name="fFormulaItemType" value="P"><i class="fa fa-flag-checkered"></i>
+                                    <input type="radio" id="fFormulaItemType" name="fFormulaItemType" value="P"><i class="fa fa-flag-checkered"></i>
                                 </label>
                                 <label class="btn btn-default">
-                                    <input type="radio" name="fFormulaItemType" value="F"><i class="fa fa-stop"></i>
+                                    <input type="radio" id="fFormulaItemType" name="fFormulaItemType" value="F"><i class="fa fa-stop"></i>
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" id="fFormulaItemType" name="fFormulaItemType" value="T"><i class="fa fa-clock-o"></i>
                                 </label>
                             </div>
                         </div>
@@ -1082,30 +1085,57 @@
                             Позиция
                         </label>
                         <div class="col-xs-9">
-                            <input type="number" class="form-control" id="fPosition" step="any" placeholder="Позиция">
+                            <input type="number" class="form-control" id="fPosition" step="any" placeholder="км">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Интервал
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="number" class="form-control" id="fInterval" step="any" placeholder="км">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-xs-3">
                             Vпдд
                         </label>
-                        <div class="col-xs-3">
-                            <input type="number" class="form-control" id="fVpdd" step="any" placeholder="Vпдд">
+                        <div class="col-xs-6">
+                            <input type="number" class="form-control" id="fVpdd" step="any" placeholder="км/ч">
                         </div>
                         <div class="col-xs-3">
-                            <label>
+                            <label id="lVds">
                                 <input type="checkbox" id="chbUseVpdd" checked>Vдс
                             </label>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="fSectorLine">
+                        <label class="control-label col-xs-3" for="fSector">Расстояние</label>
+                        <div class="col-xs-9">
+                            <input type="number" class="form-control" id="fSector" step="any" placeholder="км">
+                        </div>
+                    </div>
+                    <div class="form-group" id="fNormLine">
+                        <label class="control-label col-xs-3" for="fNorm">Норматив</label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="fNorm" placeholder="ЧЧ:ММ:СС">
+                        </div>
+                    </div>
+                    <div class="form-group" id="fVdsNoVpddLine">
                         <label class="control-label col-xs-3">
                             Vдс
                         </label>
-                        <div class="col-xs-3">
-                            <input type="number" class="form-control" id="fVds" step="any" style="display:none;" placeholder="Vдс">
-                            <label id="lVpdd">Vпдд</label>
+                        <div class="col-xs-6">
+                            <input type="number" class="form-control" id="fVds" step="any" placeholder="км/ч">
                         </div>
+                    </div>
+                    <div class="form-group" id="fVdsVpddLine">
+                        <label class="control-label col-xs-3">
+                            Vдс
+                        </label>
+                        <label class="control-label col-xs-2">
+                            Vпдд
+                        </label>
                         <div class="col-xs-3">
                             <select class="form-control" id="fSign">
                                 <option></option>
@@ -1113,7 +1143,7 @@
                                 <option>*</option>
                             </select>
                         </div>
-                        <div class="col-xs-3">
+                        <div class="col-xs-4">
                             <input type="number" class="form-control" id="fOperand" step="any" value="0" disabled>
                         </div>
                     </div>
@@ -1859,7 +1889,7 @@
         this.toString = function (f) {
             return f ?
                 (this.isVpdd ? "V" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") :
-                (this.position != null && !isNaN(this.position) ? this.position + " " : "")
+                (this.position != null && !isNaN(this.position) ? this.position + (this.interval ? "/" + this.interval + " " : " ") : (this.interval ? "/" + this.interval + " " : ""))
                     + (this.vPdd ? "Vпдд = " + this.vPdd + " " : "")
                     + (this.isVpdd ? "Vдс = Vпдд" : (this.speed != null && !isNaN(this.speed) ? "Vдс = " + this.speed : ""))
                     + (this.sign ? " " + this.sign + " " + this.operand : "");
@@ -2224,17 +2254,41 @@
         } else {
             $("#time").css("color", "rgb(0, 255, 0)");
         }
-        if (isRds()) {
-            $("#sectorTime").html(getTimeString(getRdsTime(), true));
+
+        $("#sectorTime").html(getTimeString(isRds() ? getRdsTime() : sectorTime, true));
+        if (isRds() && currentSpeedInstruction.type == 'T') {
+            $("#labelSector").html("Сектор РГ/РУ");
+            $("#labelSector").css("color", "rgb(255, 200, 0)");
+            $("#labelNorm").html("Норма РГ/РУ");
+            $("#labelNorm").css("color", "rgb(255, 200, 0)");
+            $("#sector").html(currentSpeedInstruction.sector);
+            let sectorRest = currentSpeedInstruction.sector - getRdsDistance();
+            if (sectorRest <= 0.5 && $("#sectorRest").css("color") == "rgb(0, 0, 0)") {
+                $("#sectorRest").css("color", "red");
+                beep();
+            }
+            $("#sectorRest").html(getNumberString(sectorRest, 1000));
+            $("#norm").html(getTimeString(currentSpeedInstruction.norm, true));
+            let normRest = currentSpeedInstruction.norm - getRdsTime();
+            if (normRest <= 10 && $("#normRest").css("color") == "rgb(0, 0, 0)") {
+                $("#normRest").css("color", "red");
+                speak("десять");
+            }
+            $("#normRest").html((normRest <= 10) ? getNumberString(normRest, 10) : getTimeString(normRest, true));
         } else {
-            $("#sectorTime").html(getTimeString(sectorTime, true));
+            $("#labelSector").html("Сектор");
+            $("#labelSector").css("color", "darkblue");
+            $("#labelNorm").html("Норма");
+            $("#labelNorm").css("color", "darkblue");
+            $("#sector").html(sector);
+            $("#sectorRest").html(getNumberString(sector - getDistance(), 1000));
+            $("#sectorRest").css("color", "rgb(0, 0, 0)");
+            $("#norm").html(getTimeString(norm, false));
+            $("#normRest").html(getTimeString(norm - sectorTime, true));
+            $("#normRest").css("color", "rgb(0, 0, 0)");
         }
 
-        $("#sector").html(sector);
         $("#distance").html(getNumberString(getDistance(), 1000));
-        $("#sectorRest").html(getNumberString(sector - getDistance(), 1000));
-        $("#norm").html(getTimeString(norm, false));
-        $("#normRest").html(getTimeString(norm - sectorTime, true));
         $("#start").html(getTimeString(start, true));
         $("#finish").html(getTimeString((start + norm) % (24 * 60 * 60), true));
         if (intervalDistanceGPS > 0 && distanceGPS > intervalStartGPS + intervalDistanceGPS) {
@@ -3132,6 +3186,22 @@
         return t - ri.time;
     }
 
+    function getRdsDistance() {
+        if (rds.length < 1) {
+            return null;
+        }
+        let i = rds.length;
+        while (i-- > 0) {
+            if (rds[i].type == 'S') {
+                break;
+            }
+        }
+        if (i < 0) {
+            return null;
+        }
+        return getDistance() - rds[i].distance;
+    }
+
     function getRdsLateness() {
         if (rds.length < 1) {
             return null;
@@ -3564,6 +3634,9 @@
             case 'F':
                 t = '<i class="fa fa-stop rdsIcon"></i>';
                 break;
+            case 'T':
+                t = '<i class="fa fa-clock-o rdsIcon"></i>';
+                break;
             default:
                 t = '<i class="fa fa-tachometer rdsIcon"></i>';
                 break;
@@ -3598,14 +3671,22 @@
             }
             setIntervalStartGPS(distanceGPS);
             setIntervalStartBT(distanceBT);
-            setIntervalDistanceGPS((index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStartGPS : 0);
-            setIntervalDistanceBT((index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) ? speedIns[index + 1].position - intervalStartBT : 0);
+            if (si.interval != null && !isNaN(si.interval)) {
+                setNextPosition(si.interval);
+            } else if (index + 1 < speedIns.length && speedIns[index + 1].position != null && !isNaN(speedIns[index + 1].position)) {
+                setIntervalDistanceGPS(speedIns[index + 1].position - intervalStartGPS);
+                setIntervalDistanceBT(speedIns[index + 1].position - intervalStartBT);
+            } else {
+                setIntervalDistanceGPS(0);
+                setIntervalDistanceBT(0);
+            }
             if (si.isFormula()) {
                 currentSpeedInstruction = si;
                 localStorage.setItem("currentSpeedInstruction", JSON.stringify(currentSpeedInstruction));
             }
             switch (si.type) {
                 case 'S':
+                case 'T':
                     rdsStart(si.vPdd, deltaGPS, deltaBT);
                     break;
                 case 'P':
@@ -3656,37 +3737,37 @@
         $('#modalAddFormula').modal('show');
         if (addSiEdit && addSiIndex >= 0 && addSiIndex < speedIns.length) {
             var si = speedIns[addSiIndex];
-            $('input[name=fFormulaItemType][value=' + si.type + ']').closest('.btn').button('toggle');
+            $('input[name=fFormulaItemType][value=' + (si.type || 'C') + ']').closest('.btn').button('toggle');
             $('#modalAddFormula #fPosition').val(si.position || "");
             $('#modalAddFormula #fVpdd').val(si.vPdd || "");
+            $('#modalAddFormula #fInterval').val(si.interval || "");
+            $('#modalAddFormula #fSector').val(si.sector || "");
+            $('#modalAddFormula #fNorm').val(si.norm > 0 ? getTimeString(si.norm, true) : "");
             $('#modalAddFormula #fVds').val(si.speed || "");
             $('#modalAddFormula #chbUseVpdd').prop('checked', si.isVpdd);
             $('#modalAddFormula #fSign').val(si.sign);
             $('#modalAddFormula #fOperand').val(si.operand);
             if (si.isVpdd) {
-                $('#modalAddFormula #fVds').hide();
-                $('#modalAddFormula #lVpdd').show();
-                $('#modalAddFormula #fSign').show();
-                $('#modalAddFormula #fOperand').show();
+                $('#modalAddFormula #fVdsNoVpddLine').hide();
+                $('#modalAddFormula #fVdsVpddLine').show();
                 if (si.sign != '') {
                     $('#modalAddFormula #fOperand').prop('disabled', false);
                 }
             } else {
-                $('#modalAddFormula #fVds').show();
-                $('#modalAddFormula #lVpdd').hide();
-                $('#modalAddFormula #fSign').hide();
-                $('#modalAddFormula #fOperand').hide();
+                $('#modalAddFormula #fVdsNoVpddLine').show();
+                $('#modalAddFormula #fVdsVpddLine').hide();
             }
         } else {
             $('input[name=fFormulaItemType][value=C]').closest('.btn').button('toggle');
             $('#modalAddFormula #fPosition').val("");
+            $('#modalAddFormula #fInterval').val("");
+            $('#modalAddFormula #fSector').val("");
+            $('#modalAddFormula #fNorm').val("");
             $('#modalAddFormula #fVpdd').val("");
             $('#modalAddFormula #fVds').val("");
             $('#modalAddFormula #chbUseVpdd').prop('checked', false);
-            $('#modalAddFormula #fVds').show();
-            $('#modalAddFormula #lVpdd').hide();
-            $('#modalAddFormula #fSign').hide();
-            $('#modalAddFormula #fOperand').hide();
+            $('#modalAddFormula #fVdsNoVpddLine').show();
+            $('#modalAddFormula #fVdsVpddLine').hide();
         }
         $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').removeClass('has-success');
     }
@@ -3701,23 +3782,41 @@
 
         si.type = $('input[name=fFormulaItemType]:checked').val();
         si.position = parseFloat($('#modalAddFormula #fPosition').val());
+        si.interval = parseFloat($('#modalAddFormula #fInterval').val());
+        si.sector = parseFloat($('#modalAddFormula #fSector').val());
+        si.norm = getTimeValue($('#modalAddFormula #fNorm').val());
         si.vPdd = parseFloat($('#modalAddFormula #fVpdd').val());
-        si.isVpdd = $('#modalAddFormula #chbUseVpdd').prop('checked');
-        if (si.isVpdd) {
-            si.sign = $('#modalAddFormula #fSign').val();
-            if (si.sign) {
-                si.operand = parseFloat($('#modalAddFormula #fOperand').val());
-                if (si.operand) {
-                    $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').addClass('has-success');
-                } else {
-                    $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-success').addClass('has-error');
-                    isGood = false;
+        if (si.type == 'T') {
+            if (si.sector) {
+                $('#modalAddFormula #fSector').closest('.form-group').removeClass('has-error').addClass('has-success');
+            } else {
+                $('#modalAddFormula #fSector').closest('.form-group').removeClass('has-success').addClass('has-error');
+                isGood = false;
+            }
+            if (si.norm > 0) {
+                $('#modalAddFormula #fNorm').closest('.form-group').removeClass('has-error').addClass('has-success');
+            } else {
+                $('#modalAddFormula #fNorm').closest('.form-group').removeClass('has-success').addClass('has-error');
+                isGood = false;
+            }
+            si.isVpdd = false;
+            si.speed = parseFloat($('#modalAddFormula #fVds').val());
+        } else {
+            si.isVpdd = $('#modalAddFormula #chbUseVpdd').prop('checked');
+            if (si.isVpdd) {
+                si.sign = $('#modalAddFormula #fSign').val();
+                if (si.sign) {
+                    si.operand = parseFloat($('#modalAddFormula #fOperand').val());
+                    if (si.operand) {
+                        $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').addClass('has-success');
+                    } else {
+                        $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-success').addClass('has-error');
+                        isGood = false;
+                    }
                 }
             }
-        } else {
-            si.speed = parseFloat($('#modalAddFormula #fVds').val());
         }
-        if (isGood && (si.type != 'C' || (si.position && !isNaN(si.position)) || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed)))) {
+        if (isGood && (si.type != 'C' || (si.position && !isNaN(si.position)) || si.interval || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed)))) {
             $('#modalAddFormula').modal('hide');
             speedIns.splice(addSiIndex, addSiEdit ? 1 : 0, si);
             localStorage.setItem("speedIns", JSON.stringify(speedIns));
@@ -3732,15 +3831,11 @@
 
     $('#modalAddFormula #chbUseVpdd').on('click', function (e) {
         if (this.checked) {
-            $('#modalAddFormula #fVds').hide();
-            $('#modalAddFormula #lVpdd').show();
-            $('#modalAddFormula #fSign').show();
-            $('#modalAddFormula #fOperand').show();
+            $('#modalAddFormula #fVdsNoVpddLine').hide();
+            $('#modalAddFormula #fVdsVpddLine').show();
         } else {
-            $('#modalAddFormula #fVds').show();
-            $('#modalAddFormula #lVpdd').hide();
-            $('#modalAddFormula #fSign').hide();
-            $('#modalAddFormula #fOperand').hide();
+            $('#modalAddFormula #fVdsNoVpddLine').show();
+            $('#modalAddFormula #fVdsVpddLine').hide();
         }
     });
 
@@ -3761,6 +3856,53 @@
     $('#modalAddFormula #btnClose').on('click', function (e) {
         if (addSiEdit) showModalSpeed();
     });
+
+    $("input[name=fFormulaItemType]").change(function () {
+        if (this.value == 'T') {
+            // RG/RU
+            $('#modalAddFormula #fSectorLine').show();
+            $('#modalAddFormula #fNormLine').show();
+            $('#modalAddFormula #lVds').hide();
+            $('#modalAddFormula #fVds').prop('disabled', true);
+            $('#modalAddFormula #fVdsNoVpddLine').show();
+            $('#modalAddFormula #fVdsVpddLine').hide();
+        } else {
+            // RD
+            $('#modalAddFormula #fSectorLine').hide();
+            $('#modalAddFormula #fNormLine').hide();
+            $('#modalAddFormula #lVds').show();
+            $('#modalAddFormula #fVds').prop('disabled', false);
+            if ($('#modalAddFormula #chbUseVpdd').prop('checked')) {
+                $('#modalAddFormula #fVdsNoVpddLine').hide();
+                $('#modalAddFormula #fVdsVpddLine').show();
+            } else {
+                $('#modalAddFormula #fVdsNoVpddLine').show();
+                $('#modalAddFormula #fVdsVpddLine').hide();
+            }
+        }
+    });
+
+    $('#fSector').on('change', function() {
+        refreshVds();
+    });
+
+    $('#fNorm').on('change', function() {
+        let v = getTimeValue(this.value);
+        if (v > 0) {
+            this.value = getTimeString(v, true);
+        }
+        refreshVds();
+    });
+
+    function refreshVds() {
+        let sector = parseFloat($('#fSector').val());
+        let norm = getTimeValue($('#fNorm').val());
+        if (sector && norm > 0) {
+            $('#fVds').val(getNumberString(sector / norm * 3600, 100));
+        } else {
+            $('#fVds').val('');
+        }
+    }
 
     function viewRds() {
         if (rds.length == 0) {
