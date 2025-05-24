@@ -33,7 +33,7 @@
 			}
 
 			if (distanceMeter) {
-				distanceMeter.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+				distanceMeter.removeEventListener('characteristicvaluechanged', handleCharacteristicELMChanged);
 				distanceMeter = null;
 			}
 
@@ -65,7 +65,7 @@
 				}
 				nextBTTime = Date.now() + 1000 * arr.length + 5000;
 				characteristic.startNotifications();
-				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicELMChanged);
 			});
 		}).catch(error => { console.log(error); });
 	}
@@ -75,7 +75,7 @@
 		alert('Disconnected');
 		distanceMeter.gatt.connect();
 	}
-	function handleCharacteristicValueChanged(event) {
+	function handleCharacteristicELMChanged(event) {
 		let value = event.target.value;
 		const decoder = new TextDecoder();
 		var str = decoder.decode(value);

@@ -14,7 +14,7 @@
   <p id="dataAO">0</p>
   <button id="send">Send</button>
   <br>
-Version 0.2
+Version 0.7
   <script>
 	function parseValue (v) {
 		// В Chrome 50+ используется DataView.
@@ -46,13 +46,13 @@ Version 0.2
 				distanceMeter.gatt.disconnect();
 				console.log('Disconnect');
 			}
-
+/*
 			if (distanceMeter) {
-				distanceMeter.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+				distanceMeter.removeEventListener('characteristicvaluechanged', handleCharacteristicBikeChanged);
 				distanceMeter.removeEventListener('characteristicvaluechanged', handleCharacteristicBatteryChanged);
 				distanceMeter = null;
 			}
-
+*/
 			distanceMeter = null;
 		} else {
 			navigator.bluetooth.requestDevice({
@@ -69,19 +69,21 @@ Version 0.2
 
 		device.gatt.connect().then(server => {
 			// speed service
-			server.getPrimaryService('00001816-0000-1000-8000-00805f9b34fb').then(service => {
-				return service.getCharacteristic('00002a5b-0000-1000-8000-00805f9b34fb');
-			}).then(characteristic => characteristic.startNotifications())
+			server.getPrimaryService('00001816-0000-1000-8000-00805f9b34fb')
+			.then(service => service.getCharacteristic('00002a5b-0000-1000-8000-00805f9b34fb'))
 			.then(characteristic => {
-				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+				characteristic.startNotifications();
+				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicBikeChanged);
 			}).catch(error => { console.log(error); });
 			// battery service
-			server.getPrimaryService('0000180f-0000-1000-8000-00805f9b34fb').then(service => {
-				return service.getCharacteristic('00002a19-0000-1000-8000-00805f9b34fb');
-			}).then(characteristic => characteristic.startNotifications())
-			.then(characteristic => {
-				characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicBatteryChanged);
-			}).catch(error => { console.log(error); });
+			setTimeout(function(server) {
+				server.getPrimaryService('0000180f-0000-1000-8000-00805f9b34fb')
+				.then(service => service.getCharacteristic('00002a19-0000-1000-8000-00805f9b34fb'))
+				.then(characteristic => {
+					characteristic.startNotifications();
+					characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicBatteryChanged);
+				}).catch(error => { console.log(error); });
+			}, 2000, server);
 		}).catch(error => { console.log(error); });
 	}
 	
@@ -94,7 +96,7 @@ Version 0.2
 		//catch(error => alert(error));
 		distanceMeter.gatt.connect();
 	}
-	function handleCharacteristicValueChanged(event) {
+	function handleCharacteristicBikeChanged(event) {
 		let value = event.target.value;
 		var d = parseValue(value);
 		data.innerHTML = "D: " + d.distance;
