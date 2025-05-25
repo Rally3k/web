@@ -795,7 +795,7 @@
     <thead>
         <tr class="rds-item-header">
             <th>Тип</th>
-            <th>Дистанция</th>
+            <th>Позиция</th>
             <th>Скорость</th>
             <th>Опоздание</th>
             <th class="visible-l">Норма</th>
@@ -1128,7 +1128,7 @@
                         </div>
                     </div>
                     <div class="form-group" id="fSectorLine">
-                        <label class="control-label col-xs-3" for="fSector">Расстояние</label>
+                        <label class="control-label col-xs-3" for="fSector">Дистанция/label>
                         <div class="col-xs-9">
                             <input type="number" class="form-control" id="fSector" step="any" placeholder="км">
                         </div>
@@ -2345,7 +2345,7 @@
         if (isRds() && currentSpeedInstruction.type == 'T') {
             $("#labelTime").html("Время РГ/РУ");
             $("#labelTime").css("color", "rgb(255, 200, 0)");
-            $("#labelSector").html("Расстояние РГ/РУ");
+            $("#labelSector").html("Дистанция РГ/РУ");
             $("#labelSector").css("color", "rgb(255, 200, 0)");
             $("#labelNorm").html("Норматив РГ/РУ");
             $("#labelNorm").css("color", "rgb(255, 200, 0)");
