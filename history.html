@@ -182,7 +182,13 @@
                         if (myMap && rds[i].latitude && rds[i].longitude) {
                             myMap.geoObjects.add(new ymaps.Placemark([rds[i].latitude, rds[i].longitude],
                                 {iconContent:c,
-                                balloonContent: 'D: ' + getNumberString(rds[i].distance, 1000) + '<br>S: ' + getNumberString(rds[i].speed, 100) + '<br>L: ' + getNumberString(rds[i].lateness, 10) + '<br>N: ' + getTimeString(rds[i].norm, true) + '<br>T: ' + getTimeString(rds[i].time, true) + '<br>P: ' + getTimeString(rds[i].neitralization, true)},
+                                balloonContent: 'Поз.: ' + getNumberString(rds[i].distance, 1000)
+                                 + '<br>Скор.: ' + getNumberString(rds[i].speed, 100)
+                                 + '<br>Vпдд: ' + getNumberString(rds[i].vPdd, 100)
+                                 + '<br>Опоз.: ' + getNumberString(rds[i].lateness, 10)
+                                 + '<br>Норм.: ' + getTimeString(rds[i].norm, true)
+                                 + '<br>Время: ' + getTimeString(rds[i].time, true)
+                                 + '<br>Нейтр.: ' + getTimeString(rds[i].neitralization, true)},
                                 {preset: s}));
                             if (myPolyline != null) myPolyline.geometry.insert(myPolyline.geometry.getLength(), [rds[i].latitude, rds[i].longitude]);
                         }
