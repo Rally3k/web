@@ -4147,8 +4147,8 @@
         $('#modalKv #fKvStart').val((i == -1 || kvs[i].start == null) ? null : getTimeString(kvs[i].start, true));
         $('#modalKv #fKvSector').val(i == -1 ? null : kvs[i].sector);
         $('#modalKv #fKvNorm').val(i == -1 ? null : getTimeString(kvs[i].norm, false));
-        $('#modalKv #fKvNeitralization').val(i > 0 && kvs[i].neitralization > 0 ? getTimeString(kvs[i].neitralization, true) : null);
-        $('#modalKv #fKvNeitralizationDone').val(i > 0 && kvs[i].neitralizationDone > 0 ? getTimeString(kvs[i].neitralizationDone, true) : null);
+        $('#modalKv #fKvNeitralization').val(i >= 0 && kvs[i].neitralization > 0 ? getTimeString(kvs[i].neitralization, true) : null);
+        $('#modalKv #fKvNeitralizationDone').val(i >= 0 && kvs[i].neitralizationDone > 0 ? getTimeString(kvs[i].neitralizationDone, true) : null);
         $('#modalKv #fKvPause').val((i == -1 || kvs[i].pause == null) ? null : getTimeString(kvs[i].pause, false));
     }
 
