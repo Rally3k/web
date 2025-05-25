@@ -892,31 +892,40 @@
                                 <label class="btn btn-default">
                                     <input type="radio" name="fRdsItemType" value="F"><i class="fa fa-stop"></i>
                                 </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="fRdsItemType" value="N"><i class="fa fa-pause"></i>
+                                </label>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="fRdsItemDistance">Дистанция</label>
                         <div class="col-sm-10">
-                            <input type="number" class="form-control big-input" id="fRdsItemDistance" step="any" placeholder="Дистанция">
+                            <input type="number" class="form-control big-input" id="fRdsItemDistance" step="any" placeholder="км">
+                        </div>
+                    </div>
+                    <div class="form-group" id="fRdsItemNeitralizationLine">
+                        <label class="control-label col-sm-2" for="fRdsItemNeitralization">Нейтрализация</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="fRdsItemNeitralization" placeholder="чч:мм:сс">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="fRdsItemVpdd">Vпдд</label>
                         <div class="col-sm-10">
-                            <input type="number" class="form-control big-input" id="fRdsItemVpdd" step="any" placeholder="Vпдд">
+                            <input type="number" class="form-control big-input" id="fRdsItemVpdd" step="any" placeholder="км/ч">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="fRdsItemSpeed" id="fRdsItemSpeedLabel">Скорость</label>
                         <div class="col-sm-10">
-                            <input type="number" class="form-control big-input" id="fRdsItemSpeed" step="any" placeholder="Скорость">
+                            <input type="number" class="form-control big-input" id="fRdsItemSpeed" step="any" placeholder="км/ч">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="fRdsItemTime">Время</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="fRdsItemTime" placeholder="Время отметки">
+                            <input type="text" class="form-control" id="fRdsItemTime" placeholder="чч:мм:сс">
                         </div>
                     </div>
                 </div>
@@ -968,7 +977,7 @@
                         <label class="control-label col-sm-4" for="fCorrectionType">Тарировка по</label>
                         <div class="col-sm-8">
                             <label class="radio-inline">
-                                <input type="radio" name="fCorrectionType" value="I" checked>Интервал
+                                <input type="radio" name="fCorrectionType" value="I">Интервал
                             </label>
                             <label class="radio-inline">
                                 <input type="radio" name="fCorrectionType" value="V">Значение
@@ -978,10 +987,10 @@
                     <div class="form-group">
                         <label class="control-label col-sm-4" for="fCorrectionIntervalGPS">Пройдено GPS/BT</label>
                         <div class="col-sm-4">
-                            <input type="number" class="form-control" id="fCorrectionIntervalGPS" step="any" disabled placeholder="GPS">
+                            <input type="number" class="form-control" id="fCorrectionIntervalGPS" step="any" placeholder="GPS">
                         </div>
                         <div class="col-sm-4">
-                            <input type="number" class="form-control" id="fCorrectionIntervalBT" step="any" disabled placeholder="Bluetooth">
+                            <input type="number" class="form-control" id="fCorrectionIntervalBT" step="any" placeholder="Bluetooth">
                         </div>
                     </div>
                     <div class="form-group">
@@ -1428,6 +1437,10 @@
             text = "Пром";
         } else if (text == '<i class="fa fa-stop"></i>') {
             text = "Финиш";
+        } else if (text == '<i class="fa fa-clock-o"></i>') {
+            text = "Норматив";
+        } else if (text == '<i class="fa fa-pause"></i>') {
+            text = "Нейтрализация";
         } else if (text == '↑скорость↑') {
             text = "Действие скорости";
         } else if (text == 'Новая формула') {
@@ -1473,8 +1486,8 @@
         , ['Норма']
         , ['Пройдено']
         , ['Следующая', 'Интервал', 'Позиция']
-        , ['Новый сектор', 'Старт', 'Сектор', 'Норма', 'Пауза']
-        , ['Новая формула', 'Тип', 'Позиция', 'Vпдд', 'Vдс', 'Операция', 'Операнд']
+        , ['Новый сектор', 'Старт', 'Сектор', 'Норма', 'Пауза', 'Нейтрализация']
+        , ['Новая формула', 'Тип', 'Позиция', 'Интервал', 'Vпдд', 'Vдс', 'Операция', 'Операнд', 'Дистанция', 'Норматив', 'Нейтрализация']
 		, ['Тарировка']
         , ['Скорость']
         , ['↑скорость↑', 'Расстояние', 'Скорость после']
@@ -1482,8 +1495,8 @@
     var enterValue = [[], [], [], [], [], [], [], [], [], [], []];
     var enterTypeId = 2;
     var enterSubTypeId;
-    var rdsItemHtmlTypes = ['<i class="fa fa-play"></i>', '<i class="fa fa-tachometer"></i>', '<i class="fa fa-flag-checkered"></i>', '<i class="fa fa-stop"></i>'];
-    var rdsItemCodes = ['S', 'C', 'P', 'F'];
+    var rdsItemHtmlTypes = ['<i class="fa fa-play"></i>', '<i class="fa fa-tachometer"></i>', '<i class="fa fa-flag-checkered"></i>', '<i class="fa fa-stop"></i>', '<i class="fa fa-clock-o"></i>', '<i class="fa fa-pause"></i>'];
+    var rdsItemCodes = ['S', 'C', 'P', 'F', 'T', 'N'];
     var vdsItemTypes = ['x', 'Vпдд', '5', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '130'];
     var pddSpeedTypes = ['x', '5', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '110', '130']
     var operationsTypes = ['нет', '-', '*'];
@@ -2140,7 +2153,7 @@
             addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'N', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT, neitralization));
         }
         if (myMap != null) {
-            myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: '||'}, {preset: 'islands#grayCircleIcon'}));
+            myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#grayCircleDotIcon'}));
         }
     }
 
@@ -2288,6 +2301,17 @@
             kvs[currentKvIndex].neitralizationDone = (n + v > 0) ? n + v : 0;
             localStorage.setItem("kvs", JSON.stringify(kvs));
         }
+        if (v && !isNaN(v)) {
+            speak("Нейтрилизация");
+            setTimeout(speakLeteness, 1000);
+        }
+    }
+    function getLateness() {
+        return isRds() ? getRdsLateness() : (sector > 0 ? getKvTime() - getDistance() / sector * (norm - getNeitralization()) : null);
+    }
+    function speakLeteness() {
+        let l = getLateness();
+        if (l != null) speak((l < 0 ? "Опережение " : "Опоздание") + getTimeToSpeak(Math.abs(l)));
     }
 
     function newMove(d) {
@@ -2669,7 +2693,6 @@
     function applyKv(index) {
         if (index >= 0 && index < kvs.length) {
 			setCurrentKvIndex(index);
-            kvs[index].neitralizationDone = null; // обнуляем выполненную нейтрализацию
             if (kvs[index].start == null) {
                 var nextStart = start;
                 for (var i = 0; i < index; ++i) {
@@ -2684,15 +2707,15 @@
         } else if (index != -1) {
             return;
         }
-
         newMove();
-        beep();
     }
 
     function startKv(index) {
         if (index < -1 || index >= kvs.length) return;
         resetDistance();
+        kvs[index].neitralizationDone = null; // обнуляем выполненную нейтрализацию
         applyKv(index);
+        beep();
     }
 
     function getDefaultEnterValue(typeId, subTypeId) {
@@ -2806,24 +2829,38 @@
         return -1;
     }
 
-    function addFromula(type, position, vPdd, vDs, sign, operand) {
+    function addFormula(type, position, interval, vPdd, vDs, sign, operand, sector, norm, neitralization) {
         var si = new SpeedInstruction();
         si.type = type;
         si.position = (!position || position == '') ? null : parseFloat(position);
         if (isNaN(si.position)) return 1;
+        si.interval = (!interval || interval == '') ? null : parseFloat(interval);
+        if (isNaN(si.interval)) return 2;
         si.vPdd = (!vPdd || vPdd == '') ? null : parseFloat(vPdd);
-        if (isNaN(si.vPdd)) return 2;
+        if (isNaN(si.vPdd)) return 3;
         si.isVpdd = (vDs == vdsItemTypes[1]);
         if (!si.isVpdd) {
             si.speed = (!vDs || vDs == '') ? null : parseFloat(vDs);
-            if (isNaN(si.speed)) return 3;
+            if (isNaN(si.speed)) return 4;
         }
-        si.sign = sign;
-        if (si.sign) {
+        if (si.type == 'T') {
+            si.sector = parseFloat(sector);
+            if (isNaN(si.sector)) return 5;
+            si.norm = getTimeValue(norm);
+            si.norm %= (24 * 60 * 60);
+            if (si.norm <= 0) return 6;
+            si.speed = Math.floor(100 * si.sector / si.norm * 3600) / 100;
+        } else {
+            si.sign = sign;
             si.operand = parseFloat(operand);
-            if (!si.operand) return 5;
+            if (!si.operand) return 7;
         }
-        if (si.type != 'C' || (si.position && !isNaN(si.position)) || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed))) {
+        if (si.type == 'N') {
+            si.neitralization = (!neitralization || neitralization == '') ? null : getTimeValue(neitralization);
+            if (si.neitralization == -1) return 8;
+            si.neitralization %= (24 * 60 * 60);
+        }
+        if (si.type != 'C' || (si.position && !isNaN(si.position)) || si.interval || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed))) {
             //speedIns.splice(addSiIndex, 0, si);
             speedIns.push(si);
             localStorage.setItem("speedIns", JSON.stringify(speedIns));
@@ -2838,7 +2875,7 @@
         return -1;
     }
 
-    function addKv(start, sector, norm, pause) {
+    function addKv(start, sector, norm, pause, neitralization) {
         var kv = new Kv();
 
         kv.start = (!start || start == '') ? null : getTimeValue(start);
@@ -2855,6 +2892,10 @@
         kv.pause = (!pause || pause == '') ? null : getTimeValue(pause);
         if (kv.pause == -1) return 3;
         kv.pause %= (24 * 60 * 60);
+
+        kv.neitralization = (!neitralization || neitralization == '') ? null : getTimeValue(neitralization);
+        if (kv.neitralization == -1) return 4;
+        kv.neitralization %= (24 * 60 * 60);
 
         kvs.push(kv);
         localStorage.setItem("kvs", JSON.stringify(kvs));
@@ -2980,13 +3021,17 @@
                             result = setNorm(getTimeValue($('#enterValue').html()));
                             break;
                         case 'Новая формула':
-                            result = addFromula(
+                            result = addFormula(
                                 rdsItemCodes[rdsItemHtmlTypes.indexOf(enterValue[enterTypeId][1])],
                                 (enterValue[enterTypeId][2] == 'x') ? null : enterValue[enterTypeId][2],
                                 (enterValue[enterTypeId][3] == 'x') ? null : enterValue[enterTypeId][3],
                                 (enterValue[enterTypeId][4] == 'x') ? null : enterValue[enterTypeId][4],
-                                (enterValue[enterTypeId][5] == 'нет') ? null : enterValue[enterTypeId][5],
-                                (enterValue[enterTypeId][6] == 'x') ? null : enterValue[enterTypeId][6]
+                                (enterValue[enterTypeId][5] == 'x') ? null : enterValue[enterTypeId][5],
+                                (enterValue[enterTypeId][6] == 'нет') ? null : enterValue[enterTypeId][6],
+                                (enterValue[enterTypeId][7] == 'x') ? null : enterValue[enterTypeId][7],
+                                (enterValue[enterTypeId][8] == 'x') ? null : enterValue[enterTypeId][8],
+                                (enterValue[enterTypeId][9] == 'x') ? null : enterValue[enterTypeId][9],
+                                (enterValue[enterTypeId][10] == 'x') ? null : enterValue[enterTypeId][10]
                             );
                             break;
                         case 'Новый сектор':
@@ -2994,7 +3039,8 @@
                                 (enterValue[enterTypeId][1] == 'x') ? null : enterValue[enterTypeId][1],
                                 (enterValue[enterTypeId][2] == 'x') ? null : enterValue[enterTypeId][2],
                                 (enterValue[enterTypeId][3] == 'x') ? null : enterValue[enterTypeId][3],
-                                (enterValue[enterTypeId][4] == 'x') ? null : enterValue[enterTypeId][4]
+                                (enterValue[enterTypeId][4] == 'x') ? null : enterValue[enterTypeId][4],
+                                (enterValue[enterTypeId][5] == 'x') ? null : enterValue[enterTypeId][5]
                             );
                             break;
                         case 'Тарировка':
@@ -3500,6 +3546,7 @@
         var ri = rds[index];
         $('input[name=fRdsItemType][value=' + ri.type + ']').closest('.btn').button('toggle');
         $('#fRdsItemDistance').val(ri.distance);
+        $('#fRdsItemNeitralization').val(ri.neitralization > 0 ? getTimeString(ri.neitralization, true) : null);
         $('#fRdsItemVpdd').val(ri.vPdd);
         $('#fRdsItemSpeedLabel').text((ri.siIndex < 0 || ri.siIndex >= speedIns.length) ? 'Скорость' : 'Скорость (' + speedIns[ri.siIndex] + ')');
         $('#fRdsItemSpeed').val(ri.speed);
@@ -3507,6 +3554,7 @@
         $('#modalRdsItem').modal('show');
 
         $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#fRdsItemNeitralization').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fRdsItemVpdd').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#fRdsItemTime').closest('.form-group').removeClass('has-error').removeClass('has-success');
@@ -3516,6 +3564,14 @@
         setTimeout(function () { $('#fRdsItemDistance').focus().select(); }, 100);
     })
 
+    $("input[name=fRdsItemType]").change(function () {
+        if (this.value == 'N') {
+            $('#fRdsItemNeitralizationLine').show();
+        } else {
+            $('#fRdsItemNeitralizationLine').hide();
+        }
+    });
+    
     $('#fRdsItemVpdd').on('change', function() {
         if (editRdsItemIndex < 0 || editRdsItemIndex >= rds.length) return;
         var ri = rds[editRdsItemIndex];
@@ -3534,33 +3590,30 @@
     })
 
     $('#modalRdsItem').on('submit', function (e) {
-        var isGood = true;
-        var riDistance = parseFloat($('#fRdsItemDistance').val());
+        let isGood = true;
+        let riType = $('input[name=fRdsItemType]:checked').val();
+        let riDistance = parseFloat($('#fRdsItemDistance').val());
         if (riDistance == null) {
             $('#fRdsItemDistance').closest('.form-group').removeClass('has-success').addClass('has-error');
             isGood = false;
         }
-        var riVpdd = parseFloat($('#fRdsItemVpdd').val());
+        let riNeitralization = getTimeValue($('#fRdsItemNeitralization').val());
+        if (riType == 'N' && (!riNeitralization || riNeitralization < 0)) {
+            $('#fRdsItemNeitralization').closest('.form-group').removeClass('has-success').addClass('has-error');
+            isGood = false;
+        }
+        let riVpdd = parseFloat($('#fRdsItemVpdd').val());
         if (!riVpdd) {
             $('#fRdsItemVpdd').closest('.form-group').removeClass('has-success').addClass('has-error');
             isGood = false;
         }
-        var riSpeed = parseFloat($('#fRdsItemSpeed').val());
+        let riSpeed = parseFloat($('#fRdsItemSpeed').val());
         if (!riSpeed) {
             $('#fRdsItemSpeed').closest('.form-group').removeClass('has-success').addClass('has-error');
             isGood = false;
         }
-        var riTime = $('#fRdsItemTime').val();
-        var nTime = -1;
-        if (riTime) {
-            var t = riTime.split(/[\D]/);
-            if (t.length == 2) {
-                nTime = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]);
-            } else if (t.length == 3) {
-                nTime = 3600 * parseInt(t[0]) + 60 * parseInt(t[1]) + parseInt(t[2]);
-            }
-        }
-        if (!nTime || nTime < 0) {
+        let riTime = getTimeValue($('#fRdsItemTime').val());
+        if (!riTime || riTime < 0) {
             $('#fRdsItemTime').closest('.form-group').removeClass('has-success').addClass('has-error');
             isGood = false;
         }
@@ -3569,16 +3622,21 @@
             return false;
         } else {
             $('#fRdsItemDistance').closest('.form-group').removeClass('has-error').addClass('has-success');
+            $('#fRdsItemNeitralization').closest('.form-group').removeClass('has-error').removeClass('has-success');
             $('#fRdsItemSpeed').closest('.form-group').removeClass('has-error').addClass('has-success');
             $('#fRdsItemVpdd').closest('.form-group').removeClass('has-error').addClass('has-success');
             $('#fRdsItemTime').closest('.form-group').removeClass('has-error').addClass('has-success');
             $('#modalRdsItem').modal('hide');
             if (editRdsItemIndex >= 0 && editRdsItemIndex < rds.length) {
-                rds[editRdsItemIndex].type = $('input[name=fRdsItemType]:checked').val();
+                if (rds[editRdsItemIndex].type == 'N' || riType == 'N') {
+                    changeNeitralizationDone((riType == 'N' ? riNeitralization : 0) - (rds[editRdsItemIndex].type == 'N' ? rds[editRdsItemIndex].neitralization : 0));
+                }
+                rds[editRdsItemIndex].type = riType;
                 rds[editRdsItemIndex].distance = riDistance;
+                rds[editRdsItemIndex].neitralization = riType == 'N' ? riNeitralization : null;
                 rds[editRdsItemIndex].vPdd = riVpdd;
                 rds[editRdsItemIndex].speed = riSpeed;
-                rds[editRdsItemIndex].time = nTime;
+                rds[editRdsItemIndex].time = riTime;
                 rds.sort(compareRdsItems);
                 recalculateRds();
                 refreshRdsTable();
@@ -3663,20 +3721,20 @@
         return false;
     });
 
-    $('input[name=fCorrectionType][value=I]').on('click', function () {
-        $('#fCorrectionIntervalGPS').prop('disabled', true);
-        $('#fCorrectionIntervalBT').prop('disabled', true);
-        $('#fCorrectionValueGPS').prop('disabled', true);
-        $('#fCorrectionValueBT').prop('disabled', true);
-    });
-
-    $('input[name=fCorrectionType][value=V]').on('click', function () {
-        $('#fCorrectionIntervalGPS').prop('disabled', false);
-        $('#fCorrectionIntervalBT').prop('disabled', false);
-        $('#fCorrectionValueGPS').prop('disabled', false);
-        $('#fCorrectionValueBT').prop('disabled', false);
-        $('#fCorrectionValueGPS').val(correctionGPS);
-        $('#fCorrectionValueBT').val(correctionBT);
+    $("input[name=fCorrectionType]").change(function () {
+        if (this.value == 'I') {
+            $('#fCorrectionIntervalGPS').prop('disabled', true);
+            $('#fCorrectionIntervalBT').prop('disabled', true);
+            $('#fCorrectionValueGPS').prop('disabled', true);
+            $('#fCorrectionValueBT').prop('disabled', true);
+        } else if (this.value == 'V') {
+            $('#fCorrectionIntervalGPS').prop('disabled', false);
+            $('#fCorrectionIntervalBT').prop('disabled', false);
+            $('#fCorrectionValueGPS').prop('disabled', false);
+            $('#fCorrectionValueBT').prop('disabled', false);
+            $('#fCorrectionValueGPS').val(correctionGPS);
+            $('#fCorrectionValueBT').val(correctionBT);
+        }
     });
 
     $('#fCorrectionIntervalGPS').on('change', function() { refreshCorrection(); });
@@ -3872,7 +3930,7 @@
         si.type = $('input[name=fFormulaItemType]:checked').val();
         si.position = parseFloat($('#modalAddFormula #fPosition').val());
         si.interval = parseFloat($('#modalAddFormula #fInterval').val());
-        si.neitralization = getTimeValue($('#modalAddFormula #fNeitralization').val());
+        si.neitralization = si.type == 'N' ? getTimeValue($('#modalAddFormula #fNeitralization').val()) : null;
         si.sector = parseFloat($('#modalAddFormula #fSector').val());
         si.norm = getTimeValue($('#modalAddFormula #fNorm').val());
         si.vPdd = parseFloat($('#modalAddFormula #fVpdd').val());
@@ -3884,13 +3942,13 @@
                 isGood = false;
             }
             if (si.norm > 0) {
+                si.speed = Math.floor(100 * si.sector / si.norm * 3600) / 100;
                 $('#modalAddFormula #fNorm').closest('.form-group').removeClass('has-error').addClass('has-success');
             } else {
                 $('#modalAddFormula #fNorm').closest('.form-group').removeClass('has-success').addClass('has-error');
                 isGood = false;
             }
             si.isVpdd = false;
-            si.speed = parseFloat($('#modalAddFormula #fVds').val());
         } else {
             si.isVpdd = $('#modalAddFormula #chbUseVpdd').prop('checked');
             if (si.isVpdd) {
@@ -3904,6 +3962,8 @@
                         isGood = false;
                     }
                 }
+            } else {
+                si.speed = parseFloat($('#modalAddFormula #fVds').val());
             }
             if (si.type == 'N') {
                 if (si.neitralization > 0) {
@@ -4221,6 +4281,64 @@
         } else {
             return (n ? "-" : "") + h + (m < 10 ? ":0" : ":") + m;
         }
+    }
+
+    function getTimeToSpeak(value) {
+        if (value == null || value == 0) {
+            return "ноль";
+        }
+        value = Math.abs(value);
+        let h = Math.floor(value / 3600);
+        let m = Math.floor((value - 3600 * h) / 60);
+        let s = Math.floor(value - 60 * m - 3600 * h);
+//        if (h > 99) return "много часов";
+        return (h > 0 ? h.toString() + " ч " : "") + (m > 0 || h > 0 && m == 0 && s > 0 ? m.toString() + " мин ": "") + (s > 0 ? s.toString() + "с" : "");
+
+/*        const tens = ['', '', 'двадцать ', 'тридцать ', 'сорок ', 'пятьдесят ', 'шестьдесят ', 'семьдесят ', 'восемьдесят ', 'девяносто '];
+        let ht = Math.floor(h / 10);
+        let ho = h % 10;
+        let hs = "";
+        if (ht == 1) {
+            hs = h.toString() + " часов ";
+        } else if (h > 0) {
+            if (ht > 1) {
+                hs = tens[ht];
+            }
+            if (ho != 0) hs += ho.toString();
+            if (ho == 1) hs += "  час ";
+            else if (ho >= 2 && ho <= 4) hs += " часа ";
+            else hs += " часов ";
+        }
+        let mt = Math.floor(m / 10);
+        let mo = m % 10;
+        let ms = "";
+        if (mt == 1) {
+            ms = m.toString() + " минут ";
+        } else {
+            if (mt > 1) {
+                ms = tens[mt];
+            }
+            if (mt == 0 || mo != 0) ms += mo.toString();
+            if (mo == 1) ms += " минута ";
+            else if (mo >= 2 && mo <= 4) ms += " минуты ";
+            else ms += " минут ";
+        }
+        let st = Math.floor(s / 10);
+        let so = s % 10;
+        let ss = "";
+        if (st == 1) {
+            ss = s.toString() + " секунд";
+        } else {
+            if (st > 1) {
+                ss = tens[st];
+            }
+            if (st == 0 || so != 0) ss += so.toString();
+            if (so == 1) ss += " секунда";
+            else if (so >= 2 && so <= 4) ss += " секунды";
+            else ss += " секунд";
+        }
+        return (h > 0 ? hs : "") + (h > 0 || m > 0 ? ms : "") + ss;
+*/
     }
 
     function getNumberString(value, size) {

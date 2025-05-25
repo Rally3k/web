@@ -61,6 +61,7 @@
                             <th>Норма&nbsp;времени</th>
                             <th>Норма&nbsp;(с)</th>
                             <th>Время</th>
+                            <th>Нейтрализация</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -94,6 +95,7 @@
 	<textarea readonly id="json" style="width: 100%; max-width: 100%;" rows="40"></textarea>
     <script type="text/javascript">
         var myMap = null;
+        var myPolyline = null;
 		
 		function load() {
             $('#selectRds > option').remove();
@@ -124,6 +126,8 @@
                 $("#normTable > tbody tr").remove();
                 if (myMap) {
                     myMap.geoObjects.removeAll();
+                    myPolyline = new ymaps.Polyline([], null, {strokeColor: "#0000FF", strokeWidth: 4, strokeOpacity: 0.5});
+                    myMap.geoObjects.add(myPolyline);
                 }
                 if (rds) {
                     var n = 0;
@@ -149,6 +153,10 @@
                                 t = '<i class="fa fa-stop"></i>';
                                 s = 'islands#redCircleDotIcon';
                                 break;
+                            case 'N':
+                                t = '<i class="fa fa-pause"></i>';
+                                s = 'islands#grayCircleDotIcon';
+                                break;
                         }
                         $('#rdsTable > tbody').append($('<tr>')
                             .append($('<td>').html(t))
@@ -160,6 +168,7 @@
                             .append($('<td>').text(getTimeString(rds[i].norm, true)))
                             .append($('<td>').text(getNumberString(rds[i].norm, 100)))
                             .append($('<td>').text(getTimeString(rds[i].time, true)))
+                            .append($('<td>').text(getTimeString(rds[i].neitralization, true)))
                         );
                         if (rds[i].type != 'C') {
                             $('#normTable > tbody').append($('<tr>')
@@ -173,8 +182,9 @@
                         if (myMap && rds[i].latitude && rds[i].longitude) {
                             myMap.geoObjects.add(new ymaps.Placemark([rds[i].latitude, rds[i].longitude],
                                 {iconContent:c,
-                                balloonContent: 'D: ' + getNumberString(rds[i].distance, 1000) + '<br>S: ' + getNumberString(rds[i].speed, 100) + '<br>L: ' + getNumberString(rds[i].lateness, 10) + '<br>N: ' + getTimeString(rds[i].norm, true) + '<br>T: ' + getTimeString(rds[i].time, true)},
+                                balloonContent: 'D: ' + getNumberString(rds[i].distance, 1000) + '<br>S: ' + getNumberString(rds[i].speed, 100) + '<br>L: ' + getNumberString(rds[i].lateness, 10) + '<br>N: ' + getTimeString(rds[i].norm, true) + '<br>T: ' + getTimeString(rds[i].time, true) + '<br>P: ' + getTimeString(rds[i].neitralization, true)},
                                 {preset: s}));
+                            if (myPolyline != null) myPolyline.geometry.insert(myPolyline.geometry.getLength(), [rds[i].latitude, rds[i].longitude]);
                         }
                     }
                     if (myMap && rds.length > 0) {
