@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="files/font-awesome/css/font-awesome.min.css">
 
     <script src="https://api-maps.yandex.ru/2.1/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -44,35 +47,8 @@
         <button class="btn btn-danger" onclick="deleteAll(); return false;"><i class="fa fa-trash"></i></button>
         <button class="btn btn-info" onclick="load(); return false;"><i class="fa fa-rotate-right"></i></button>
     </form>
-    Смены скоростей:
+    Нормативы: <button id="normDownload">jpeg</button>
     <div class="content grid container-fluid">
-    </div>
-        <div class="row">
-            <div class="col-xs-6">
-                <table id="rdsTable" class="table">
-                    <thead>
-                        <tr>
-                            <th>Тип</th>
-                            <th>Дистанция</th>
-                            <th>Норматив</th>
-                            <th>Скорость</th>
-                            <th>Vпдд</th>
-                            <th>Опоздание</th>
-                            <th>Норма&nbsp;времени</th>
-                            <th>Норма&nbsp;(с)</th>
-                            <th>Время</th>
-                            <th>Нейтрализация</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    Нормативы:
-    <div class="content grid container-fluid">
-    </div>
         <div class="row">
             <div class="col-xs-6">
                 <table id="normTable" class="table">
@@ -90,6 +66,33 @@
             </div>
         </div>
     </div>
+    Смены скоростей: <button id="rdsDownload">jpeg</button>
+    <div class="content grid container-fluid">
+        <div class="row">
+            <div class="col-xs-6">
+                <table id="rdsTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Тип</th>
+                            <th>Дистанция</th>
+                            <th>Интервал</th>
+                            <th>Норматив</th>
+                            <th>Скорость</th>
+                            <th>Vпдд</th>
+                            <th>Опоздание</th>
+                            <th>Норма&nbsp;времени</th>
+                            <th>Норма&nbsp;(с)</th>
+                            <th>Время</th>
+                            <th>Нейтрализация</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div id="map"></div>
 	<button onclick="copyToClipboard()">Copy json</button><br>
 	<textarea readonly id="json" style="width: 100%; max-width: 100%;" rows="40"></textarea>
@@ -118,6 +121,27 @@
         $(document).ready(function () {
             ymaps.ready(initMap);
 
+            $('#rdsDownload').click(function(){
+                html2canvas(document.getElementById("rdsTable"), {useCORS: true, allowTaint: true}).then(
+                    function(canvas) {
+                        var imgData = canvas.toDataURL("image/jpeg", 1.0);
+                        var link = document.createElement('a');
+                        link.href = imgData;
+                        link.download = "rds" + $('#selectRds').val() + '.jpg';
+                        link.click();
+                    });
+            });
+            $('#normDownload').click(function(){
+                html2canvas(document.getElementById("normTable"), {useCORS: true, allowTaint: true}).then(
+                    function(canvas) {
+                        var imgData = canvas.toDataURL("image/jpeg", 1.0);
+                        var link = document.createElement('a');
+                        link.href = imgData;
+                        link.download = "norm" + $('#selectRds').val() + '.jpg';
+                        link.click();
+                    });
+            });
+
             $('#selectRds').change(function() {
                 var j = localStorage.getItem("rds" + $('#selectRds').val());
                 var rds = JSON.parse(j);
@@ -131,36 +155,45 @@
                 }
                 if (rds) {
                     var n = 0;
+                    var m = 0;
                     for (var i = 0; i < rds.length; ++i) {
                         var t = '';
                         var s = '';
                         var c = getNumberString(rds[i].speed, 1);
                         n += rds[i].norm;
+                        var b = (m % 2) ? 'lightgray' : 'white';
                         switch (rds[i].type) {
                             case 'S':
                                 t = '<i class="fa fa-play"></i>';
                                 s = 'islands#darkGreenCircleDotIcon';
+                                b = 'lightgreen';
                                 break;
                             case 'C':
                                 t = '<i class="fa fa-tachometer"></i>';
                                 s = 'islands#grayCircleIcon';
+                                ++m;
                                 break;
                             case 'P':
                                 t = '<i class="fa fa-flag-checkered"></i>';
                                 s = 'islands#yellowCircleDotIcon';
+                                b = 'lightyellow';
                                 break;
                             case 'F':
                                 t = '<i class="fa fa-stop"></i>';
                                 s = 'islands#redCircleDotIcon';
+                                b = 'coral';
                                 break;
                             case 'N':
                                 t = '<i class="fa fa-pause"></i>';
                                 s = 'islands#grayCircleDotIcon';
+                                b = 'lightblue';
                                 break;
                         }
-                        $('#rdsTable > tbody').append($('<tr>')
+                        
+                        $('#rdsTable > tbody').append($('<tr style="background-color: ' + b + '">')
                             .append($('<td>').html(t))
                             .append($('<td>').html('<a href="#" onclick="show(' + rds[i].latitude + ', ' + rds[i].longitude + ')">' + getNumberString(rds[i].distance, 1000) + '</a>'))
+                            .append($('<td>').text((i > 0) ? getNumberString(rds[i].distance - rds[i-1].distance, 1000) : ''))
                             .append($('<td>').text(getTimeString(n, true)))
                             .append($('<td>').text(getNumberString(rds[i].speed, 100)))
                             .append($('<td>').text(getNumberString(rds[i].vPdd, 100)))
@@ -170,8 +203,8 @@
                             .append($('<td>').text(getTimeString(rds[i].time, true)))
                             .append($('<td>').text(getTimeString(rds[i].neitralization, true)))
                         );
-                        if (rds[i].type != 'C') {
-                            $('#normTable > tbody').append($('<tr>')
+                        if (rds[i].type != 'C' && rds[i].type != 'N') {
+                            $('#normTable > tbody').append($('<tr style="background-color: ' + b + '">')
                                 .append($('<td>').html(t))
                                 .append($('<td>').html('<a href="#" onclick="show(' + rds[i].latitude + ', ' + rds[i].longitude + ')">' + getNumberString(rds[i].distance, 1000) + '</a>'))
                                 .append($('<td>').text(getTimeString(n, true)))
