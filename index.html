@@ -2845,19 +2845,21 @@
         }
         if (si.type == 'T') {
             si.sector = parseFloat(sector);
-            if (isNaN(si.sector)) return 5;
+            if (isNaN(si.sector)) return 7;
             si.norm = getTimeValue(norm);
             si.norm %= (24 * 60 * 60);
-            if (si.norm <= 0) return 6;
+            if (si.norm <= 0) return 8;
             si.speed = Math.floor(100 * si.sector / si.norm * 3600) / 100;
         } else {
             si.sign = sign;
-            si.operand = parseFloat(operand);
-            if (!si.operand) return 7;
+            if (si.sign) {
+                si.operand = parseFloat(operand);
+                if (!si.operand) return 6;
+            }
         }
         if (si.type == 'N') {
             si.neitralization = (!neitralization || neitralization == '') ? null : getTimeValue(neitralization);
-            if (si.neitralization == -1) return 8;
+            if (si.neitralization == -1) return 9;
             si.neitralization %= (24 * 60 * 60);
         }
         if (si.type != 'C' || (si.position && !isNaN(si.position)) || si.interval || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed))) {

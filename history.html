@@ -193,7 +193,7 @@
                         $('#rdsTable > tbody').append($('<tr style="background-color: ' + b + '">')
                             .append($('<td>').html(t))
                             .append($('<td>').html('<a href="#" onclick="show(' + rds[i].latitude + ', ' + rds[i].longitude + ')">' + getNumberString(rds[i].distance, 1000) + '</a>'))
-                            .append($('<td>').text((i > 0) ? getNumberString(rds[i].distance - rds[i-1].distance, 1000) : ''))
+                            .append($('<td>').text((i+1 < rds.length) ? getNumberString(rds[i+1].distance - rds[i].distance, 1000) : ''))
                             .append($('<td>').text(getTimeString(n, true)))
                             .append($('<td>').text(getNumberString(rds[i].speed, 100)))
                             .append($('<td>').text(getNumberString(rds[i].vPdd, 100)))
