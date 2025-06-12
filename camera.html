@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Камера с координатами</title>
+ <style>
+ #video {
+ width: 100%;
+ max-width: 640;
+ height: auto;
+ }
+ #canvas {
+ display: none;
+ }
+ #intervalSelect {
+ margin: 10px;
+ padding: 5px;
+ font-size: 16px;
+ }
+ #status {
+ margin: 10px;
+ font-size: 14px;
+ }
+ </style>
+</head>
+<body>
+ <div>
+ Интервал между снимками:
+ <select id="intervalSelect">
+ <option value="0">Выключено</option>
+ <option value="1000">1 секунда</option>
+ <option value="2000">2 секунды</option>
+ <option value="3000">3 секунды</option>
+ <option value="5000">5 секунд</option>
+ <option value="10000">10 секунд</option>
+ <option value="15000">15 секунд</option>
+ <option value="20000">20 секунд</option>
+ </select>
+ </div>
+ <div id="status" style="white-space: pre-wrap;">Загрузка...</div>
+ <video id="video" autoplay></video>
+ <canvas id="canvas"></canvas>
+
+ <script>
+ // Получаем элементы
+ const video = document.getElementById('video');
+ const canvas = document.getElementById('canvas');
+ const status = document.getElementById('status');
+ const intervalSelect = document.getElementById('intervalSelect');
+ 
+ let captureInterval;
+ let stream;
+ let selectedInterval = 0;
+
+ // Инициализация камеры
+ function initCamera() {
+ return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { min: 640, ideal: 1280, max: 1920 }, height: { min: 480, ideal: 720, max: 1080 }, } })
+.then(mediaStream => {
+ stream = mediaStream;
+ video.srcObject = mediaStream;
+ video.play();
+ status.textContent = 'Камера готова';
+ //startCapture(); // автоматически начинаем съемку
+ })
+.catch(error => {
+ status.textContent = 'Ошибка доступа к камере: ' + error.message;
+ });
+ }
+
+ // Функция захвата и сохранения
+ function captureAndSave() {
+ // Рисуем кадр с видео на canvas
+ const context = canvas.getContext('2d');
+ canvas.width = video.videoWidth;
+ canvas.height = video.videoHeight;
+ context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+/*
+Сектор: КВ1-2, Пройдено: 99 999.123 км, Интервал: 123.321 км
+Скорость: 199 км/ч, Vпдд = 130 км/ч, Vдс = 190 км/ч, V = Vпдд - 10
+Время: 12:23:45 Опоздание: 1:99:99.88
+*/
+	context.font = '20px Arial';
+	context.fillStyle = 'black';
+	context.shadowColor = 'white';
+	context.shadowBlur = 2;
+	//context.fillRect(0, canvas.height - 60, canvas.width, 60);
+	context.textBaseline = 'bottom';
+	context.textAlign = 'center';
+	const latitude = 12.3456789;
+	const longitude = 98.876543;
+	context.fillText(`Сектор: КВ1-2, Пройдено: 99 999.123 км, Интервал: 123.321 км`, canvas.width / 2, canvas.height - 65);
+	context.fillText(`Скорость: 199 км/ч, Vпдд = 130 км/ч, Vдс = 190 км/ч, V = Vпдд - 10`, canvas.width / 2, canvas.height - 35);
+	context.fillText(`Время: 12:23:45 Опоздание: 1:99:99.88`, canvas.width / 2, canvas.height - 5);
+
+// Получаем координаты
+ /*navigator.geolocation.getCurrentPosition(position => {
+ const coords = position.coords;
+ const latitude = coords.latitude.toFixed(6);
+ const longitude = coords.longitude.toFixed(6);
+
+ // Добавляем текст на canvas
+ context.font = '20px Arial';
+ context.fillStyle = 'white';
+ context.textBaseline = 'bottom';
+ context.fillText(`Широта: ${latitude}`, 10, canvas.height - 10);
+ context.fillText(`Долгота: ${longitude}`, 10, canvas.height - 40);
+*/
+ // Сохраняем изображение
+ canvas.toBlob(blob => {
+ const date = new Date();
+ const filename = `photo_${date.getTime()}.jpg`;
+ const link = document.createElement('a');
+ link.href = URL.createObjectURL(blob);
+ link.download = filename;
+ document.body.appendChild(link);
+ link.click();
+ document.body.removeChild(link);
+ status.textContent = `Фото сохранено как ${filename}`;
+ }, 'image/jpeg');
+ //});
+ }
+
+ // Функция начала захвата
+ function startCapture() {
+	status.textContent = `Начинаем захват ${selectedInterval}`;
+ 	if (selectedInterval != 0) captureInterval = setInterval(captureAndSave, selectedInterval);
+ }
+
+ // Обработка выбора интервала
+ intervalSelect.addEventListener('change', () => {
+ selectedInterval = parseInt(intervalSelect.value);
+ if (captureInterval) clearInterval(captureInterval);
+ startCapture();
+});
+
+ // Запускаем всё при загрузке страницы
+ initCamera();
+ </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Видеозапись с камеры</title>
+    <style>
+        #videoElement {
+            width: 100%;
+            max-width: 1920px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <video id="videoElement" autoplay playsinline webkit-playsinline muted></video>
+    <button id="startButton">Начать запись</button>
+    <button id="stopButton" disabled>Остановить запись</button>
+
+    <script>
+        const videoElement = document.getElementById('videoElement');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        
+        let mediaRecorder;
+        let recordedChunks = [];
+        let recordingTime = 1 * 60 * 1000; // 5 минут в миллисекундах
+        
+        // Настройки потока
+        const streamConstraints = {
+            audio: true,
+            video: {
+                facingMode: 'environment', // задняя камера
+                width: 1920,
+                height: 1080
+            }
+        };
+        
+        // Настройки записи
+        const recorderOptions = {
+            mimeType: 'video/webm; codecs=vp9'
+        };
+
+        // Инициализация камеры
+        function initCamera() {
+            return navigator.mediaDevices.getUserMedia(streamConstraints)
+                .then(stream => {
+                    videoElement.srcObject = stream;
+                    return stream;
+                })
+                .catch(error => {
+                    console.error('Ошибка доступа к камере:', error);
+                });
+        }
+
+        // Начало записи
+        function startRecording() {
+            initCamera()
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream, recorderOptions);
+                    mediaRecorder.ondataavailable = handleDataAvailable;
+                    mediaRecorder.onstop = handleStop;
+                    
+                    mediaRecorder.start();
+                    setTimeout(() => mediaRecorder.stop(), recordingTime);
+                    
+                    startButton.disabled = true;
+                    stopButton.disabled = false;
+                });
+        }
+
+        // Остановка записи
+        function stopRecording() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+                startButton.disabled = false;
+                stopButton.disabled = true;
+            }
+        }
+
+        // Обработка записанных данных
+        function handleDataAvailable(event) {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+            }
+        }
+
+        // Сохранение файла
+        function handleStop() {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            document.body.appendChild(a);
+            a.style = 'display: none';
+            a.href = url;
+            a.download = `video_${new Date().getTime()}.webm`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            recordedChunks = [];
+        }
+
+        // Обработчики событий для кнопок
+        startButton.addEventListener('click', startRecording);
+        stopButton.addEventListener('click', stopRecording);
+    </script>
+</body>
+</html>
