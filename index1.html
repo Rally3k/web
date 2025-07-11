@@ -332,31 +332,13 @@
 <div class="content alert alert-warning alert-dismissable fade in" id="alertNumber" onclick="$(this).hide();" style="display: none">Введено не число!</div>
 <div class="content alert alert-danger alert-dismissable fade in" id="alDanger" onclick="$(this).hide();" style="display: none"></div>
 <div class="content grid container-fluid">
+    <div class="square-content">
+        <i class="fa icon-small fa-globe" style="position: fixed; top: 0; left: 0;"></i>
+    </div>
+    <div class="square-content">
+        <span class="item-label" id="batteryBT" style="position: fixed; top: 0; right: 0; transform: translate(-70%, 0);"></span><i class="fa icon-small fa-bluetooth" style="position: fixed; top: 0; right: 0;"><span class="item-label" id="batteryBT"></span></i>
+    </div>
     <div class="row">
-        <div class="col-l-2 col-xs-4 border nopadding square-box">
-            <div class="square-content">
-                <i class="fa icon-small fa-globe" style="position: fixed; top: 0; left: 0;"></i>
-            </div>
-            <div class="square-content">
-                <span class="item-label" id="batteryBT" style="position: fixed; top: 0; right: 0; transform: translate(-70%, 0);"></span><i class="fa icon-small fa-bluetooth" style="position: fixed; top: 0; right: 0;"><span class="item-label" id="batteryBT"></span></i>
-            </div>
-            <div class="square-content">
-                <div class="split-vertical">
-                    <a href="javascript:showModalTime('Время', getCurrentTime(), true);" class="line-height-small">
-                        <span class="item-label" style="color:darkblue" id="labelTime">Время</span>
-                        <span class="item-value" id="time">23:55:55</span>
-                        <span class="item-label" id="sectorTime">00:00:00</span>
-                    </a>
-                </div>
-                <div class="split-vertical">
-                    <a href="javascript:showModalTime('Старт', start, true);" class="line-height-small">
-                        <span class="item-label" style="color:darkblue">Старт</span>
-                        <span class="item-value" id="start">10:00:00</span>
-                        <span class="item-label" id="finish">11:00:00</span>
-                    </a>
-                </div>
-            </div>
-        </div>
         <div class="col-l-4 col-xs-8 border nopadding rect-box">
             <div class="square-content" style="display: none" id="movePause">
                 <div class="no-split">
@@ -371,7 +353,7 @@
             <div class="square-content">
                 <div class="no-split">
                     <a href="javascript:showModalNumber('Пройдено', getNumberString(getDistance(), 1000));" oncontextmenu="javascript:resetDistance(); return false;" class="line-height-big">
-                        <span class="item-label-big" style="color:darkblue" id="labelDistance">Пройдено</span>
+                        <span class="item-label-big" style="color:darkblue;" id="labelDistance">Пройдено</span>
                         <span class="item-value-big" id="distance">999.999</span>
                         <span class="item-label-big" id="nextPosition">000.000</span>
                     </a>
@@ -379,26 +361,58 @@
             </div>
         </div>
         <div class="col-l-4 col-xs-8 border nopadding rect-box">
+        </div>
+        <div class="col-l-4 col-xs-8 border nopadding rect-box">
             <div class="square-content">
                 <div class="no-split">
                     <a href="javascript:showModalNumber('Интервал', getIntervalDistance() > 0 ? getIntervalDistance() : '');" oncontextmenu="javascript:resetInterval(); return false;" class="line-height-big">
-                        <span class="item-label-big" style="color:darkblue" id="labelInterval">Интервал</span>
+                        <span class="item-label-big" style="color:darkblue;" id="labelInterval">Интервал</span>
                         <span class="item-value-big" id="interval">99.999</span>
                         <span class="item-label-big" id="intervalDistance">(--.---)</span>
                     </a>
                 </div>
             </div>
         </div>
-        <div class="col-l-2 col-xs-4 border nopadding square-box">
+    </div>
+    <div class="row">
+        <div class="col-l-2 col-xs-4 border nopadding rect-box">
             <div class="square-content">
-                <div class="split-vertical">
+                <div class="no-split">
+                    <a href="javascript:showModalTime('Время', getCurrentTime(), true);" class="line-height-small">
+                        <span class="item-label" style="color:darkblue" id="labelTime">Время</span>
+                        <span class="item-value" id="time">23:55:55</span>
+                        <span class="item-label" id="sectorTime">00:00:00</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 border nopadding rect-box">
+            <div class="square-content">
+                <div class="no-split">
+                    <a href="javascript:showModalTime('Старт', start, true);" class="line-height-small">
+                        <span class="item-label" style="color:darkblue">Старт</span>
+                        <span class="item-value" id="start">10:00:00</span>
+                        <span class="item-label" id="finish">11:00:00</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 border nopadding rect-box"></div>
+        <div class="col-l-2 col-xs-4 border nopadding rect-box"></div>
+        <div class="col-l-2 col-xs-4 border nopadding rect-box">
+            <div class="square-content">
+                <div class="no-split">
                     <a href="javascript:showModalKvList();" class="line-height-small">
                         <span class="item-label" style="color:darkblue">Льгота</span>
                         <span class="item-value" id="benefit">00:05</span>
                         <span class="item-label" id="key">-</span>
                     </a>
                 </div>
-                <div class="split-vertical">
+            </div>
+        </div>
+        <div class="col-l-2 col-xs-4 border nopadding rect-box">
+            <div class="square-content">
+                <div class="no-split">
                     <a href="javascript:showModalSpeed();" class="line-height-small">
                         <span class="item-label" style="color:darkblue">Скорость</span>
                         <span class="item-value" id="speed">V - 5</span>
@@ -1483,7 +1497,7 @@
         //const latitude = 12.3456789;
         //const longitude = 98.876543;
         context.fillText(`Сектор: КВ${currentKvIndex+1}-${currentKvIndex+2}, Пройдено: ${$("#distance").text()} км, ${$("#labelInterval").text()}: ${$("#interval").text()} км`, canvas.width / 2, canvas.height - 65);
-        context.fillText(`Скорость: ${$("#actualSpeed").text()} км/ч, Vпдд = ${$("#vpdd").text()} км/ч, Vдс = ${$("#avgSpeed").text()} км/ч, V = ${$("#speed").text()}`, canvas.width / 2, canvas.height - 35);
+        context.fillText(`Скорость: ${$("#actualSpeed").text()} км/ч, Vпдд = ${$("#vpdd").text()} км/ч, Vср = ${$("#avgSpeed").text()} км/ч, V = ${$("#speed").text()}`, canvas.width / 2, canvas.height - 35);
         context.fillText(`Время: ${$("#time").text()} ${$("#labelLateness").text()}: ${$("#lateness").text()}`, canvas.width / 2, canvas.height - 5);
 
         // Сохраняем изображение
@@ -2454,7 +2468,7 @@
                 $("#sectorRest").css("color", "red");
                 beep();
             }
-            $("#sectorRest").html(getNumberString(sectorRest, 1000));
+            $("#sectorRest").html(getNumberString(sectorRest, 100));
             $("#norm").html(getTimeString(currentSpeedInstruction.norm, true));
             let normRest = currentSpeedInstruction.norm - getRdsTime();
             if (normRest <= 10 && $("#normRest").css("color") == "rgb(0, 0, 0)") {
@@ -2470,14 +2484,14 @@
             $("#labelNorm").html("Норма");
             $("#labelNorm").css("color", "darkblue");
             $("#sector").html(sector);
-            $("#sectorRest").html(getNumberString(sector - getDistance(), 1000));
+            $("#sectorRest").html(getNumberString(sector - getDistance(), 100));
             $("#sectorRest").css("color", "rgb(0, 0, 0)");
             $("#norm").html(getTimeString(norm, false));
             $("#normRest").html(getTimeString(norm - sectorTime, true));
             $("#normRest").css("color", "rgb(0, 0, 0)");
         }
 
-        $("#distance").html(getNumberString(getDistance(), 1000));
+        $("#distance").html(getNumberString(getDistance(), 100));
         $("#start").html(getTimeString(start, true));
         $("#finish").html(getTimeString((start + norm) % (24 * 60 * 60), true));
         if (intervalDistanceGPS > 0 && distanceGPS > intervalStartGPS + intervalDistanceGPS) {
@@ -2508,10 +2522,10 @@
             interval = getDistance() - getIntervalStart();
             $("#interval").css("color", "rgb(0, 0, 0)");
         }
-        $("#interval").html(getNumberString(interval, 1000));
+        $("#interval").html(getNumberString(interval, 100));
         var interval2 = getIntervalDistance2() > 0 ? getIntervalStart2() + getIntervalDistance2() - getDistance2() : getDistance2() - getIntervalStart2();
-        $("#intervalDistance").html((getIntervalDistance() > 0 ? getNumberString(getIntervalDistance(), 1000) : "-") + ((isDemo || (isBT && gpsWatch)) ? "/" + getNumberString(interval2, 1000) : ""));
-        $("#nextPosition").html((getIntervalDistance() > 0 ? getNumberString(getIntervalStart() + getIntervalDistance(), 1000) : "-") + ((isDemo || (isBT && gpsWatch)) ? "/" + getNumberString(getDistance2(), 1000) : ""));
+        $("#intervalDistance").html((getIntervalDistance() > 0 ? getNumberString(getIntervalDistance(), 100) : "-") + ((isDemo || (isBT && gpsWatch)) ? "/" + getNumberString(interval2, 100) : ""));
+        $("#nextPosition").html((getIntervalDistance() > 0 ? getNumberString(getIntervalStart() + getIntervalDistance(), 100) : "-") + ((isDemo || (isBT && gpsWatch)) ? "/" + getNumberString(getDistance2(), 100) : ""));
         //var benefit = 60 * Math.floor((getKvTime() + 9 * 60) / 600);
         var benefit = (getKvTime() > 60) ? 60 * Math.floor((getKvTime() + 9 * 60) / 600) : 60;
         $("#benefit").html(getTimeString(benefit, false));
