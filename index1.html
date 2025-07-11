@@ -1488,16 +1488,16 @@
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        context.font = '20px Arial';
-        context.fillStyle = 'black';
-        context.shadowColor = 'white';
+        context.font = '30px Arial';
+        context.fillStyle = 'white';
+        context.shadowColor = 'black';
         context.shadowBlur = 2;
         context.textBaseline = 'bottom';
         context.textAlign = 'center';
         //const latitude = 12.3456789;
         //const longitude = 98.876543;
-        context.fillText(`Сектор: КВ${currentKvIndex+1}-${currentKvIndex+2}, Пройдено: ${$("#distance").text()} км, ${$("#labelInterval").text()}: ${$("#interval").text()} км`, canvas.width / 2, canvas.height - 65);
-        context.fillText(`Скорость: ${$("#actualSpeed").text()} км/ч, Vпдд = ${$("#vpdd").text()} км/ч, Vср = ${$("#avgSpeed").text()} км/ч, V = ${$("#speed").text()}`, canvas.width / 2, canvas.height - 35);
+        context.fillText(`Сектор: КВ${currentKvIndex+1}-${currentKvIndex+2}, Пройдено: ${$("#distance").text()} км, ${$("#labelInterval").text()}: ${$("#interval").text()} км`, canvas.width / 2, canvas.height - 85);
+        context.fillText(`Скорость: ${$("#actualSpeed").text()} км/ч, Vпдд = ${$("#vpdd").text()} км/ч, Vср = ${$("#avgSpeed").text()} км/ч, V = ${$("#speed").text()}`, canvas.width / 2, canvas.height - 45);
         context.fillText(`Время: ${$("#time").text()} ${$("#labelLateness").text()}: ${$("#lateness").text()}`, canvas.width / 2, canvas.height - 5);
 
         // Сохраняем изображение
