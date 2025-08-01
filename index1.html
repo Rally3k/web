@@ -3095,6 +3095,7 @@
         if (isModalShown) {
             switch (keyCode) {
                 case 27:
+                case 192:
                 //case 71: // Samsung browser
                     $('.modal').modal('hide');
                     break;
@@ -3107,7 +3108,7 @@
 
         $('#enterValue').css('color', '');
         enterValue[enterTypeId][enterSubTypeId] = $('#enterValue').html();
-        if ($('#enterType').text() != 'Ввод' && (keyCode == 71 /*|| keyCode == 84 Samsung browser*/ || keyCode == 13 || keyCode == 27 || keyCode == 188 || keyCode == 190 || keyCode == 8 || keyCode == 73 || (keyCode > 76 && keyCode < 80) || (keyCode > 47 && keyCode < 58) || (keyCode > 36 && keyCode < 41))) {
+        if ($('#enterType').text() != 'Ввод' && (keyCode == 71 /*|| keyCode == 84 Samsung browser*/ || keyCode == 13 || keyCode == 27 || keyCode == 192 || keyCode == 188 || keyCode == 190 || keyCode == 8 || keyCode == 73 || (keyCode > 76 && keyCode < 80) || (keyCode > 47 && keyCode < 58) || (keyCode > 36 && keyCode < 41))) {
             switch (keyCode) {
                 case 13:
                     // replace decimal point
@@ -3182,6 +3183,7 @@
                     newMove();
                     // no break!
                 case 27:
+                case 192:
                 //case 71: // Samsung browser
                     $('#enterType').text('Ввод');
                     $('#enterValue').html('x');
@@ -3265,6 +3267,7 @@
         } else {
             switch (keyCode) {
                 case 27: // esc
+                case 192:
                     addDistancePlacemark();
                     break;
                 case 83: // s start DS
@@ -3276,9 +3279,9 @@
                 case 70: // f finish
                     rdsFinish();
                 break;
-                case 192: // ` speed 5
-                    rdsSpeedChange(5);
-                break;
+                //case 192: // ` speed 5 - change to ESC
+                //    rdsSpeedChange(5);
+                //break;
                 case 189: // - speed 110
                     rdsSpeedChange(110);
                 break;
