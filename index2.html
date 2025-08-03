@@ -794,6 +794,7 @@
 <table id="rdsTable" class="content table">
     <thead>
         <tr class="rds-item-header">
+            <th>№</th>
             <th>Тип</th>
             <th>Позиция</th>
             <th>Скорость</th>
@@ -899,6 +900,12 @@
                                     <input type="radio" name="fRdsItemType" value="D"><i class="fa fa-map-marker"></i>
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">Номер</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="fRdsItemNumber" placeholder="123а">
                         </div>
                     </div>
                     <div class="form-group">
@@ -2289,6 +2296,7 @@
                     break;
             }
             $("#rdsTable > tbody").prepend($('<tr class="rds-item-data" onclick="showModalRdsItem(' + i + ');">')
+                .append($('<td>').text(rds[i].number))
                 .append($('<td>').html(t))
                 .append($('<td>').text(getNumberString(rds[i].distance, 1000)))
                 .append($('<td>').text(getNumberString(rds[i].speed, 100)))
@@ -3579,6 +3587,7 @@
         editRdsItemIndex = index;
         var ri = rds[index];
         $('input[name=fRdsItemType][value=' + ri.type + ']').closest('.btn').button('toggle');
+        $('#fRdsItemNumber').val(ri.number);
         $('#fRdsItemDistance').val(ri.distance);
         $('#fRdsItemNeitralization').val(ri.neitralization > 0 ? getTimeString(ri.neitralization, true) : null);
         $('#fRdsItemVpdd').val(ri.vPdd);
@@ -3626,6 +3635,7 @@
     $('#modalRdsItem').on('submit', function (e) {
         let isGood = true;
         let riType = $('input[name=fRdsItemType]:checked').val();
+        let riNumber = $('#fRdsItemNumber').val();
         let riDistance = parseFloat($('#fRdsItemDistance').val());
         if (riDistance == null) {
             $('#fRdsItemDistance').closest('.form-group').removeClass('has-success').addClass('has-error');
@@ -3666,6 +3676,7 @@
                     changeNeitralizationDone((riType == 'N' ? riNeitralization : 0) - (rds[editRdsItemIndex].type == 'N' ? rds[editRdsItemIndex].neitralization : 0));
                 }
                 rds[editRdsItemIndex].type = riType;
+                rds[editRdsItemIndex].number = riNumber;
                 rds[editRdsItemIndex].distance = riDistance;
                 rds[editRdsItemIndex].neitralization = riType == 'N' ? riNeitralization : null;
                 rds[editRdsItemIndex].vPdd = riVpdd;
