@@ -1074,7 +1074,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Добавить формулу</h4>
+                <h4 class="modal-title">Формула</h4>
             </div>
             <form class="form-horizontal" id="formAddFormula">
                 <div class="modal-body">
@@ -1101,6 +1101,14 @@
                                     <input type="radio" id="fFormulaItemType" name="fFormulaItemType" value="N"><i class="fa fa-pause"></i>
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Номер
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="fNumber" placeholder="123a">
                         </div>
                     </div>
                     <div class="form-group">
@@ -1158,22 +1166,38 @@
                             <input type="number" class="form-control" id="fVds" step="any" placeholder="км/ч">
                         </div>
                     </div>
-                    <div class="form-group" id="fVdsVpddLine">
-                        <label class="control-label col-xs-3">
-                            Vдс
-                        </label>
-                        <label class="control-label col-xs-2">
-                            Vпдд
-                        </label>
-                        <div class="col-xs-3">
-                            <select class="form-control" id="fSign">
-                                <option></option>
-                                <option>-</option>
-                                <option>*</option>
-                            </select>
+                    <div id="fVdsVpddLine">
+                        <div class="form-group">
+                            <label class="control-label col-xs-3">
+                                Vдс
+                            </label>
+                            <label class="control-label col-xs-2">
+                                Vпдд
+                            </label>
+                            <div class="col-xs-3">
+                                <select class="form-control" id="fSign">
+                                    <option></option>
+                                    <option>-</option>
+                                    <option>*</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-4">
+                                <input type="number" class="form-control" id="fOperand" step="any" value="0" disabled>
+                            </div>
                         </div>
-                        <div class="col-xs-4">
-                            <input type="number" class="form-control" id="fOperand" step="any" value="0" disabled>
+                        <div class="form-group">
+                            <label class="control-label col-xs-5">
+                            </label>
+                            <div class="col-xs-3">
+                                <select class="form-control" id="fSign1">
+                                    <option></option>
+                                    <option>-</option>
+                                    <option>*</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-4">
+                                <input type="number" class="form-control" id="fOperand1" step="any" value="0" disabled>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1498,12 +1522,12 @@
         , ['Пройдено']
         , ['Следующая', 'Интервал', 'Позиция']
         , ['Новый сектор', 'Старт', 'Сектор', 'Норма', 'Пауза', 'Нейтрализация']
-        , ['Новая формула', 'Тип', 'Позиция', 'Интервал', 'Vпдд', 'Vдс', 'Операция', 'Операнд', 'Дистанция', 'Норматив', 'Нейтрализация']
+        , ['Новая формула', 'Номер', 'Тип', 'Позиция', 'Интервал', 'Vпдд', 'Vдс', 'Операция 1', 'Операнд 1', 'Операция 2', 'Операнд 2', 'Дистанция', 'Норматив', 'Нейтрализация']
 		, ['Тарировка']
         , ['Скорость']
         , ['↑скорость↑', 'Расстояние', 'Скорость после']
     ];
-    var enterValue = [[], [], [], [], [], [], [], [], [], [], []];
+    var enterValue = [[], [], [], [], [], [], [], [], [], [], [], [], [], []];
     var enterTypeId = 2;
     var enterSubTypeId;
     var rdsItemHtmlTypes = ['<i class="fa fa-play"></i>', '<i class="fa fa-tachometer"></i>', '<i class="fa fa-flag-checkered"></i>', '<i class="fa fa-stop"></i>', '<i class="fa fa-clock-o"></i>', '<i class="fa fa-pause"></i>'];
@@ -1900,7 +1924,7 @@
         }
     }
 
-    function SpeedInstruction(isVpdd, vPdd, speed, sign, operand, position, type) {
+    function SpeedInstruction(isVpdd, vPdd, speed, sign, operand, sign1, operand1, position, type) {
         if (vPdd === undefined && typeof(isVpdd) === 'object') {
             for (var prop in isVpdd) {
                 this[prop] = isVpdd[prop];
@@ -1912,6 +1936,8 @@
             this.speed = speed;
             this.sign = sign;
             this.operand = operand;
+            this.sign1 = sign1;
+            this.operand1 = operand1;
             this.position = position;
         }
 
@@ -1933,26 +1959,37 @@
                     s = s * this.operand;
                     break;
             }
+            switch (this.sign1) {
+                case '-':
+                    s = s - this.operand1;
+                    break;
+                case '*':
+                    s = s * this.operand1;
+                    break;
+            }
             return Math.round(100 * s) / 100;
         }
 
         this.toString = function (f) {
             return f ?
-                (this.isVpdd ? "V" : this.speed) + (this.sign ? " " + this.sign + " " + this.operand : "") :
+                (this.sign == '-' && this.sign1 == '*' ? "(" : "") + (this.isVpdd ? "V" : this.speed) + (this.sign ? this.sign + this.operand : "") + (this.sign == '-' && this.sign1 == '*' ? ")" : "") + (this.sign1 ? this.sign1 + this.operand1 : "") :
                 (this.position != null && !isNaN(this.position) ? this.position + (this.interval ? "/" + this.interval + " " : " ") : (this.interval ? "/" + this.interval + " " : ""))
                     + (this.neitralization > 0 ? getTimeString(this.neitralization, true) + " " : "")
                     + (this.vPdd ? "Vпдд = " + this.vPdd + " " : "")
-                    + (this.isVpdd ? "Vдс = Vпдд" : (this.speed != null && !isNaN(this.speed) ? "Vдс = " + this.speed : ""))
-                    + (this.sign ? " " + this.sign + " " + this.operand : "");
+                    + (this.isVpdd ? (this.sign == '-' && this.sign1 == '*' ? "Vдс = (Vпдд" : "Vдс = Vпдд") : (this.speed != null && !isNaN(this.speed) ? "Vдс = " + this.speed : ""))
+                    + (this.sign ? " " + this.sign + " " + this.operand : "")
+                    + (this.sign == '-' && this.sign1 == '*' ? ")" : "")
+                    + (this.sign1 ? " " + this.sign1 + " " + this.operand1 : "");
         }
     }
 
-    function RdsItem(distance, type, speed, time, latitude, longitude, deltaGPS, deltaBT, neitralization) {
-        if (type === undefined && typeof(distance) === 'object') {
-            for (var prop in distance) {
-                this[prop] = distance[prop];
+    function RdsItem(number, distance, type, speed, time, latitude, longitude, deltaGPS, deltaBT, neitralization) {
+        if (distance === undefined && typeof(number) === 'object') {
+            for (var prop in number) {
+                this[prop] = number[prop];
             }
         } else {
+            this.number = number;
             this.type = type;
             this.distance = distance;
             this.speed = speed;
@@ -2093,7 +2130,7 @@
         localStorage.setItem("currentKvIndex", i);
 	}
 
-    function rdsStart(pddSpeed, deltaGPS, deltaBT) {
+    function rdsStart(number, pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
         if (!isRds()) {
             if (rds && rds.length > 0) {
@@ -2106,7 +2143,7 @@
             }
             //rds = [];
         }
-        addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+        addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#darkGreenCircleDotIcon'}));
         }
@@ -2127,11 +2164,11 @@
         }
     }
 
-    function rdsSpeedChange(pddSpeed, deltaGPS, deltaBT, distance) {
+    function rdsSpeedChange(pddSpeed, deltaGPS, deltaBT, distance, number) {
         changePddSpeed(pddSpeed);
         if (!isNaN(pddSpeed) && !isNaN(distance)) lastSpeedDistance = distance;
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * (isNaN(distance) ? getDistance() : distance)) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+            addRdsItem(new RdsItem(number, Math.floor(1000 * (isNaN(distance) ? getDistance() : distance)) / 1000, 'C', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
             speak("Доп " + Math.round(currentSpeedInstruction.getSpeed()));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
@@ -2139,20 +2176,20 @@
         }
     }
 
-    function rdsPF(pddSpeed, deltaGPS, deltaBT) {
+    function rdsPF(number, pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+            addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#yellowCircleDotIcon'}));
             }
         }
     }
 
-    function rdsFinish(pddSpeed, deltaGPS, deltaBT) {
+    function rdsFinish(number, pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+            addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
             }
@@ -2160,11 +2197,11 @@
         $("#benefit").css("color", "black"); // чтобы Льгота сказала
     }
 
-    function rdsNeitralization(pddSpeed, deltaGPS, deltaBT, neitralization) {
+    function rdsNeitralization(number, pddSpeed, deltaGPS, deltaBT, neitralization) {
         changePddSpeed(pddSpeed);
         changeNeitralizationDone(neitralization);
         if (isRds()) {
-            addRdsItem(new RdsItem(Math.floor(1000 * getDistance()) / 1000, 'N', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT, neitralization));
+            addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'N', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT, neitralization));
         }
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#lightBlueCircleDotIcon'}));
@@ -2172,7 +2209,7 @@
     }
 
     function rdsStorePosition(d) {
-        addRdsItem(new RdsItem(Math.floor(1000 * d) / 1000, 'D', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
+        addRdsItem(new RdsItem(null, Math.floor(1000 * d) / 1000, 'D', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#brownCircleDotIcon'}));
         }
@@ -2747,7 +2784,8 @@
         switch (enterType[typeId][subTypeId]) {
             case 'Тип':$('#enterValue')
                 return rdsItemHtmlTypes[1];
-            case 'Операция':
+            case 'Операция 1':
+            case 'Операция 2':
                 return operationsTypes[0];
             case 'Расстояние':
                 return "0.";
@@ -2854,37 +2892,43 @@
         return -1;
     }
 
-    function addFormula(type, position, interval, vPdd, vDs, sign, operand, sector, norm, neitralization) {
+    function addFormula(number, type, position, interval, vPdd, vDs, sign, operand, sign1, operand1, sector, norm, neitralization) {
         var si = new SpeedInstruction();
+        si.number = number;
         si.type = type;
         si.position = (!position || position == '') ? null : parseFloat(position);
-        if (isNaN(si.position)) return 1;
+        if (isNaN(si.position)) return 2;
         si.interval = (!interval || interval == '') ? null : parseFloat(interval);
-        if (isNaN(si.interval)) return 2;
+        if (isNaN(si.interval)) return 3;
         si.vPdd = (!vPdd || vPdd == '') ? null : parseFloat(vPdd);
-        if (isNaN(si.vPdd)) return 3;
+        if (isNaN(si.vPdd)) return 4;
         si.isVpdd = (vDs == vdsItemTypes[1]);
         if (!si.isVpdd) {
             si.speed = (!vDs || vDs == '') ? null : parseFloat(vDs);
-            if (isNaN(si.speed)) return 4;
+            if (isNaN(si.speed)) return 5;
         }
         if (si.type == 'T') {
             si.sector = parseFloat(sector);
-            if (isNaN(si.sector)) return 7;
+            if (isNaN(si.sector)) return 10;
             si.norm = getTimeValue(norm);
             si.norm %= (24 * 60 * 60);
-            if (si.norm <= 0) return 8;
+            if (si.norm <= 0) return 11;
             si.speed = Math.floor(100 * si.sector / si.norm * 3600) / 100;
         } else {
             si.sign = sign;
             if (si.sign) {
                 si.operand = parseFloat(operand);
-                if (!si.operand) return 6;
+                if (!si.operand) return 7;
+            }
+            si.sign1 = sign1;
+            if (si.sign1) {
+                si.operand1 = parseFloat(operand1);
+                if (!si.operand1) return 9;
             }
         }
         if (si.type == 'N') {
             si.neitralization = (!neitralization || neitralization == '') ? null : getTimeValue(neitralization);
-            if (si.neitralization == -1) return 9;
+            if (si.neitralization == -1) return 12;
             si.neitralization %= (24 * 60 * 60);
         }
         if (si.type != 'C' || (si.position && !isNaN(si.position)) || si.interval || si.vPdd || si.isVpdd || (si.speed && !isNaN(si.speed))) {
@@ -2897,7 +2941,7 @@
             //    showModalSpeed();
             //}
         } else {
-            return 0;
+            return 1;
         }
         return -1;
     }
@@ -3050,16 +3094,19 @@
                             break;
                         case 'Новая формула':
                             result = addFormula(
-                                rdsItemCodes[rdsItemHtmlTypes.indexOf(enterValue[enterTypeId][1])],
-                                (enterValue[enterTypeId][2] == 'x') ? null : enterValue[enterTypeId][2],
+                                (enterValue[enterTypeId][1] == 'x') ? null : enterValue[enterTypeId][1],
+                                rdsItemCodes[rdsItemHtmlTypes.indexOf(enterValue[enterTypeId][2])],
                                 (enterValue[enterTypeId][3] == 'x') ? null : enterValue[enterTypeId][3],
                                 (enterValue[enterTypeId][4] == 'x') ? null : enterValue[enterTypeId][4],
                                 (enterValue[enterTypeId][5] == 'x') ? null : enterValue[enterTypeId][5],
-                                (enterValue[enterTypeId][6] == 'нет') ? null : enterValue[enterTypeId][6],
-                                (enterValue[enterTypeId][7] == 'x') ? null : enterValue[enterTypeId][7],
+                                (enterValue[enterTypeId][6] == 'x') ? null : enterValue[enterTypeId][6],
+                                (enterValue[enterTypeId][7] == 'нет') ? null : enterValue[enterTypeId][7],
                                 (enterValue[enterTypeId][8] == 'x') ? null : enterValue[enterTypeId][8],
-                                (enterValue[enterTypeId][9] == 'x') ? null : enterValue[enterTypeId][9],
-                                (enterValue[enterTypeId][10] == 'x') ? null : enterValue[enterTypeId][10]
+                                (enterValue[enterTypeId][9] == 'нет') ? null : enterValue[enterTypeId][9],
+                                (enterValue[enterTypeId][10] == 'x') ? null : enterValue[enterTypeId][10],
+                                (enterValue[enterTypeId][11] == 'x') ? null : enterValue[enterTypeId][11],
+                                (enterValue[enterTypeId][12] == 'x') ? null : enterValue[enterTypeId][12],
+                                (enterValue[enterTypeId][13] == 'x') ? null : enterValue[enterTypeId][13]
                             );
                             break;
                         case 'Новый сектор':
@@ -3136,11 +3183,13 @@
                         case 'Vдс':
                             rollEnterOption(vdsItemTypes, keyCode == 73 || keyCode == 40);
                         break;
-                        case 'Операция':
+                        case 'Операция 1':
+                        case 'Операция 2':
                             rollEnterOption(operationsTypes, keyCode == 73 || keyCode == 40);
                         break;
                         case 'Vпдд':
-                        case 'Операнд':
+                        case 'Операнд 1':
+                        case 'Операнд 2':
                             rollEnterOption(pddSpeedTypes, keyCode == 73 || keyCode == 40);
                         break;
                     }
@@ -3148,7 +3197,7 @@
                 case 8: // backspace
                 //case 84: // Samsung browser
 					e.preventDefault();
-                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип'|| enterType[enterTypeId][enterSubTypeId] == 'Операция') {
+                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || enterType[enterTypeId][enterSubTypeId] == 'Операция 1' || enterType[enterTypeId][enterSubTypeId] == 'Операция 2') {
                         break;
                     }
                     var val = (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && enterValue[enterTypeId][enterSubTypeId] == vdsItemTypes[1]) ? '' : $('#enterValue').html();
@@ -3158,14 +3207,14 @@
                 break;
                 case 188: // ,
                 case 190: // .
-                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && $('#enterValue').html() == vdsItemTypes[1]) || enterType[enterTypeId][enterSubTypeId] == 'Операция') {
+                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && $('#enterValue').html() == vdsItemTypes[1]) || enterType[enterTypeId][enterSubTypeId] == 'Операция 1' || enterType[enterTypeId][enterSubTypeId] == 'Операция 2') {
                         break;
                     }
                     $('#enterValue').html(($('#enterValue').html() == 'x') ? decimalPoint : $('#enterValue').html() + decimalPoint);
                     speak("точка");
                 break;
                 default:
-                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && $('#enterValue').html() == vdsItemTypes[1]) || enterType[enterTypeId][enterSubTypeId] == 'Операция') {
+                    if (enterType[enterTypeId][enterSubTypeId] == 'Тип' || (enterType[enterTypeId][enterSubTypeId] == 'Vдс' && $('#enterValue').html() == vdsItemTypes[1]) || enterType[enterTypeId][enterSubTypeId] == 'Операция 1' || enterType[enterTypeId][enterSubTypeId] == 'Операция 2') {
                         break;
                     }
                     if (keyCode > 47 && keyCode < 58) {
@@ -3283,6 +3332,9 @@
                     } else {
                         mapType();
                     }
+                break;
+                case 86: // v store position
+                    rdsStorePosition(getDistance());
                 break;
                 default:
                     //alert(keyCode);
@@ -3604,7 +3656,7 @@
     }
 
     $('#modalRdsItem').on('shown.bs.modal', function() {
-        setTimeout(function () { $('#fRdsItemDistance').focus().select(); }, 100);
+        setTimeout(function () { $('#fRdsItemNumber').focus().select(); }, 100);
     })
 
     $("input[name=fRdsItemType]").change(function () {
@@ -3805,28 +3857,28 @@
     }
 
     function getSpeedInsListItem(i) {
-        var t = '';
+        var t = speedIns[i].number ? speedIns[i].number + " " : "";
         switch (speedIns[i].type) {
             case 'S':
-                t = '<i class="fa fa-play rdsIcon"></i>';
+                t += '<i class="fa fa-play rdsIcon"></i>';
                 break;
             case 'P':
-                t = '<i class="fa fa-flag-checkered rdsIcon"></i>';
+                t += '<i class="fa fa-flag-checkered rdsIcon"></i>';
                 break;
             case 'F':
-                t = '<i class="fa fa-stop rdsIcon"></i>';
+                t += '<i class="fa fa-stop rdsIcon"></i>';
                 break;
             case 'T':
-                t = '<i class="fa fa-clock-o rdsIcon"></i>';
+                t += '<i class="fa fa-clock-o rdsIcon"></i>';
                 break;
             case 'N':
-                t = '<i class="fa fa-pause rdsIcon"></i>';
+                t += '<i class="fa fa-pause rdsIcon"></i>';
                 break;
             case 'D':
-                t = '<i class="fa fa-map-marker rdsIcon"></i>';
+                t += '<i class="fa fa-map-marker rdsIcon"></i>';
                 break;
             default:
-                t = '<i class="fa fa-tachometer rdsIcon"></i>';
+                t += '<i class="fa fa-tachometer rdsIcon"></i>';
                 break;
         }
         return '<a href="javascript:showModalAddFormula(' + i + ', true);" class="list-group-item si-item clearfix' + ((currentSiIndex == i) ? ' list-group-item-success' : '') + '">'
@@ -3875,19 +3927,19 @@
             switch (si.type) {
                 case 'S':
                 case 'T':
-                    rdsStart(si.vPdd, deltaGPS, deltaBT);
+                    rdsStart(si.number, si.vPdd, deltaGPS, deltaBT);
                     break;
                 case 'P':
-                    rdsPF(si.vPdd, deltaGPS, deltaBT);
+                    rdsPF(si.number, si.vPdd, deltaGPS, deltaBT);
                     break;
                 case 'F':
-                    rdsFinish(si.vPdd, deltaGPS, deltaBT);
+                    rdsFinish(si.number, si.vPdd, deltaGPS, deltaBT);
                     break;
                 case 'N':
-                    rdsNeitralization(si.vPdd, deltaGPS, deltaBT, si.neitralization);
+                    rdsNeitralization(si.number, si.vPdd, deltaGPS, deltaBT, si.neitralization);
                     break;
                 default:
-                    rdsSpeedChange(si.vPdd, deltaGPS, deltaBT);
+                    rdsSpeedChange(si.vPdd, deltaGPS, deltaBT, 'x', si.number);
                     break;
             }
         }
@@ -3927,12 +3979,14 @@
         $('#modalSpeed').modal('hide');
         $('#modalAddFormula').modal('show');
         $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').removeClass('has-success');
+        $('#modalAddFormula #fOperand1').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#modalAddFormula #fSector').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#modalAddFormula #fNorm').closest('.form-group').removeClass('has-error').removeClass('has-success');
         $('#modalAddFormula #fNeitralization').closest('.form-group').removeClass('has-error').removeClass('has-success');
         if (addSiEdit && addSiIndex >= 0 && addSiIndex < speedIns.length) {
             var si = speedIns[addSiIndex];
             $('input[name=fFormulaItemType][value=' + (si.type || 'C') + ']').closest('.btn').button('toggle');
+            $('#modalAddFormula #fNumber').val(si.number || "");
             $('#modalAddFormula #fPosition').val(si.position || "");
             $('#modalAddFormula #fInterval').val(si.interval || "");
             $('#modalAddFormula #fNeitralization').val(si.neitralization > 0 ? getTimeString(si.neitralization, true) : "");
@@ -3943,11 +3997,16 @@
             $('#modalAddFormula #chbUseVpdd').prop('checked', si.isVpdd);
             $('#modalAddFormula #fSign').val(si.sign);
             $('#modalAddFormula #fOperand').val(si.operand);
+            $('#modalAddFormula #fSign1').val(si.sign1);
+            $('#modalAddFormula #fOperand1').val(si.operand1);
             if (si.isVpdd) {
                 $('#modalAddFormula #fVdsNoVpddLine').hide();
                 $('#modalAddFormula #fVdsVpddLine').show();
                 if (si.sign != '') {
                     $('#modalAddFormula #fOperand').prop('disabled', false);
+                }
+                if (si.sign1 != '') {
+                    $('#modalAddFormula #fOperand1').prop('disabled', false);
                 }
             } else {
                 $('#modalAddFormula #fVdsNoVpddLine').show();
@@ -3955,6 +4014,7 @@
             }
         } else {
             $('input[name=fFormulaItemType][value=C]').closest('.btn').button('toggle');
+            $('#modalAddFormula #fNumber').val("");
             $('#modalAddFormula #fPosition').val("");
             $('#modalAddFormula #fInterval').val("");
             $('#modalAddFormula #fNeitralization').val("");
@@ -3969,7 +4029,7 @@
     }
 
     $('#modalAddFormula').on('shown.bs.modal', function() {
-        $('#fPosition').focus().select();
+        $('#fNumber').focus().select();
     })
 
     $('#modalAddFormula').on('submit', function (e) {
@@ -3977,6 +4037,7 @@
         var si = new SpeedInstruction();
 
         si.type = $('input[name=fFormulaItemType]:checked').val();
+        si.number = $('#modalAddFormula #fNumber').val();
         si.position = parseFloat($('#modalAddFormula #fPosition').val());
         si.interval = parseFloat($('#modalAddFormula #fInterval').val());
         si.neitralization = si.type == 'N' ? getTimeValue($('#modalAddFormula #fNeitralization').val()) : null;
@@ -4010,6 +4071,20 @@
                         $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-success').addClass('has-error');
                         isGood = false;
                     }
+                } else {
+                    $('#modalAddFormula #fOperand').closest('.form-group').removeClass('has-error').removeClass('has-success');
+                }
+                si.sign1 = $('#modalAddFormula #fSign1').val();
+                if (si.sign1) {
+                    si.operand1 = parseFloat($('#modalAddFormula #fOperand1').val());
+                    if (si.operand1) {
+                        $('#modalAddFormula #fOperand1').closest('.form-group').removeClass('has-error').addClass('has-success');
+                    } else {
+                        $('#modalAddFormula #fOperand1').closest('.form-group').removeClass('has-success').addClass('has-error');
+                        isGood = false;
+                    }
+                } else {
+                    $('#modalAddFormula #fOperand1').closest('.form-group').removeClass('has-error').removeClass('has-success');
                 }
             } else {
                 si.speed = parseFloat($('#modalAddFormula #fVds').val());
@@ -4049,10 +4124,13 @@
     $('#modalAddFormula #chbVds').on('click', function (e) {
         $('#modalAddFormula #fVds').prop('disabled', !this.checked);
         $('#modalAddFormula #fSign').prop('disabled', !this.checked);
+        $('#modalAddFormula #fSign1').prop('disabled', !this.checked);
         if (this.checked) {
             $('#modalAddFormula #fSign').change();
+            $('#modalAddFormula #fSign1').change();
         } else {
             $('#modalAddFormula #fOperand').prop('disabled', !this.checked);
+            $('#modalAddFormula #fOperand1').prop('disabled', !this.checked);
         }
     });
 
@@ -4060,11 +4138,31 @@
         $('#modalAddFormula #fOperand').prop('disabled', !this.value);
     });
 
+    $('#modalAddFormula #fSign1').on('change', function (e) {
+        $('#modalAddFormula #fOperand1').prop('disabled', !this.value);
+    });
+
     $('#modalAddFormula #btnClose').on('click', function (e) {
         if (addSiEdit) showModalSpeed();
     });
 
     $("input[name=fFormulaItemType]").change(function () {
+        switch(this.value) {
+            case 'S': $('#modalAddFormula .modal-title').html('Формула (Старт)');
+                break;
+            case 'C': $('#modalAddFormula .modal-title').html('Формула (смена)');
+                break;
+            case 'P': $('#modalAddFormula .modal-title').html('Формула (Промфиниш)');
+                break;
+            case 'F': $('#modalAddFormula .modal-title').html('Формула (Финиш)');
+                break;
+            case 'T': $('#modalAddFormula .modal-title').html('Формула (РГ/РУ)');
+                break;
+            case 'N': $('#modalAddFormula .modal-title').html('Формула (Нейтрализация)');
+                break;
+
+
+        }
         if (this.value == 'T') {
             // RG/RU
             $('#modalAddFormula #fSectorLine').show();

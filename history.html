@@ -54,6 +54,7 @@
                 <table id="normTable" class="table">
                     <thead>
                         <tr>
+                            <th>№</th>
                             <th>Тип</th>
                             <th>Дистанция</th>
                             <th>Норма&nbsp;времени</th>
@@ -73,6 +74,7 @@
                 <table id="rdsTable" class="table">
                     <thead>
                         <tr>
+                            <th>№</th>
                             <th>Тип</th>
                             <th>Дистанция</th>
                             <th>Интервал</th>
@@ -196,6 +198,7 @@
                         }
                         
                         $('#rdsTable > tbody').append($('<tr style="background-color: ' + b + '">')
+                            .append($('<td>').text(rds[i].number))
                             .append($('<td>').html(t))
                             .append($('<td>').html('<a href="#" onclick="show(' + rds[i].latitude + ', ' + rds[i].longitude + ')">' + getNumberString(rds[i].distance, 1000) + '</a>'))
                             .append($('<td>').text((i+1 < rds.length) ? getNumberString(rds[i+1].distance - rds[i].distance, 1000) : ''))
@@ -208,8 +211,9 @@
                             .append($('<td>').text(getTimeString(rds[i].time, true)))
                             .append($('<td>').text(getTimeString(rds[i].neitralization, true)))
                         );
-                        if (rds[i].type != 'C' && rds[i].type != 'N') {
+                        if (rds[i].type != 'C' && rds[i].type != 'N' && rds[i].type != 'D') {
                             $('#normTable > tbody').append($('<tr style="background-color: ' + b + '">')
+                                .append($('<td>').text(rds[i].number))
                                 .append($('<td>').html(t))
                                 .append($('<td>').html('<a href="#" onclick="show(' + rds[i].latitude + ', ' + rds[i].longitude + ')">' + getNumberString(rds[i].distance, 1000) + '</a>'))
                                 .append($('<td>').text(getTimeString(n, true)))
@@ -221,6 +225,7 @@
                             myMap.geoObjects.add(new ymaps.Placemark([rds[i].latitude, rds[i].longitude],
                                 {iconContent:c,
                                 balloonContent: 'Поз.: ' + getNumberString(rds[i].distance, 1000)
+                                 + '<br>№: ' + rds[i].number
                                  + '<br>Скор.: ' + getNumberString(rds[i].speed, 100)
                                  + '<br>Vпдд: ' + getNumberString(rds[i].vPdd, 100)
                                  + '<br>Опоз.: ' + getNumberString(rds[i].lateness, 10)
