@@ -2216,6 +2216,19 @@
     }
 
     function addRdsItem(item) {
+        if (item.number == null && item.type != 'C' && item.type != 'P' && item.type != 'F') {
+            if (rds && rds.length > 0) {
+                for (var i = rds.length - 1; i >= 0; --i) {
+                    var n = parseInt(rds[i].number);
+                    if (!isNaN(n)) {
+                        item.number = n + 1;
+                        break;
+                    }
+                }
+            }
+            if (item.number == null) item.number = 1;
+
+        }
         rds.push(item);
         rds.sort(compareRdsItems);
         recalculateRds();
@@ -3042,7 +3055,7 @@
             keyCode = 27;
         }
 		
-		if (keyCode == 27) {
+		if (keyCode == 27 || !isModalShown && keyCode == 9) {
 			e.preventDefault();
 		}
 
@@ -3524,7 +3537,8 @@
 		setIntervalStartBT(distanceBT);
         setIntervalDistanceGPS(0);
 		setIntervalDistanceBT(0);
-        newMove();
+        rdsStorePosition(getDistance());
+        //newMove();
         speak("Смотрим знаки");
         addDistancePlacemark();
     }
