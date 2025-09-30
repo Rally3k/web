@@ -807,7 +807,7 @@
     </tbody>
 </table>
 <div class="btn-group btn-group-lg col-xs-12">
-    <button type="button" class="btn btn-default" onclick="showModalNumber('Кол-во записей РДС', displayRdsItems);">Кол-во записей РДС</button>
+    <button type="button" class="btn btn-default" onclick="showModalNumber('Кол-во записей', displayRdsItems);">Кол-во записей</button>
 </div>
 <!-- Modal Number -->
 <div class="modal" id="modalNumber" role="dialog">
@@ -941,7 +941,7 @@
                 </div>
                 <div class="modal-footer">
                     <div class="btn-group btn-group-lg col-xs-12">
-                        <button type="submit" class="btn btn-success col-xs-3" onclick="isIntervalPosition=true;"><i class="fa fa-check-circle"></i></button>
+                        <button type="submit" class="btn btn-success col-xs-3" onclick="isIntervalPosition=false;"><i class="fa fa-check-circle"></i></button>
                         <button type="submit" class="btn btn-info col-xs-3" onclick="isIntervalPosition=true;"><i class="fa fa-map-marker"></i></button>
                         <button type="button" class="btn btn-danger col-xs-3" data-dismiss="modal" id="fRdsItemDelete"><i class="fa fa-trash"></i></button>
                         <button type="button" class="btn btn-default  col-xs-3" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
@@ -1983,7 +1983,7 @@
         }
     }
 
-    function RdsItem(number, distance, type, speed, time, latitude, longitude, deltaGPS, deltaBT, neitralization) {
+    function RdsItem(number, distance, type, speed, time, latitude, longitude, deltaGPS, deltaBT, neitralization, lateness) {
         if (distance === undefined && typeof(number) === 'object') {
             for (var prop in number) {
                 this[prop] = number[prop];
@@ -2132,7 +2132,7 @@
 
     function rdsStart(number, pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
-        if (!isRds()) {
+        /*if (!isRds()) {
             if (rds && rds.length > 0) {
                 var i = 0;
                 while (localStorage.getItem("rds" + i)) { ++i; }
@@ -2142,7 +2142,7 @@
                 if (rds[i].type != 'D') rds.splice(i, 1);
             }
             //rds = [];
-        }
+        }*/
         addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'S', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#darkGreenCircleDotIcon'}));
@@ -2173,50 +2173,55 @@
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentSpeedInstruction.getSpeed()}, {preset: 'islands#grayCircleIcon'}));
             }
+        } else {
+            addRdsItem(new RdsItem(number, Math.floor(1000 * (isNaN(distance) ? getDistance() : distance)) / 1000, 'C', currentPddSpeed, Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+            if (myMap != null) {
+                myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {iconContent: currentPddSpeed}, {preset: 'islands#grayCircleIcon'}));
+            }
         }
     }
 
     function rdsPF(number, pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
-        if (isRds()) {
-            addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'P', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+        //if (isRds()) {
+            addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'P', isRds() ? currentSpeedInstruction.getSpeed() : currentPddSpeed, Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#yellowCircleDotIcon'}));
             }
-        }
+        //}
     }
 
     function rdsFinish(number, pddSpeed, deltaGPS, deltaBT) {
         changePddSpeed(pddSpeed);
-        if (isRds()) {
-            addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'F', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
+//        if (isRds()) {
+            addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'F', getKvAvgSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT));
             if (myMap != null) {
                 myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#redCircleDotIcon'}));
             }
-        }
+//        }
         $("#benefit").css("color", "black"); // чтобы Льгота сказала
     }
 
     function rdsNeitralization(number, pddSpeed, deltaGPS, deltaBT, neitralization) {
         changePddSpeed(pddSpeed);
         changeNeitralizationDone(neitralization);
-        if (isRds()) {
-            addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'N', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT, neitralization));
-        }
+        //if (isRds()) {
+            addRdsItem(new RdsItem(number, Math.floor(1000 * getDistance()) / 1000, 'N', isRds() ? currentSpeedInstruction.getSpeed() : currentPddSpeed, Math.floor(getCurrentTime()), lastLatitude, lastLongitude, deltaGPS, deltaBT, neitralization));
+        //}
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#lightBlueCircleDotIcon'}));
         }
     }
 
     function rdsStorePosition(d) {
-        addRdsItem(new RdsItem(null, Math.floor(1000 * d) / 1000, 'D', currentSpeedInstruction.getSpeed(), Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
+        addRdsItem(new RdsItem(null, Math.floor(1000 * d) / 1000, 'D', isRds() ? currentSpeedInstruction.getSpeed() : currentPddSpeed, Math.floor(getCurrentTime()), lastLatitude, lastLongitude));
         if (myMap != null) {
             myMap.geoObjects.add(new ymaps.Placemark([lastLatitude, lastLongitude], {}, {preset: 'islands#brownCircleDotIcon'}));
         }
     }
 
     function addRdsItem(item) {
-        if (item.number == null && item.type != 'C' && item.type != 'P' && item.type != 'F') {
+        if (item.number == null && item.type == 'D') {
             if (rds && rds.length > 0) {
                 for (var i = rds.length - 1; i >= 0; --i) {
                     var n = parseInt(rds[i].number);
@@ -2227,11 +2232,11 @@
                 }
             }
             if (item.number == null) item.number = 1;
-
         }
+        if (!isRds()) item.lateness = getKvLateness();
         rds.push(item);
         rds.sort(compareRdsItems);
-        recalculateRds();
+        recalculateAllRds();
         refreshRdsTable();
         localStorage.setItem("rds", JSON.stringify(rds));
         newMove();
@@ -2267,25 +2272,23 @@
             if (rds[i].deltaBT) setDistanceBT(distanceBT - rds[i].deltaBT);
         }
         rds.splice(i, 1);
-        recalculateRds(i);
+        //recalculateRds(i);
+        recalculateAllRds();
         refreshRdsTable();
         localStorage.setItem("rds", JSON.stringify(rds));
         newMove();
     }
 
     function isRds() {
-        var result = false;
-        for (var i = 0; i < rds.length; ++i) {
+        for (var i = rds.length - 1; i >= 0; --i) {
             switch (rds[i].type) {
                 case 'S':
-                    result = true;
-                    break;
+                    return true;
                 case 'F':
                     return false;
-                    break;
             }
         }
-        return result;
+        return false;
     }
     
     function calculateRdsItem(index) {
@@ -2301,7 +2304,7 @@
             // other item
             rds[index].norm = 3600.0 * (1000 * rds[index].distance - 1000 * rds[index - 1].distance) / rds[index - 1].speed / 1000;
             rds[index].vPddNorm = 3600.0 * (1000 * rds[index].distance - 1000 * rds[index - 1].distance) / rds[index - 1].vPdd / 1000;
-            if (rds[index].type == 'S' && rds[index].type == 'F') {
+            if (rds[index].type == 'S' || rds[index].type == 'F') {
                 // старт или финиш округляем до целых секунд
                 rds[index].norm = Math.floor(rds[index].norm);
                 rds[index].vPddNorm = Math.floor(rds[index].vPddNorm);
@@ -2318,6 +2321,33 @@
     function recalculateRds(startIndex) {
         for (var i = (startIndex != null) ? startIndex : 0; i < rds.length; ++i) {
             calculateRdsItem(i);
+        }
+    }
+
+    function recalculateAllRds() {
+        if (!rds || rds == null || rds.length <= 1) return;
+        let r = false;
+        for (let index = 0; index < rds.length; ++index) {
+            if (r) {
+                rds[index].norm = 3600.0 * (1000 * rds[index].distance - 1000 * rds[index - 1].distance) / rds[index - 1].speed / 1000;
+                rds[index].vPddNorm = 3600.0 * (1000 * rds[index].distance - 1000 * rds[index - 1].distance) / rds[index - 1].vPdd / 1000;
+                if (rds[index].type == 'S' || rds[index].type == 'F') {
+                    // старт или финиш округляем до целых секунд
+                    rds[index].norm = Math.floor(rds[index].norm);
+                    rds[index].vPddNorm = Math.floor(rds[index].vPddNorm);
+                } else if (rds[index].type == 'C') {
+                    // floor to 0.01
+                    rds[index].norm = Math.floor(100.0 * rds[index].norm) / 100.0;
+                    rds[index].vPddNorm = Math.floor(100.0 * rds[index].vPddNorm) / 100.0;
+                }
+                rds[index].lateness = rds[index].time - rds[index - 1].time - rds[index].norm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].lateness) - (rds[index].type == 'N' && rds[index].neitralization > 0 ? rds[index].neitralization : 0.0) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
+                rds[index].vPddLateness = rds[index].time - rds[index - 1].time - rds[index].vPddNorm + (rds[index - 1].type == 'S' ? 0.0 : rds[index - 1].vPddLateness) - (rds[index].type == 'N' && rds[index].neitralization > 0 ? rds[index].neitralization : 0.0) + (rds[index].time < rds[index - 1].time ? 24.0 * 3600.0 : 0.0);
+            }
+            if (rds[index].type == 'S') {
+                r = true;
+            } else if (rds[index].type == 'F') {
+                r = false;
+            }
         }
     }
 
@@ -2382,11 +2412,17 @@
         }
     }
     function getLateness() {
-        return isRds() ? getRdsLateness() : (sector > 0 ? getKvTime() - getDistance() / sector * (norm - getNeitralization()) : null);
+        return isRds() ? getRdsLateness() : getKvLateness();
     }
     function speakLeteness() {
         let l = getLateness();
         if (l != null) speak((l < 0 ? "Опережение " : "Опоздание") + getTimeToSpeak(Math.abs(l)));
+    }
+    function getKvAvgSpeed() {
+        return norm - getNeitralization() > 0 ? 3600.0 * sector / (norm - getNeitralization()) : null;
+    }
+    function getKvLateness() {
+        return (sector > 0 ? getKvTime() - getDistance() / sector * (norm - getNeitralization()) : null);
     }
 
     function newMove(d) {
@@ -2557,7 +2593,7 @@
             }
         } else {
             $("#labelLateness").html(lateness < 0 ? "Опережение" : "Опоздание");
-            $("#avgSpeed").html((norm - getNeitralization() > 0 ? getNumberString(3600.0 * sector / (norm - getNeitralization()), 100) : "--.--"));
+            $("#avgSpeed").html(getNumberString(getKvAvgSpeed(), 100));
             $("#lateness").html(lateness ? getTimeString(lateness, true) : "--:--:--");
             //$("#latenessPdd").html("-");
             $("#latenessPdd").html(getTimeString(latenessVkv, false) + " (ВКВ)");
@@ -2787,9 +2823,9 @@
 
     function startKv(index) {
         if (index < -1 || index >= kvs.length) return;
-        resetDistance();
         kvs[index].neitralizationDone = null; // обнуляем выполненную нейтрализацию
         applyKv(index);
+        resetDistance();
         beep();
     }
 
@@ -3509,7 +3545,7 @@
             case 'Интервал':
                 resetInterval();
                 break;
-            case 'Кол-во записей РДС':
+            case 'Кол-во записей':
                 setRdsItemsCount(10);
                 break;
         }
@@ -3523,12 +3559,19 @@
         setIntervalDistanceGPS(0);
 		setIntervalDistanceBT(0);
         // remove stored distances
-        for (var i = rds.length - 1; i >= 0; --i) {
-            if (rds[i].type == 'D') rds.splice(i, 1);
+        //for (var i = rds.length - 1; i >= 0; --i) {
+        //    if (rds[i].type == 'D') rds.splice(i, 1);
+        //}
+        // store rds (kv) and remove all items
+        if (rds && rds.length > 0) {
+            var i = 0;
+            while (localStorage.getItem("rds" + i)) { ++i; }
+            localStorage.setItem("rds" + i, JSON.stringify(rds));
+            rds = [];
+            //recalculateAllRds();
+            refreshRdsTable();
+            localStorage.setItem("rds", JSON.stringify(rds));
         }
-        recalculateRds();
-        refreshRdsTable();
-        localStorage.setItem("rds", JSON.stringify(rds));
         newMove();
     }
 
@@ -3582,7 +3625,7 @@
                     setIntervalDistanceGPS(isIntervalPosition ? numberValue - intervalStartGPS : numberValue);
                     setIntervalDistanceBT(isIntervalPosition ? numberValue - intervalStartBT : numberValue);
                     break;
-                case 'Кол-во записей РДС':
+                case 'Кол-во записей':
                     setRdsItemsCount(numberValue);
                     break;
             }
@@ -3750,7 +3793,7 @@
                 rds[editRdsItemIndex].time = riTime;
                 if (isIntervalPosition) setPosition(riDistance, riDistance);
                 rds.sort(compareRdsItems);
-                recalculateRds();
+                recalculateAllRds();
                 refreshRdsTable();
                 localStorage.setItem("rds", JSON.stringify(rds));
                 newMove();
