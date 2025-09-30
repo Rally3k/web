@@ -2221,17 +2221,18 @@
     }
 
     function addRdsItem(item) {
-        if (item.number == null && item.type == 'D') {
+        if (item.number == null) {
             if (rds && rds.length > 0) {
-                for (var i = rds.length - 1; i >= 0; --i) {
-                    var n = parseInt(rds[i].number);
+                for (let i = rds.length - 1; i >= 0; --i) {
+                    //let n = parseInt(rds[i].number);
+                    let n = parseFloat(rds[i].number);
                     if (!isNaN(n)) {
-                        item.number = n + 1;
+                        item.number = item.type == 'D' ? "" + (Math.floor(n) + 1) : getNumberString(n + 0.01, 100);
                         break;
                     }
                 }
             }
-            if (item.number == null) item.number = 1;
+            if (item.number == null) item.number = rds.length + 1;
         }
         if (!isRds()) item.lateness = getKvLateness();
         rds.push(item);
