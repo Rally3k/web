@@ -1346,6 +1346,7 @@
                     <table id="normTable" class="table">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Тип</th>
                                 <th>Дистанция</th>
                                 <th>Норматив</th>
@@ -4308,9 +4309,10 @@
         $("#normTable > tbody tr").remove();
         if (rds) {
             var n = 0;
+            let r = false;
             for (var i = 0; i < rds.length; ++i) {
                 var t = '';
-                n += rds[i].norm;
+                if (r) n += rds[i].norm;
                 switch (rds[i].type) {
                     case 'S':
                         t = '<i class="fa fa-play"></i>';
@@ -4322,14 +4324,20 @@
                         t = '<i class="fa fa-stop"></i>';
                         break;
                 }
-                if (rds[i].type == 'S' || rds[i].type == 'P' || rds[i].type == 'F') {
+                if (rds[i].type == 'S' || (r && (rds[i].type == 'P' || rds[i].type == 'F'))) {
                     $('#normTable > tbody').append($('<tr>')
+                        .append($('<td>').text(rds[i].number))
                         .append($('<td>').html(t))
                         .append($('<td>').text(getNumberString(rds[i].distance, 1000)))
                         .append($('<td>').text(getTimeString(n, true)))
                         .append($('<td>').text(getTimeString(rds[i].time, true)))
                     );
                     if (rds[i].type != 'P') n = 0;
+                }
+                if (rds[i].type == 'S') {
+                    r = true;
+                } else if (rds[i].type == 'F') {
+                    r = false;
                 }
             }
         }

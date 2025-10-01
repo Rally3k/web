@@ -158,6 +158,7 @@
                 if (rds) {
                     var n = 0;
                     var m = 0;
+                    let r = false;
                     for (var i = 0; i < rds.length; ++i) {
                         var t = '';
                         var s = '';
@@ -211,7 +212,7 @@
                             .append($('<td>').text(getTimeString(rds[i].time, true)))
                             .append($('<td>').text(getTimeString(rds[i].neitralization, true)))
                         );
-                        if (rds[i].type != 'C' && rds[i].type != 'N' && rds[i].type != 'D') {
+                        if (rds[i].type == 'S' || (r && (rds[i].type == 'P' || rds[i].type == 'F'))) {
                             $('#normTable > tbody').append($('<tr style="background-color: ' + b + '">')
                                 .append($('<td>').text(rds[i].number))
                                 .append($('<td>').html(t))
@@ -220,6 +221,11 @@
                                 .append($('<td>').text(getNumberString(n, 100)))
                             );
                             if (rds[i].type != 'P') n = 0;
+                        }
+                        if (rds[i].type == 'S') {
+                            r = true;
+                        } else if (rds[i].type == 'F') {
+                            r = false;
                         }
                         if (myMap && rds[i].latitude && rds[i].longitude) {
                             myMap.geoObjects.add(new ymaps.Placemark([rds[i].latitude, rds[i].longitude],
