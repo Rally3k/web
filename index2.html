@@ -1031,6 +1031,18 @@
                             <input type="number" class="form-control" id="fCorrectionMaxSpeed" step="any" placeholder="В км/ч">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionElmWrite">ELM327 Write</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="fCorrectionElmWrite" placeholder="Write Characteristic Id">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="fCorrectionElmNotify">ELM327 Notify</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="fCorrectionElmNotify" placeholder="Notify Characteristic Id">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <div class="btn-group btn-group-lg col-xs-12">
@@ -1434,6 +1446,8 @@
     var lastBTTime = 0;
     var lastBTSpeed = 0;
     var nextBTTime = 0;
+    var elmWriteCharacteristicId = null;
+    var elmNotifyCharacteristicId = null;
 
     var decimalPoint = 1.1 + '';
     decimalPoint = decimalPoint.toLocaleString().substring(1, 2);
@@ -1628,6 +1642,8 @@
                 }
             }
             currentKvIndex = parseInt(localStorage.getItem("currentKvIndex"));
+            elmWriteCharacteristicId = localStorage.getItem("elmWriteCharacteristicId");
+            elmNotifyCharacteristicId = localStorage.getItem("elmNotifyCharacteristicId");
         }
         sector = sector ? sector : 10.0;
         norm = norm ? norm : 3600.0;
@@ -1652,6 +1668,8 @@
         currentSpeedInstruction = currentSpeedInstruction == "undefined" || currentSpeedInstruction == "" ? new SpeedInstruction(true) : currentSpeedInstruction;
         speedIns = speedIns.length == 0 ? [new SpeedInstruction(true, 60), new SpeedInstruction(true, null, null, '-', 10.0), new SpeedInstruction(null, 77), new SpeedInstruction(false, null, 66)] : speedIns;
 		currentKvIndex = currentKvIndex ? currentKvIndex : -1;
+        elmWriteCharacteristicId = elmWriteCharacteristicId ? elmWriteCharacteristicId : '0000fff1-0000-1000-8000-00805f9b34fb';
+        elmNotifyCharacteristicId = elmNotifyCharacteristicId ? elmNotifyCharacteristicId : '0000fff1-0000-1000-8000-00805f9b34fb';
         // TODO: apply actions if needed
         //localStorage.setItem("speedIns", null);
         refreshRdsTable();
@@ -1742,20 +1760,28 @@
             }).catch(error => { console.log(error); });
         } else {
             // ELM
-            device.gatt.connect()
-            .then(server => server.getPrimaryService('0000fff0-0000-1000-8000-00805f9b34fb'))
-            .then(service => service.getCharacteristic('0000fff1-0000-1000-8000-00805f9b34fb'))
-            .then(characteristic => {
-                distanceMeterTx = characteristic;
-                var initELM = "ATZ;ATSP0;ATE0";
-                var arr = initELM.split(';');
-                for (i = 0; i < arr.length; ++i) {
-                    var str = arr[i]+'\r';
-                    setTimeout(function(val) { distanceMeterTx.writeValue(new TextEncoder().encode(val)); }, 1000 * i + 1000, str);
-                }
-                nextBTTime = Date.now() + 1000 * arr.length + 5000;
-                characteristic.startNotifications();
-                characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicELMChanged);
+            device.gatt.connect().then(server => {
+                server.getPrimaryService('0000fff0-0000-1000-8000-00805f9b34fb')
+                .then(service => service.getCharacteristic(elmWriteCharacteristicId))
+                .then(characteristic => {
+                    distanceMeterTx = characteristic;
+                    var initELM = "ATZ;ATSP0;ATE0";
+                    var arr = initELM.split(';');
+                    for (i = 0; i < arr.length; ++i) {
+                        var str = arr[i]+'\r';
+                        setTimeout(function(val) { distanceMeterTx.writeValue(new TextEncoder().encode(val)); }, 1000 * i + 1000, str);
+                    }
+                    nextBTTime = Date.now() + 1000 * arr.length + 5000;
+                }).catch(error => { console.log(error); });
+                // Notify characteristic
+                setTimeout(function(server) {
+                    server.getPrimaryService('0000fff0-0000-1000-8000-00805f9b34fb')
+                    .then(service => service.getCharacteristic(elmNotifyCharacteristicId))
+                    .then(characteristic => {
+                        characteristic.startNotifications();
+                        characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicELMChanged);
+                    }).catch(error => { console.log(error); });
+                }, 2000, server);
             }).catch(error => { console.log(error); });
         }
 	}
@@ -3834,6 +3860,8 @@
         $('input[name=fCorrectionType][value=V]').prop('checked', true);
         $('#fCorrectionValueGPS').val(correctionGPS);
         $('#fCorrectionValueBT').val(correctionBT);
+        $('#fCorrectionElmWrite').val(elmWriteCharacteristicId);
+        $('#fCorrectionElmNotify').val(elmNotifyCharacteristicId);
         /*if ($('input[name=fCorrectionType]:checked').val() == 'V') {
             $('#fCorrectionValueGPS').val(correctionGPS);
             $('#fCorrectionValueBT').val(correctionBT);
@@ -3874,6 +3902,10 @@
 			defaultMeter = $('input[name=fCorrectionDefaultMeter]:checked').val();
 			localStorage.setItem("defaultMeter", defaultMeter);
             setBTMeter($('input[name=fCorrectionBTMeter]:checked').val());
+            elmWriteCharacteristicId = $('#fCorrectionElmWrite').val();
+            localStorage.setItem("elmWriteCharacteristicId", elmWriteCharacteristicId);
+            elmNotifyCharacteristicId = $('#fCorrectionElmNotify').val();
+            localStorage.setItem("elmNotifyCharacteristicId", elmNotifyCharacteristicId);
         }
         return false;
     });
