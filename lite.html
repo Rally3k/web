@@ -2,34 +2,41 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Перетаскиваемые блоки разных размеров</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" crossorigin="anonymous">
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0px;
+            line-height: 1;
         }
 
-        .grid {
+		.grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            max-width: 1200px;
+            gap: 0px;
             margin: 0 auto;
-            border: 1px solid #ddd;
-            padding: 10px;
+            padding: 0px;
             box-sizing: border-box;
         }
 
-        .item {
-            background-color: #3498db;
-            color: white;
+		.item {
+            background-color: white;
+            color: black;
             text-align: center;
-            border-radius: 5px;
+            border-radius: 0px;
             cursor: move;
             user-select: none;
             position: relative;
             box-sizing: border-box;
+            border: 1px solid gray;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
         }
+
+        .item.noborder { border: 0; }
 
         /* Высота: 50% или 100% от ширины */
         .item.h50  { padding-bottom: 50%; }
@@ -41,7 +48,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            padding: 5px 10px;
+            padding: 0px 0px;
             white-space: nowrap;
         }
 
@@ -50,60 +57,316 @@
             grid-column: span 1;
             grid-row: span 1;
         }
-        
         .item.size-1x2 {
             grid-column: span 2;
             grid-row: span 1;
         }
-        
-        .item.size-2x2 {
-            grid-column: span 2;
-            grid-row: span 2;
-        }
-        
-        .item.size-2x4 {
-            grid-column: span 4;
-            grid-row: span 2;
-        }
-        
         .item.size-2x3 {
             grid-column: span 3;
             grid-row: span 2;
-        }
-        
-        .item.size-4x4 {
-            grid-column: span 4;
-            grid-row: span 4;
         }
 
         .item.highlight {
             border: 3px dashed #2980b9;
         }
 
-		/* 6 колонок на широких экранах (≥ 1024px) */
-        @media (min-width: 640px) {
+        .item-title {
+            font-size: 1rem;
+            text-align: center;
+            color: darkblue;
+            font-weight: bold;
+            margin: 0;
+            padding: 0;
+        }
+        .item-title.size-1x2 {
+            font-size: 1.2rem;
+        }
+        .item-title.size-2x3 {
+            font-size: 2rem;
+        }
+
+        .item-value {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            color: black;
+            margin: 0;
+            padding: 0;
+        }
+        .item-value.size-1x2 {
+            font-size: 2rem;
+        }
+        .item-value.size-2x3 {
+            font-size: 3.5rem;
+        }
+
+        .item-value2 {
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            color: grey;
+            margin: 0;
+            padding: 0;
+        }
+        .item-value2.size-1x2 {
+            font-size: 1.2rem;
+        }
+        .item-value2.size-2x3 {
+            font-size: 2rem;
+        }
+
+        .btn {
+            background-color: transparent;
+            border: none;
+            border-radius: 0;
+            height: 100%;
+            width: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            opacity: 0.1;
+            z-index: 1;
+            padding: 0;
+            font-size: 3rem;
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        .btn.size-1x1 {
+            font-size: 3rem;
+            width: 100%;
+            opacity: 1;
+        }
+
+        .btn.size-1x2 {
+            font-size: 3rem;
+        }
+
+        .btn.size-1x2x1 {
+            font-size: 3rem;
+            width: 100%;
+        }
+
+        .btn.size-2x3 {
+            font-size: 4rem;
+            width: 33%;
+        }
+
+        .btn.size-2x3x2 {
+            font-size: 4rem;
+            width: 50%;
+        }
+
+        .btn-left {
+            left: 0px;
+        }
+
+        .btn-right {
+            right: 0px;
+        }
+        
+        .road-sign {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0.6rem solid darkred;
+            border-radius: 50%;
+            text-decoration: none;
+        }
+
+        .speed-limit {
+            color: black;
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 0;
+        }
+
+        @media (orientation: portrait) {
+            .grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+		@media (orientation: landscape) {
             .grid {
                 grid-template-columns: repeat(12, 1fr);
             }
+            
+            .settings { grid-column: 12; grid-row: 1; }
+            .car { grid-column: 11; grid-row: 1; }
         }
+
     </style>
 </head>
 <body>
-    <h1>Перетаскиваемые блоки (1×1, 1×2, 2×2, 2×4, 4×4)</h1>
+    <script type="text/ecmascript" src="files/NoSleep.min.js"></script>
+    <div class="grid" id="grid2">
+        <div class="item h100"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-globe"></i></button></div>
+        <div class="item h100"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-brands fa-bluetooth"></i></button></div>
+        <div class="item h50 size-1x2">
+            <div class="content"><div class="item-title size-1x2">Время</div><div class="item-value size-1x2">22:23:24</div></div>
+            <button class="btn btn-left size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-1x2" id="reset-btn-2"><i class="fas fa-undo"></i></button>
+        </div>
+        <div class="item h100 car"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-car"></i></button></div>
+        <div class="item h100 settings"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-cog"></i></button></div>
+        <div class="item h50 size-1x2">
+            <div class="content"><div class="item-title size-1x2">Сектор</div><div class="item-value size-1x2">299.98</div></div>
+            <button class="btn btn-left size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-1x2" id="reset-btn-2"><i class="fas fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="item h50 size-1x2">
+            <div class="content"><div class="item-title size-1x2">Старт</div><div class="item-value size-1x2">12:13:14</div></div>
+            <button class="btn btn-left size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-1x2" id="reset-btn-2"><i class="fas fa-undo"></i></button>
+        </div>
+        <div class="item h100 size-1x1">
+            <div class="content"><div class="item-title size-1x2">Норма</div><div class="item-value size-1x2">2:30</div></div>
+            <button class="btn size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+        </div>
+        <div class="item h100 size-1x1">
+            <div class="content"><div class="item-title size-1x2">Льгота</div><div class="item-value size-1x2">2:30</div></div>
+            <button class="btn size-1x2" id="reset-btn-2"><i class="fas fa-table-list"></i></button>
+        </div>
+        <div class="item h50 size-2x3">
+            <div class="content">
+                <div class="item-title size-2x3">Пройдено</div>
+                <div class="item-value size-2x3">123.567</div>
+                <div class="item-value2 size-2x3">123.567</div>
+            </div>
+            <button class="btn btn-left size-2x3" id="reset-btn-2"><i class="fas fa-backward"></i></button>
+            <button class="btn size-2x3" id="set-position"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-2x3" id="reset-btn-2"><i class="fas fa-pause"></i></button>
+        </div>
+        <div class="item h50 size-2x3">
+            <div class="content">
+                <div class="item-title size-2x3">Интервал</div>
+                <div class="item-value size-2x3">23.567</div>
+                <div class="item-value2 size-2x3">123.567</div>
+            </div>
+            <button class="btn btn-left size-2x3" id="store-position-btn"><i class="fas fa-location-dot"></i></button>
+            <button class="btn size-2x3" id="set-interval-btn"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-2x3" id="reset-interval-btn"><i class="fas fa-undo"></i></button>
+        </div>
+        <div class="item h50 size-2x3">
+            <div class="content"><div class="item-title size-2x3">Опоздание</div><div class="item-value size-2x3">-10:34</div></div>
+            <button class="btn btn-left size-2x3" id="set-btn-2"><i class="fas fa-play"></i></button>
+            <button class="btn size-2x3" id="reset-btn-2"><i class="fas fa-flag-checkered"></i></button>
+            <button class="btn btn-right size-2x3" id="reset-btn-2"><i class="fas fa-stop"></i></button>
+        </div>
+        <div class="item h50 size-2x3">
+            <div class="content"><div class="item-title size-2x3">Скорость</div><div class="item-value size-2x3">299</div></div>
+            <button class="btn btn-left size-2x3" id="reset-btn-2"><i class="fas fa-chevron-up"></i></button>
+            <button class="btn size-2x3" id="set-position"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-2x3" id="reset-btn-2"><i class="fas fa-chevron-down"></i></button>
+        </div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(10);"><div class="speed-limit">10</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(20);"><div class="speed-limit">20</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(30);"><div class="speed-limit">30</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(40);"><div class="speed-limit">40</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(50);"><div class="speed-limit">50</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(60);"><div class="speed-limit">60</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(70);"><div class="speed-limit">70</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(80);"><div class="speed-limit">80</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(90);"><div class="speed-limit">90</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(100);"><div class="speed-limit">100</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(110);"><div class="speed-limit">110</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(130);"><div class="speed-limit">130</div></button></div>
+    </div>
+<br>
+    <div class="grid" id="grid1">
+        <div class="item h100"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-globe"></i></button></div>
+        <div class="item h100"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-brands fa-bluetooth"></i></button></div>
+        <div class="item h50 size-1x2">
+            <div class="content"><div class="item-title size-1x2">Время</div><div class="item-value size-1x2">22:23:24</div></div>
+            <button class="btn btn-left size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-1x2" id="reset-btn-2"><i class="fas fa-undo"></i></button>
+        </div>
+        <div class="item h100 car"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-car"></i></button></div>
+        <div class="item h100 settings"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-cog"></i></button></div>
+        <div class="item h50 size-1x2">
+            <div class="content"><div class="item-title size-1x2">Сектор</div><div class="item-value size-1x2">299.98</div></div>
+            <button class="btn btn-left size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-1x2" id="reset-btn-2"><i class="fa-regular fa-lightbulb"></i></button>
+        </div>
+        <div class="item h50 size-1x2">
+            <div class="content"><div class="item-title size-1x2">Старт</div><div class="item-value size-1x2">12:13:14</div></div>
+            <button class="btn btn-left size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-1x2" id="reset-btn-2"><i class="fas fa-undo"></i></button>
+        </div>
+        <div class="item h50 size-1x2">
+            <div class="content"><div class="item-title size-1x2">Норма</div><div class="item-value size-1x2">2:30</div></div>
+            <button class="btn btn-left size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-1x2" id="reset-btn-2"><i class="fas fa-window-maximize"></i></button>
+        </div>
+        <div class="item h50 size-2x3">
+            <div class="content"><div class="item-title size-2x3">Пройдено</div><div class="item-value size-2x3">123.567</div></div>
+            <button class="btn btn-left size-2x3" id="reset-btn-2"><i class="fas fa-backward"></i></button>
+            <button class="btn size-2x3" id="set-position"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-2x3" id="reset-btn-2"><i class="fas fa-pause"></i></button>
+        </div>
+        <div class="item h50 size-2x3">
+            <div class="content"><div class="item-title size-2x3">Интервал</div><div class="item-value size-2x3">23.567</div></div>
+            <button class="btn btn-left size-2x3x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-2x3x2" id="reset-btn-2"><i class="fas fa-undo"></i></button>
+        </div>
+        <div class="item h50 size-2x3">
+            <div class="content"><div class="item-title size-2x3">Опоздание</div><div class="item-value size-2x3">10:34</div></div>
+            <button class="btn btn-left size-2x3x2" id="set-btn-2"><i class="fas fa-play"></i></button>
+            <button class="btn btn-right size-2x3x2" id="reset-btn-2"><i class="fas fa-stop"></i></button>
+        </div>
+        <div class="item h50 size-2x3">
+            <div class="content"><div class="item-title size-2x3">Скорость</div><div class="item-value size-2x3">299</div></div>
+            <button class="btn btn-left size-2x3" id="reset-btn-2"><i class="fas fa-minus"></i></button>
+            <button class="btn size-2x3" id="set-position"><i class="fas fa-cog"></i></button>
+            <button class="btn btn-right size-2x3" id="reset-btn-2"><i class="fas fa-plus"></i></button>
+        </div>
+        <div class="item h100"><div class="content">+1</div></div>
+        <div class="item h100"><div class="content">-1</div></div>
+        <div class="item h100"><div class="content">Play</div></div>
+        <div class="item h100"><div class="content">Stop</div></div>
+        <div class="item h100"><div class="content">F+</div></div>
+        <div class="item h100"><div class="content">F-</div></div>
+        <div class="item h100"><div class="content">Car</div></div>
+        <div class="item h100"><div class="content">Lamp</div></div>
+        <div class="item h100"><div class="content">Full</div></div>
+        <div class="item h100"><div class="content">Res</div></div>
+    </div>
+    <br>
     <div class="grid" id="grid"></div>
 
     <script>
+        document.getElementById('store-position-btn').addEventListener('click', () => {
+            alert('Store position button.');
+        });
+        document.getElementById('set-interval-btn').addEventListener('click', () => {
+            showModalNumber('Интервал', getIntervalDistance() > 0 ? getIntervalDistance() : '');
+        });
+        document.getElementById('reset-interval-btn').addEventListener('click', () => {
+            alert('Reset interval button.');
+        });
+
+        function rdsSpeedChange(pddSpeed, deltaGPS, deltaBT, distance, number) {
+            alert(pddSpeed);
+        }
+
+        function getIntervalDistance() {
+            return 100.123;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const grid = document.getElementById('grid');
             let draggedItem = null;
 
             // Исходное состояние блоков
             const itemsData = [
-                { id: 6, name: 'A', height: 'h100', size: 'size-1x1' },
-                { id: 7, name: 'B', height: 'h100', size: 'size-1x1' },
+                { id: 6, name: 'GPS', height: 'h100', size: 'size-1x1' },
+                { id: 7, name: 'BT', height: 'h100', size: 'size-1x1' },
                 { id: 1, name: 'Время', height: 'h50',  size: 'size-1x2' },
-                { id: 8, name: 'C', height: 'h100', size: 'size-1x1' },
-                { id: 9, name: 'D', height: 'h100', size: 'size-1x1' },
+                { id: 8, name: 'Rev', height: 'h100', size: 'size-1x1' },
+                { id: 9, name: 'Pau', height: 'h100', size: 'size-1x1' },
                 { id: 2, name: 'Старт', height: 'h50', size: 'size-1x2' },
                 { id: 15, name: 'Сектор', height: 'h50', size: 'size-1x2' },
                 { id: 16, name: 'Норма', height: 'h50',  size: 'size-1x2' },
@@ -131,7 +394,7 @@
                     // Внутреннее содержимое
                     const content = document.createElement('div');
                     content.className = 'content';
-                    content.textContent = `${item.id}. ${item.name}`;
+                    content.innerHTML = `${item.id}. ${item.name}`;
                     
                     // Добавляем метку размера
                     switch (item.size) {
