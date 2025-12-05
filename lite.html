@@ -11,6 +11,14 @@
             line-height: 1;
         }
 
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
 		.grid {
             display: grid;
             gap: 0px;
@@ -120,7 +128,7 @@
             border: none;
             border-radius: 0;
             height: 100%;
-            width: 50%;
+            /*width: 50%;*/
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -134,29 +142,28 @@
             color: rgba(0, 0, 0, 0.9);
         }
 
+        .btn.icon {
+            opacity: 1;
+        }
+
         .btn.size-1x1 {
             font-size: 3rem;
             width: 100%;
-            opacity: 1;
         }
 
         .btn.size-1x2 {
             font-size: 3rem;
+            width: 50%;
         }
 
-        .btn.size-1x2x1 {
-            font-size: 3rem;
-            width: 100%;
+        .btn.size-2x2 {
+            font-size: 4rem;
+            width: 50%;
         }
 
         .btn.size-2x3 {
             font-size: 4rem;
             width: 33%;
-        }
-
-        .btn.size-2x3x2 {
-            font-size: 4rem;
-            width: 50%;
         }
 
         .btn-left {
@@ -183,6 +190,192 @@
             padding: 0;
         }
 
+        /* Затемнённый фон (центрирование через flex) */
+        .modal-overlay {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0px;
+        }
+
+        /* Модальное окно (Grid-разметка) */
+        .modal-window {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-height: 90vh;
+            display: grid;
+            grid-template-areas:
+                "header"
+                "content"
+                "footer";
+            grid-template-rows: auto 1fr auto;
+            gap: 0;
+        }
+
+        /* Заголовок (по центру) */
+        .modal-header {
+            grid-area: header;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eaeaea;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        /* Кнопка закрытия */
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        /* Тело с прокруткой (Grid для форм) */
+        .modal-content {
+            grid-area: content;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: grid;
+            gap: 12px;
+        }
+
+        /* Строка формы (адаптивная) */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            align-items: center;
+        }
+
+        label {
+            /*font-weight: 500;*/
+            font-size: 1.2rem;
+            color: #555;
+            text-align: right;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        /* Футер (кнопки в колонку) */
+        .modal-footer {
+            grid-area: footer;
+            padding: 15px 20px;
+            border-top: 1px solid #eaeaea;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-modal {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .btn-primary {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #218837;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            border-radius: 13px;
+            background: #ccc;
+            transition: 0.3s;
+        }
+
+        .toggle::before {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle.active {
+            background: #28a745;
+        }
+
+        .toggle.active::before {
+            left: calc(100% - 24px);
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        .radio-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .radio-buttons label {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .radio-buttons input:checked + label {
+            background-color: #007bff;
+            color: white;
+            border-color: #0056b3;
+        }
+
         @media (orientation: portrait) {
             .grid {
                 grid-template-columns: repeat(6, 1fr);
@@ -192,6 +385,10 @@
 		@media (orientation: landscape) {
             .grid {
                 grid-template-columns: repeat(12, 1fr);
+            }
+            .form-row {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 16px;
             }
             
             .settings { grid-column: 12; grid-row: 1; }
@@ -203,15 +400,15 @@
 <body>
     <script type="text/ecmascript" src="files/NoSleep.min.js"></script>
     <div class="grid" id="grid2">
-        <div class="item h100"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-globe"></i></button></div>
-        <div class="item h100"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-brands fa-bluetooth"></i></button></div>
+        <div class="item h100"><div class="content"></div><button class="btn size-1x1 icon"><i class="fas fa-globe"></i></button></div>
+        <div class="item h100"><div class="content"></div><button class="btn size-1x1 icon"><i class="fas fa-brands fa-bluetooth"></i></button></div>
         <div class="item h50 size-1x2">
             <div class="content"><div class="item-title size-1x2">Время</div><div class="item-value size-1x2">22:23:24</div></div>
             <button class="btn btn-left size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
             <button class="btn btn-right size-1x2" id="reset-btn-2"><i class="fas fa-undo"></i></button>
         </div>
-        <div class="item h100 car"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-car"></i></button></div>
-        <div class="item h100 settings"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-cog"></i></button></div>
+        <div class="item h100 car"><div class="content"></div><button class="btn size-1x1 icon"><i class="fas fa-car"></i></button></div>
+        <div class="item h100 settings"><div class="content"></div><button class="btn size-1x1 icon"><i class="fas fa-keyboard"></i></button></div>
         <div class="item h50 size-1x2">
             <div class="content"><div class="item-title size-1x2">Сектор</div><div class="item-value size-1x2">299.98</div></div>
             <button class="btn btn-left size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
@@ -224,11 +421,11 @@
         </div>
         <div class="item h100 size-1x1">
             <div class="content"><div class="item-title size-1x2">Норма</div><div class="item-value size-1x2">2:30</div></div>
-            <button class="btn size-1x2" id="set-btn-2"><i class="fas fa-cog"></i></button>
+            <button class="btn size-1x1" id="set-btn-2"><i class="fas fa-cog"></i></button>
         </div>
         <div class="item h100 size-1x1">
             <div class="content"><div class="item-title size-1x2">Льгота</div><div class="item-value size-1x2">2:30</div></div>
-            <button class="btn size-1x2" id="reset-btn-2"><i class="fas fa-table-list"></i></button>
+            <button class="btn size-1x1" id="reset-btn-2"><i class="fas fa-table-list"></i></button>
         </div>
         <div class="item h50 size-2x3">
             <div class="content">
@@ -262,20 +459,55 @@
             <button class="btn size-2x3" id="set-position"><i class="fas fa-cog"></i></button>
             <button class="btn btn-right size-2x3" id="reset-btn-2"><i class="fas fa-chevron-down"></i></button>
         </div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(10);"><div class="speed-limit">10</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(20);"><div class="speed-limit">20</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(30);"><div class="speed-limit">30</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(40);"><div class="speed-limit">40</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(50);"><div class="speed-limit">50</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(60);"><div class="speed-limit">60</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(70);"><div class="speed-limit">70</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(80);"><div class="speed-limit">80</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(90);"><div class="speed-limit">90</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(100);"><div class="speed-limit">100</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(110);"><div class="speed-limit">110</div></button></div>
-        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 road-sign" onclick="rdsSpeedChange(130);"><div class="speed-limit">130</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(10);"><div class="speed-limit">10</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(20);"><div class="speed-limit">20</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(30);"><div class="speed-limit">30</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(40);"><div class="speed-limit">40</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(50);"><div class="speed-limit">50</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(60);"><div class="speed-limit">60</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(70);"><div class="speed-limit">70</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(80);"><div class="speed-limit">80</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(90);"><div class="speed-limit">90</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(100);"><div class="speed-limit">100</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(110);"><div class="speed-limit">110</div></button></div>
+        <div class="item noborder h100"><div class="content"></div><button class="btn size-1x1 icon road-sign" onclick="rdsSpeedChange(130);"><div class="speed-limit">130</div></button></div>
     </div>
-<br>
+    <div class="modal-overlay" id="positionModal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Позиция</h3>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div class="modal-content">
+                <div class="form-row">
+                    <label for="">Тип</label>
+                    <div class="radio-buttons">
+                        <input type="radio" id="mode1" name="mode" value="light" checked>
+                        <label for="mode1">Светлый</label>
+                        <input type="radio" id="mode2" name="mode" value="dark">
+                        <label for="mode2">Тёмный</label>
+                        <input type="radio" id="mode3" name="mode" value="auto">
+                        <label for="mode3">Авто</label>
+                    </div>
+
+                    <label for="">Номер</label><input type="text" placeholder="123a">
+                </div>
+                <div class="form-row">
+                    <label for="numberInput">Позиция</label><input type="number" id="numberInput" placeholder="км">
+                    <label for="">Интервал</label><input type="number" placeholder="км">
+                </div>
+                <div class="form-row">
+                    <label for="">Vпдд</label><input type="number" placeholder="км/ч">
+                    <label>Vдс = Vпдд</label><div class="toggle" id="toggleSwitch"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-primary">Подтвердить</button>
+                <button class="btn-modal btn-secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+    <br>
     <div class="grid" id="grid1">
         <div class="item h100"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-globe"></i></button></div>
         <div class="item h100"><div class="content"></div><button class="btn size-1x1"><i class="fas fa-brands fa-bluetooth"></i></button></div>
@@ -337,6 +569,7 @@
     <br>
     <div class="grid" id="grid"></div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         document.getElementById('store-position-btn').addEventListener('click', () => {
             alert('Store position button.');
@@ -355,6 +588,12 @@
         function getIntervalDistance() {
             return 100.123;
         }
+
+        $(document).ready(function() {
+            $('#toggleSwitch').click(function() {
+                $(this).toggleClass('active');
+            });
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             const grid = document.getElementById('grid');
