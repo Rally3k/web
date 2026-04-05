@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluetooth Serial Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        #status {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+        }
+        #data {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 100px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bluetooth Serial Client</h1>
+    <div id="status">Статус: не подключено</div>
+    <button id="connectBtn">Подключить устройство</button>
+    <button id="sendBtn" disabled>Отправить запрос</button>
+    <button id="disconnectBtn" disabled>Отключить</button>
+
+    <h2>Полученные данные:</h2>
+    <div id="data"></div>
+
+    <script>
+        // Элементы интерфейса
+        const statusEl = document.getElementById('status');
+        const dataEl = document.getElementById('data');
+        const connectBtn = document.getElementById('connectBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+
+        // Переменные для соединения
+        let device = null;
+        let server = null;
+        let rxChar = null;  // Characteristic для приёма данных
+        let txChar = null;  // Characteristic для отправки данных
+
+        // UUID сервисов и характеристик (стандартный UART для BLE)
+        //const UART_SERVICE_UUID = '00001816-0000-1000-8000-00805f9b34fb';
+        const UART_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+        const UART_RX_CHAR_UUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'; // Receive (от устройства)
+        const UART_TX_CHAR_UUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'; // Transmit (к устройству)
+
+        // Обработчик подключения
+        connectBtn.addEventListener('click', async () => {
+            try {
+                // Запрос на выбор Bluetooth-устройства
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: [UART_SERVICE_UUID] }]
+                });
+
+                // Подключение к GATT-серверу
+                server = await device.gatt.connect();
+                statusEl.textContent = 'Статус: подключение к сервису...';
+                statusEl.className = '';
+
+                // Получение сервиса
+                const service = await server.getPrimaryService(UART_SERVICE_UUID);
+
+                // Получение характеристик
+                rxChar = await service.getCharacteristic(UART_RX_CHAR_UUID);
+                txChar = await service.getCharacteristic(UART_TX_CHAR_UUID);
+
+                // Включение уведомлений для RX
+                await rxChar.startNotifications();
+                rxChar.addEventListener('characteristicvaluechanged', onDataReceived);
+
+                statusEl.textContent = `Статус: подключено к ${device.name}`;
+                statusEl.className = 'success';
+
+                // Активация кнопок
+                connectBtn.disabled = true;
+                sendBtn.disabled = false;
+                disconnectBtn.disabled = false;
+
+            } catch (error) {
+                statusEl.textContent = `Ошибка: ${error.message}`;
+                statusEl.className = 'error';
+            }
+        });
+
+        // Обработчик отправки запроса
+        sendBtn.addEventListener('click', async () => {
+            if (!txChar) return;
+
+            const message = 'GET_DATA\n'; // Ваш запрос
+            const encoder = new TextEncoder();
+            const data = encoder.encode(message);
+
+            try {
+                await txChar.writeValue(data);
+                statusEl.textContent = 'Запрос отправлен';
+            } catch (error) {
+                statusEl.textContent = `Ошибка отправки: ${error.message}`;
+                statusEl.className = 'error';
+            }
+        });
+
+        // Обработчик приёма данных
+        function onDataReceived(event) {
+            const value = event.target.value;
+            const decoder = new TextDecoder();
+            const text = decoder.decode(value);
+
+            // Добавляем в лог
+            const line = document.createElement('div');
+            line.textContent = text;
+            dataEl.appendChild(line);
+
+            // Прокручиваем вниз
+            dataEl.scrollTop = dataEl.scrollHeight;
+        }
+
+        // Обработчик отключения
+        disconnectBtn.addEventListener('click', () => {
+            if (server) {
+                server.disconnect();
+                device = null;
+                server = null;
+                rxChar = null;
+                txChar = null;
+
+                statusEl.textContent = 'Статус: отключено';
+                statusEl.className = '';
+
+                connectBtn.disabled = false;
+                sendBtn.disabled = true;
+                disconnectBtn.disabled = true;
+
+                dataEl.innerHTML = ''; // Очищаем лог
+            }
+        });
+    </script>
+</body>
+</html>
